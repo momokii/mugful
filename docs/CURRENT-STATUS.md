@@ -1,8 +1,11 @@
 # Current status
 
-**Last updated:** 2026-08-08
+**Last updated:** 2026-08-09
 **Phase:** Product and architecture discovery complete; implementation not started
 **Release target:** v1 invite-only beta
+**Product name:** Mugful
+**Public repository:** https://github.com/momokii/mugful
+**Latest verified commit:** `f3d599d` on `master` and `origin/master`
 
 ## Completed
 
@@ -14,6 +17,8 @@
 - UI direction confirmed and recorded in the root design system.
 - Product specification, architecture, roadmap, contributor guidance, security policy, and external-service index created.
 - SMTP and Indonesia UU PDP research notes created under `docs/`.
+- Naming research completed; Mugful is the selected working name pending final trademark, domain, app-store, and namespace verification.
+- Documentation baseline committed as nine atomic commits and pushed to the public GitHub repository.
 
 ## Not started
 
@@ -30,6 +35,10 @@
 ## Next recommended step
 
 Create the implementation plan as small vertical slices, beginning with repository/toolchain scaffolding and a verified local Docker development environment. Do not add video, AI, analytics, Redis, or a second activity while building v1.
+
+## Command status
+
+There is no `package.json`, Compose file, application entry point, or runnable development command yet. Do not tell contributors to run commands that have not been implemented and verified.
 
 ## Known constraints
 

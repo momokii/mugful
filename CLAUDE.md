@@ -7,9 +7,10 @@ This repository is Mugful: a private web space for two adults in a long-distance
 1. `README.md` for the public project overview.
 2. `docs/README.md` for the documentation index.
 3. `docs/CURRENT-STATUS.md` for the current phase and completed work.
-4. `docs/ROADMAP.md` for next outcomes.
-5. `docs/PRODUCT-SPEC.md` for agreed behavior.
-6. `docs/ARCHITECTURE.md` and `DESIGN.md` before changing backend or UI architecture.
+4. `docs/DEVELOPMENT.md` for the fresh-session workflow and exact command policy.
+5. `docs/ROADMAP.md` for next outcomes.
+6. `docs/PRODUCT-SPEC.md` for agreed behavior.
+7. `docs/ARCHITECTURE.md` and `DESIGN.md` before changing backend or UI architecture.
 
 ## Current status
 
@@ -40,7 +41,7 @@ Product and architecture discovery is complete. Documentation exists; applicatio
 
 ## Documentation discipline
 
-Keep the root README concise and link to `./docs` for detail. Use an ADR when a decision changes architecture, security, privacy, deployment, or a public contract. Keep roadmap status honest. If a future session cannot understand what is currently happening by reading the documents above, improve the documentation before adding more code.
+Documentation updates are part of every change’s definition of done; do not wait for the user to request them. When behavior, configuration, API contracts, security/privacy boundaries, deployment, external services, testing, or architectural decisions change, update the relevant specification, architecture/ADR, environment or runbook, and `docs/CURRENT-STATUS.md` in the same change. Keep the root README concise and link to `./docs` for detail. Keep roadmap status honest. If a future session cannot understand what is currently happening by reading the documents above, improve the documentation before adding more code.
 
 ## Future milestones
 

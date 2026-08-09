@@ -32,6 +32,7 @@ This repository currently contains the confirmed product, architecture, design-s
 - [`DESIGN.md`](./DESIGN.md) — visual tokens and UI rules; required before UI code.
 - [`docs/README.md`](./docs/README.md) — documentation index and reading order.
 - [`docs/CURRENT-STATUS.md`](./docs/CURRENT-STATUS.md) — honest current phase, completed work, and next step.
+- [`docs/DEVELOPMENT.md`](./docs/DEVELOPMENT.md) — fresh-session development handoff and verified-command policy.
 - [`docs/PRODUCT-SPEC.md`](./docs/PRODUCT-SPEC.md) — agreed product and implementation specification.
 - [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) — service boundaries, data flow, privacy, deployment, and operations.
 - [`docs/ROADMAP.md`](./docs/ROADMAP.md) — v1 phases, stability gate, and future v1.1 work.

@@ -7,14 +7,15 @@ This directory is the detailed source of truth for product, architecture, operat
 1. [`PRODUCT-SPEC.md`](./PRODUCT-SPEC.md) — what v1 must do and must not do.
 2. [`ARCHITECTURE.md`](./ARCHITECTURE.md) — how the system is shaped.
 3. [`CURRENT-STATUS.md`](./CURRENT-STATUS.md) — what is done and what is next.
-4. [`ROADMAP.md`](./ROADMAP.md) — release gate and future milestones.
-5. Root [`DESIGN.md`](../DESIGN.md) — UI design tokens before frontend work.
-6. [`EXTERNAL-SERVICES.md`](./EXTERNAL-SERVICES.md) — setup and operational dependencies.
-7. [`ENVIRONMENT.md`](./ENVIRONMENT.md) — environment-variable categories and secret-handling rules.
-8. [`INDONESIA-PDP-COMPLIANCE-CHECKLIST.md`](./INDONESIA-PDP-COMPLIANCE-CHECKLIST.md) — Indonesia privacy research.
-9. [`SMTP-OPTIONS-RESEARCH.md`](./SMTP-OPTIONS-RESEARCH.md) — current SMTP options and setup research.
-10. [`decisions/README.md`](./decisions/README.md) — ADR format for future architectural changes.
-11. [`NAMING-RESEARCH.md`](./NAMING-RESEARCH.md) — naming research and adoption checks for Mugful.
+4. [`DEVELOPMENT.md`](./DEVELOPMENT.md) — fresh-session handoff and development workflow.
+5. [`ROADMAP.md`](./ROADMAP.md) — release gate and future milestones.
+6. Root [`DESIGN.md`](../DESIGN.md) — UI design tokens before frontend work.
+7. [`EXTERNAL-SERVICES.md`](./EXTERNAL-SERVICES.md) — setup and operational dependencies.
+8. [`ENVIRONMENT.md`](./ENVIRONMENT.md) — environment-variable categories and secret-handling rules.
+9. [`INDONESIA-PDP-COMPLIANCE-CHECKLIST.md`](./INDONESIA-PDP-COMPLIANCE-CHECKLIST.md) — Indonesia privacy research.
+10. [`SMTP-OPTIONS-RESEARCH.md`](./SMTP-OPTIONS-RESEARCH.md) — current SMTP options and setup research.
+11. [`decisions/README.md`](./decisions/README.md) — ADR format for future architectural changes.
+12. [`NAMING-RESEARCH.md`](./NAMING-RESEARCH.md) — naming research and adoption checks for Mugful.
 
 ## Document conventions
 
