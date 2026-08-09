@@ -8,7 +8,7 @@
     "pnpm": "11.x"
   },
   "scripts": {
-    "dev": "turbo run dev",
+    "dev": "pnpm --filter @mugful/contracts build && turbo run dev",
     "build": "turbo run build",
     "typecheck": "turbo run typecheck",
     "lint": "turbo run lint",
