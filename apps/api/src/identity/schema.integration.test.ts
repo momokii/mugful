@@ -1,3 +1,5 @@
+import { createHmac, randomUUID } from "node:crypto";
+
 import { Pool } from "pg";
 import { describe, expect, it } from "vitest";
 
@@ -40,7 +42,10 @@ describe.skipIf(!databaseTestsEnabled || databaseUrl === "")(
           `
             SELECT conname
             FROM pg_constraint
-            WHERE conname = 'accounts_normalized_email_canonical'
+            WHERE conname IN (
+              'accounts_normalized_email_canonical',
+              'rate_limit_buckets_principal_hash_check'
+            )
           `,
         ),
       ]).finally(() => pool.end());
@@ -118,6 +123,48 @@ describe.skipIf(!databaseTestsEnabled || databaseUrl === "")(
       expect(constraints.rows).toContainEqual({
         conname: "accounts_normalized_email_canonical",
       });
+      expect(constraints.rows).toContainEqual({
+        conname: "rate_limit_buckets_principal_hash_check",
+      });
+    });
+
+    it("rejects raw rate-limit principals while accepting an HMAC digest", async () => {
+      // Given: a manually migrated database and a generated HMAC digest
+      const pool = new Pool({ connectionString: databaseUrl });
+      const principalHash = createHmac("sha256", "p".repeat(32))
+        .update(randomUUID())
+        .digest("hex");
+
+      // When: raw values and a valid digest are written directly to PostgreSQL
+      try {
+        await expect(
+          pool.query(
+            "INSERT INTO rate_limit_buckets (principal_hash) VALUES ($1)",
+            ["person@example.test"],
+          ),
+        ).rejects.toThrow();
+        await expect(
+          pool.query(
+            "INSERT INTO rate_limit_buckets (principal_hash) VALUES ($1)",
+            ["203.0.113.8"],
+          ),
+        ).rejects.toThrow();
+        await expect(
+          pool.query(
+            "INSERT INTO rate_limit_buckets (principal_hash) VALUES ($1)",
+            ["not-a-hex-digest"],
+          ),
+        ).rejects.toThrow();
+        const inserted = await pool.query<{ readonly principal_hash: string }>(
+          "INSERT INTO rate_limit_buckets (principal_hash) VALUES ($1) RETURNING principal_hash",
+          [principalHash],
+        );
+
+        // Then: only the HMAC-shaped digest is stored
+        expect(inserted.rows).toEqual([{ principal_hash: principalHash }]);
+      } finally {
+        await pool.end();
+      }
     });
   },
 );

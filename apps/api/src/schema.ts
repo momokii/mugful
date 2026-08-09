@@ -161,16 +161,25 @@ export const registrationPolicyAuditEvents = pgTable(
   ],
 );
 
-export const rateLimitBuckets = pgTable("rate_limit_buckets", {
-  principalHash: varchar("principal_hash", { length: 64 }).primaryKey(),
-  attemptCount: integer("attempt_count").notNull().default(0),
-  windowStartedAt: timestamp("window_started_at", { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-});
+export const rateLimitBuckets = pgTable(
+  "rate_limit_buckets",
+  {
+    principalHash: varchar("principal_hash", { length: 64 }).primaryKey(),
+    attemptCount: integer("attempt_count").notNull().default(0),
+    windowStartedAt: timestamp("window_started_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    check(
+      "rate_limit_buckets_principal_hash_check",
+      sql`${table.principalHash} ~ '^[a-f0-9]{64}$'`,
+    ),
+  ],
+);
 
 export const identityTokens = pgTable(
   "identity_tokens",
