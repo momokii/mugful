@@ -1,0 +1,129 @@
+.page {
+  min-height: 100dvh;
+}
+
+.main {
+  display: grid;
+  place-items: start center;
+  padding: var(--space-16) var(--space-4);
+}
+
+.panel {
+  width: min(100%, 520px);
+  padding: var(--space-10);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-panel);
+  background: var(--surface-elevated);
+}
+
+.eyebrow {
+  margin: 0 0 var(--space-3);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.panel h1 {
+  margin: 0;
+  font-size: 36px;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+}
+
+.description {
+  margin: var(--space-3) 0 var(--space-8);
+  color: var(--text-secondary);
+}
+
+.form {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.field {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.field label {
+  color: var(--surface-elevated);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.field input {
+  width: 100%;
+  min-height: 48px;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-control);
+  background: var(--surface-primary);
+  color: var(--text-primary);
+  transition: border-color var(--motion-micro);
+}
+
+.field input:hover {
+  border-color: var(--text-secondary);
+}
+
+.field input:focus {
+  border-color: var(--accent-primary);
+}
+
+.hint {
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: 14px;
+}
+
+.submit {
+  min-height: 48px;
+  margin-top: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--accent-hover);
+  border-radius: var(--radius-control);
+  background: var(--accent-hover);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-weight: 700;
+  transition:
+    background-color var(--motion-micro),
+    border-color var(--motion-micro);
+}
+
+.submit:hover {
+  border-color: var(--accent-hover);
+  background: var(--accent-primary);
+}
+
+.footerLink {
+  margin: var(--space-6) 0 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  text-align: center;
+}
+
+.footerLink a {
+  color: var(--text-primary);
+  font-weight: 600;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  .main {
+    padding-block: var(--space-12);
+  }
+
+  .panel {
+    padding: var(--space-6);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .submit {
+    color: var(--surface-elevated);
+  }
+}

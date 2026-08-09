@@ -1,0 +1,78 @@
+.header {
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.headerInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: min(100% - (var(--space-8)), 1200px);
+  min-height: 80px;
+  margin: 0 auto;
+}
+
+.wordmark {
+  color: var(--text-primary);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+}
+
+.navigation {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.signInLink,
+.headerAction {
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.signInLink {
+  color: var(--text-secondary);
+  transition: color var(--motion-micro);
+}
+
+.signInLink:hover {
+  color: var(--text-primary);
+}
+
+.headerAction {
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--accent-hover);
+  border-radius: var(--radius-control);
+  color: var(--text-primary);
+  transition:
+    background-color var(--motion-micro),
+    color var(--motion-micro);
+}
+
+.headerAction:hover {
+  background: var(--accent-hover);
+  color: var(--surface-elevated);
+}
+
+@media (max-width: 640px) {
+  .headerInner {
+    width: min(100% - (var(--space-4)), 1200px);
+    min-height: 72px;
+  }
+
+  .navigation {
+    gap: var(--space-3);
+  }
+
+  .headerAction {
+    padding-inline: var(--space-3);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .headerAction:hover {
+    color: var(--surface-elevated);
+  }
+}

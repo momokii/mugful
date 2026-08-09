@@ -1,11 +1,11 @@
 # Current status
 
 **Last updated:** 2026-08-09
-**Phase:** 0b local runtime and database health boundary complete
+**Phase:** 0b local runtime/database health boundary and Todo 4 accessible web shell complete
 **Release target:** v1 invite-only beta
 **Product name:** Mugful
 **Public repository:** https://github.com/momokii/mugful
-**Latest verified baseline:** `b4563f76ef6affe9a62bebe4df5a517e445acc89` on `master` before the authorized tooling commit
+**Latest verified baseline:** `0381e23` on `master` before Todo 4 implementation
 
 ## Completed
 
@@ -23,10 +23,12 @@
 - Turborepo tasks, strict TypeScript, ESLint, Prettier, Vitest, frozen-lockfile installation, and root validation scripts verified locally.
 - `apps/web` and `apps/api` contain only TypeScript executable smoke shells with a `workspace:*` dependency on shared contracts; they provide no framework, HTTP, realtime, or product behavior.
 - Local-only PostgreSQL 17 Compose, Fastify liveness/readiness, Drizzle/node-postgres, one manual neutral migration, validated environment, and minimal Next proxy are implemented and verified.
+- Accessible static public/auth shell is implemented at `/`, `/login`, and `/register` with documented Mugful tokens, CSS Modules, semantic landmarks, dark color-scheme support, reduced-motion support, visible focus, and responsive no-overflow behavior.
+- Production-server Playwright browser checks and screenshots are verified at 375px, 768px, and 1280px for the public/auth shell; evidence is stored under `.omo/evidence/task-4-*`.
 
 ## Not started
 
-- Next.js web application.
+- Next.js web application beyond the Todo 4 static shell.
 - Fastify API/realtime application.
 - Database schema and migrations.
 - Authentication, invitations, and Privacy Center.

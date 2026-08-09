@@ -2,7 +2,7 @@
 
 A private, playful web space for adults in long-distance relationships. The first release focuses on one shared activity: **Guess My Answer**.
 
-> **Status:** The local PostgreSQL, Fastify health API, and Next proxy foundation is verified. Product behavior does not exist yet.
+> **Status:** The local runtime foundation and Todo 4 accessible public/auth UI shell are verified. Authentication and product behavior remain unimplemented.
 
 ## Product direction
 
@@ -24,7 +24,7 @@ v1 deliberately does **not** include native video, AI, behavioral analytics, or 
 
 ## Current repository state
 
-This repository contains a local-only PostgreSQL 17 Compose service, Fastify liveness/readiness API, and minimal Next.js proxy. No auth, domain data, realtime, or product UI exists.
+This repository contains a local-only PostgreSQL 17 Compose service, Fastify liveness/readiness API, minimal Next.js proxy, and static accessible Mugful public/auth shell. Auth, domain data, realtime, and product activity behavior remain unimplemented.
 
 With Node 22 and pnpm 11.20.0 installed, a contributor can verify the tooling foundation with:
 
@@ -36,6 +36,8 @@ pnpm format:check
 pnpm test
 pnpm build
 ```
+
+The web shell also has a production-server Playwright check covering `/`, `/login`, and `/register` at mobile, tablet, and desktop widths. Run it after a production build with `API_INTERNAL_ORIGIN=http://127.0.0.1:3001 pnpm --filter @mugful/web e2e`.
 
 Create ignored `.env` from `.env.example`, replace its local-only password consistently, then run `docker compose -f compose.yaml up -d postgres`, `pnpm --filter @mugful/api dev`, and `pnpm --filter @mugful/web dev`. Liveness is `http://127.0.0.1:3001/health/live`; the proxy is `http://127.0.0.1:3000/api/health/live`. Run the reviewed bootstrap migration only explicitly with `pnpm --filter @mugful/api db:migrate`.
 

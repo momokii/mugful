@@ -1,6 +1,6 @@
 # Development guide
 
-**Status:** 0b local runtime foundation verified. Product behavior remains unimplemented.
+**Status:** 0b local runtime foundation and Todo 4 accessible web shell verified. Product behavior remains unimplemented.
 
 This document is the handoff point for a fresh agent or contributor who does not have the conversation history.
 
@@ -25,7 +25,7 @@ Then inspect the current Git state:
 
 ## Current state
 
-Mugful has strict TypeScript tooling, a local-only PostgreSQL 17 Compose service, Fastify health API, and minimal Next.js proxy. No auth, domain schema, realtime behavior, or product UI exists.
+Mugful has strict TypeScript tooling, a local-only PostgreSQL 17 Compose service, Fastify health API, minimal Next.js proxy, and a static Next.js public/auth shell. Auth, domain schema, realtime behavior, and product activity UI remain unimplemented.
 
 Use Node 22 and the committed pnpm 11.20.0 pin. The following commands have been verified locally:
 
@@ -35,11 +35,12 @@ Use Node 22 and the committed pnpm 11.20.0 pin. The following commands have been
 - `pnpm format:check`;
 - `pnpm test`;
 - `pnpm build`;
+- `API_INTERNAL_ORIGIN=http://127.0.0.1:3001 pnpm --filter @mugful/web e2e`, which runs the production-server Playwright checks at 375px, 768px, and 1280px and writes evidence under `.omo/evidence/task-4-*`;
 - `pnpm dev`, which compiles and prints labels from the two shell entry points.
 
 The following are planned, not available yet:
 
-- Next.js web development server;
+- Next.js product development server beyond the verified static shell;
 - Fastify API development server;
 - PostgreSQL Compose services;
 - Mailpit Compose service;
