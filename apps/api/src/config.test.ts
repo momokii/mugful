@@ -10,6 +10,10 @@ describe("parseApiConfig", () => {
       API_PORT: "3001",
       DATABASE_URL:
         "postgresql://mugful:local-only-password@127.0.0.1:5432/mugful",
+      CSRF_SECRET: "c".repeat(32),
+      RATE_LIMIT_PRINCIPAL_PEPPER: "r".repeat(32),
+      SESSION_TOKEN_PEPPER: "s".repeat(32),
+      WEB_ORIGIN: "https://mugful.example",
     };
 
     // When: configuration is parsed
@@ -21,6 +25,11 @@ describe("parseApiConfig", () => {
       port: 3001,
       databaseUrl:
         "postgresql://mugful:local-only-password@127.0.0.1:5432/mugful",
+      csrfSecret: "c".repeat(32),
+      rateLimitPrincipalPepper: "r".repeat(32),
+      registrationDefaultEnabled: false,
+      sessionTokenPepper: "s".repeat(32),
+      webOrigin: "https://mugful.example",
     });
   });
 
@@ -36,5 +45,23 @@ describe("parseApiConfig", () => {
     // Then: startup fails with a generic configuration error
     expect(parse).toThrow("Invalid API configuration");
     expect(parse).not.toThrow("not-a-database-url");
+  });
+
+  it("defaults registration to disabled when no override is supplied", () => {
+    // Given: valid identity configuration without a registration override
+    const environment = {
+      DATABASE_URL:
+        "postgresql://mugful:local-only-password@127.0.0.1:5432/mugful",
+      CSRF_SECRET: "c".repeat(32),
+      RATE_LIMIT_PRINCIPAL_PEPPER: "r".repeat(32),
+      SESSION_TOKEN_PEPPER: "s".repeat(32),
+      WEB_ORIGIN: "https://mugful.example",
+    };
+
+    // When: configuration is parsed
+    const config = parseApiConfig(environment);
+
+    // Then: registration remains closed until explicitly enabled
+    expect(config.registrationDefaultEnabled).toBe(false);
   });
 });

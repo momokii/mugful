@@ -13,6 +13,11 @@ Zod validates API and server-side web configuration. Invalid values fail with ge
 | `DATABASE_URL`                 | API and manual migration | Yes    | Valid `postgres://` or `postgresql://` URL     |
 | `API_HOST`, `API_PORT`         | Fastify                  | No     | Defaults to `127.0.0.1:3001`                   |
 | `API_INTERNAL_ORIGIN`          | Next rewrite             | No     | Required server-only URL without `/api` suffix |
+| `WEB_ORIGIN`                   | API identity policy      | No     | Required absolute browser origin               |
+| `REGISTRATION_DEFAULT_ENABLED` | API identity policy      | No     | Optional `true` or `false`; defaults `false`   |
+| `SESSION_TOKEN_PEPPER`         | API identity policy      | Yes    | Required minimum 32-character secret           |
+| `CSRF_SECRET`                  | API identity policy      | Yes    | Required minimum 32-character secret           |
+| `RATE_LIMIT_PRINCIPAL_PEPPER`  | API identity policy      | Yes    | Required HMAC secret; never persist principals |
 
 ## Configuration categories
 
