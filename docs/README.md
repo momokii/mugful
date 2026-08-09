@@ -28,4 +28,4 @@ This directory is the detailed source of truth for product, architecture, operat
 
 ## Current status
 
-The product and architecture are confirmed, but implementation has not started. See [`CURRENT-STATUS.md`](./CURRENT-STATUS.md) for the maintained status snapshot. Existing research notes should be re-verified before a production launch because law, provider limits, and service interfaces can change.
+The product and architecture are confirmed, with the local runtime foundation, Todo 4 shell, Todo 5A persistence primitives, and Todo 5B1 identity policy persistence/configuration implemented. See [`CURRENT-STATUS.md`](./CURRENT-STATUS.md) for the maintained status snapshot. Existing research notes should be re-verified before a production launch because law, provider limits, and service interfaces can change.
