@@ -5,7 +5,7 @@
 **Release target:** v1 invite-only beta
 **Product name:** Mugful
 **Public repository:** https://github.com/momokii/mugful
-**Latest verified baseline:** `9b21a26` on `master` before Todo 5A implementation
+**Latest verified baseline:** `ff5bd7f` on `master` before Todo 5B1 implementation
 
 ## Completed
 
@@ -27,6 +27,7 @@
 - Production-server Playwright browser checks and screenshots are verified at 375px, 768px, and 1280px for the public/auth shell; evidence is stored under `.omo/evidence/task-4-*`.
 - Todo 5A identity persistence primitives are implemented and verified: `0001_identity.sql` adds accounts, versioned adult/terms/privacy consent records, hashed opaque sessions, and hashed single-use expiring identity tokens without raw credential or token columns.
 - Internal Argon2id password hash/verify policy, opaque token HMAC/expiry/single-use guards, session token/cookie-option types, and versioned consent vocabulary have focused unit coverage. The manual migration was applied and schema-checked against local PostgreSQL Compose.
+- Todo 5B1 identity policy persistence/configuration is verified: additive `0002_identity_policy.sql` adds normalized-email uniqueness, disabled-by-default registration policy/audit state, session lifecycle metadata, and HMAC-keyed rate-limit buckets without raw email or IP columns. Session/CSRF/origin/registration defaults are runtime-validated; no HTTP identity behavior is implemented.
 
 ## Not started
 
