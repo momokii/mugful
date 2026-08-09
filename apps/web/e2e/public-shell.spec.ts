@@ -59,6 +59,7 @@ test.describe("public and auth shell", () => {
 
   test("dark theme keeps the shell readable", async ({ browser }, testInfo) => {
     const context = await browser.newContext({
+      baseURL: "http://127.0.0.1:3100",
       colorScheme: "dark",
       viewport: { width: 375, height: 812 },
     });

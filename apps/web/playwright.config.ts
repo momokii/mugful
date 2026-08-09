@@ -22,7 +22,7 @@ export default defineConfig({
     {
       name: "mobile",
       use: {
-        ...devices["Desktop Chrome"],
+        ...devices["Pixel 5"],
         viewport: { width: 375, height: 812 },
       },
     },

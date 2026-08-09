@@ -48,7 +48,7 @@
 }
 
 .field label {
-  color: var(--surface-elevated);
+  color: var(--text-primary);
   font-size: 14px;
   font-weight: 600;
 }
