@@ -1,6 +1,6 @@
 # Development guide
 
-**Status:** 0b local runtime foundation, Todo 4 accessible web shell, and Todo 5A identity persistence primitives verified. Todo 5 remains in progress; product behavior remains unimplemented.
+**Status:** 0b local runtime foundation, Todo 4 accessible web shell, Todo 5A identity persistence primitives, and Todo 5B1 identity policy persistence/configuration verified. Todo 5 remains in progress; product behavior remains unimplemented.
 
 This document is the handoff point for a fresh agent or contributor who does not have the conversation history.
 
@@ -25,7 +25,7 @@ Then inspect the current Git state:
 
 ## Current state
 
-Mugful has strict TypeScript tooling, a local-only PostgreSQL 17 Compose service, Fastify health API, minimal Next.js proxy, a static Next.js public/auth shell, and a manual identity persistence migration. Todo 5A supplies only internal account/consent/session/token schema and primitives; it does not expose authentication behavior.
+Mugful has strict TypeScript tooling, a local-only PostgreSQL 17 Compose service, Fastify health API, minimal Next.js proxy, a static Next.js public/auth shell, and manual identity persistence migrations. Todo 5A supplies internal account/consent/session/token schema and primitives; Todo 5B1 adds identity-policy schema/configuration only. Neither exposes authentication behavior.
 
 Use Node 22 and the committed pnpm 11.20.0 pin. The following commands have been verified locally:
 

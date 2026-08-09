@@ -2,7 +2,7 @@
 
 A private, playful web space for adults in long-distance relationships. The first release focuses on one shared activity: **Guess My Answer**.
 
-> **Status:** The local runtime foundation, Todo 4 accessible public/auth UI shell, and Todo 5A identity persistence primitives are verified. Todo 5 remains in progress; authentication behavior and product behavior remain unimplemented.
+> **Status:** The local runtime foundation, Todo 4 accessible public/auth UI shell, Todo 5A identity persistence primitives, and Todo 5B1 identity policy persistence/configuration are verified. Todo 5 remains in progress; authentication behavior and product behavior remain unimplemented.
 
 ## Product direction
 
@@ -24,7 +24,7 @@ v1 deliberately does **not** include native video, AI, behavioral analytics, or 
 
 ## Current repository state
 
-This repository contains a local-only PostgreSQL 17 Compose service, Fastify liveness/readiness API, minimal Next.js proxy, static accessible Mugful public/auth shell, and manual identity persistence migration. Todo 5A provides account, versioned consent, hashed-session, and hashed identity-token tables plus internal password/token/cookie primitives; it provides no identity routes, session issuance, mail, CSRF handling, or registration/login/reset behavior.
+This repository contains a local-only PostgreSQL 17 Compose service, Fastify liveness/readiness API, minimal Next.js proxy, static accessible Mugful public/auth shell, and manual identity migrations. Todo 5A provides account, versioned consent, hashed-session, and hashed identity-token tables plus internal password/token/cookie primitives. Todo 5B1 adds disabled-by-default registration policy/audit persistence, normalized-email uniqueness, session lifecycle metadata, HMAC-keyed rate-limit bucket storage, and validated identity configuration. It provides no identity routes, session issuance, mail, CSRF handling, or registration/login/reset behavior.
 
 With Node 22 and pnpm 11.20.0 installed, a contributor can verify the tooling foundation with:
 
