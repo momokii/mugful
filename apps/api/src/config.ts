@@ -9,6 +9,13 @@ const databaseUrlSchema = z
   );
 
 const secretSchema = z.string().min(32);
+const webOriginSchema = z
+  .string()
+  .url()
+  .refine((value) => {
+    const origin = new URL(value).origin;
+    return value === origin || value === `${origin}/`;
+  });
 
 const apiConfigSchema = z.object({
   API_HOST: z.string().min(1).default("127.0.0.1"),
@@ -21,7 +28,7 @@ const apiConfigSchema = z.object({
     .default("false")
     .transform((value) => value === "true"),
   SESSION_TOKEN_PEPPER: secretSchema,
-  WEB_ORIGIN: z.string().url(),
+  WEB_ORIGIN: webOriginSchema,
 });
 
 export type ApiConfig = Readonly<{

@@ -64,4 +64,24 @@ describe("parseApiConfig", () => {
     // Then: registration remains closed until explicitly enabled
     expect(config.registrationDefaultEnabled).toBe(false);
   });
+
+  it("rejects a web URL that is not an origin", () => {
+    // Given: an otherwise valid configuration with a path-bearing web URL
+    const environment = {
+      DATABASE_URL:
+        "postgresql://mugful:local-only-password@127.0.0.1:5432/mugful",
+      CSRF_SECRET: "c".repeat(32),
+      RATE_LIMIT_PRINCIPAL_PEPPER: "r".repeat(32),
+      SESSION_TOKEN_PEPPER: "s".repeat(32),
+      WEB_ORIGIN: "https://mugful.example/login",
+    };
+
+    // When: configuration is parsed
+    const parse = (): void => {
+      parseApiConfig(environment);
+    };
+
+    // Then: an origin-only policy rejects the path
+    expect(parse).toThrow("Invalid API configuration");
+  });
 });
