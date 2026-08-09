@@ -11,11 +11,11 @@
 
 These were the three strongest candidates I found, each from a different direction. None is perfect on every axis, and the LDR-couples app market turned out to be one of the most crowded I have ever researched (see §1 and §2.8). The repository is now connected as `mugful`, so Mugful is the selected working name pending final trademark, domain, app-store, and namespace verification.
 
-| # | Candidate | Direction | One-line rationale | Repo slug | Docker image pattern (per `ARCHITECTURE.md`) | Primary open questions |
-|---|---|---|---|---|---|---|
-| **F1** | **Mugful** | cozy domestic | "Two mugs on a kitchen table." Small, intimate, gendered-neutral, image-led. Stretches to Together Room (a hot drink while you video) and to future activities. | `mugful` | `docker.io/<owner>/mugful-web:<semver>-<sha>` and `docker.io/<owner>/mugful-api:<semver>-<sha>` | Is the word in any active app/brand I missed? Sound-symbolic risk: "mugful" reads as "mug full" — make sure the logo disambiguates. |
-| **F2** | **Bidewith** | invented coinage | Old English *bide* = to stay, wait, dwell; *bide with* = to stay with. Reads as a verb ("we bidewith") and as a name. Stretches well to video and activities. | `bidewith` | `docker.io/<owner>/bidewith-web:<semver>-<sha>` and `docker.io/<owner>/bidewith-api:<semver>-<sha>` | Verbing a brand ("Bidewith me") works in English but may need localizing for non-English LDR markets. Confirm `.com`/`.app`/`.io` at a registrar. |
-| **F3** | **Tondel** | sound-symbolic / invented | Coined from Italian *tondo* — round, whole, complete. Soft, warm, two-syllable, easy to say. A "small object on a shelf" feeling that ages well. | `tondel` | `docker.io/<owner>/tondel-web:<semver>-<sha>` and `docker.io/<owner>/tondel-api:<semver>-<sha>` | Coinage risk: harder to land on first read than an English word. The Docker Hub username `tondel` is already taken by an unrelated user (Tondel Fernandes) — namespace unblocked at the org level but the personal namespace is squatted. |
+| #      | Candidate    | Direction                 | One-line rationale                                                                                                                                              | Repo slug  | Docker image pattern (per `ARCHITECTURE.md`)                                                        | Primary open questions                                                                                                                                                                                                                    |
+| ------ | ------------ | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **F1** | **Mugful**   | cozy domestic             | "Two mugs on a kitchen table." Small, intimate, gendered-neutral, image-led. Stretches to Together Room (a hot drink while you video) and to future activities. | `mugful`   | `docker.io/<owner>/mugful-web:<semver>-<sha>` and `docker.io/<owner>/mugful-api:<semver>-<sha>`     | Is the word in any active app/brand I missed? Sound-symbolic risk: "mugful" reads as "mug full" — make sure the logo disambiguates.                                                                                                       |
+| **F2** | **Bidewith** | invented coinage          | Old English _bide_ = to stay, wait, dwell; _bide with_ = to stay with. Reads as a verb ("we bidewith") and as a name. Stretches well to video and activities.   | `bidewith` | `docker.io/<owner>/bidewith-web:<semver>-<sha>` and `docker.io/<owner>/bidewith-api:<semver>-<sha>` | Verbing a brand ("Bidewith me") works in English but may need localizing for non-English LDR markets. Confirm `.com`/`.app`/`.io` at a registrar.                                                                                         |
+| **F3** | **Tondel**   | sound-symbolic / invented | Coined from Italian _tondo_ — round, whole, complete. Soft, warm, two-syllable, easy to say. A "small object on a shelf" feeling that ages well.                | `tondel`   | `docker.io/<owner>/tondel-web:<semver>-<sha>` and `docker.io/<owner>/tondel-api:<semver>-<sha>`     | Coinage risk: harder to land on first read than an English word. The Docker Hub username `tondel` is already taken by an unrelated user (Tondel Fernandes) — namespace unblocked at the org level but the personal namespace is squatted. |
 
 **Why these three and not others**: see §3 (finalists, with per-candidate tradeoffs) and §4 (names considered and rejected). The rest of this note is the evidence behind them.
 
@@ -34,7 +34,7 @@ The LDR / couple / relationship app space is **one of the most crowded categorie
 - **Couplete** (Wonderabbit, Inc., also maker of Lovedays / CoupleKeeper). Couples messenger, calendar, photos. Listed on Apptopia, app-store-id 742745050.
 - **Love Nudge** (Love Language Brand / Grooters Productions, under the 5 Love Languages brand). <https://5lovelanguages.com/resources/app>, App Store <https://apps.apple.com/us/app/love-nudge/id495326842>, Play Store <https://play.google.com/store/apps/details?id=com.grootersproductions.challenge>.
 
-### 1.2 LDR-targeted apps (closest in *behaviour* to what this project does)
+### 1.2 LDR-targeted apps (closest in _behaviour_ to what this project does)
 
 These are the ones the principal developer is most likely to be confused with in the App Store. All primary-sourced.
 
@@ -62,7 +62,7 @@ For completeness, all primary-sourced:
 
 ### 1.4 What this means for naming
 
-The buyer searching for "couples app" or "LDR app" will see at least 15 of the products above. Differentiation has to come from the *kind* of warmth and the *single-activity focus*, not from the name alone. A name that says "LDR-couples app" is a name that competes head-on; a name that says "a small, private place for two" is a name that invites a different search. The finalist shortlist in §3 leans toward the latter.
+The buyer searching for "couples app" or "LDR app" will see at least 15 of the products above. Differentiation has to come from the _kind_ of warmth and the _single-activity focus_, not from the name alone. A name that says "LDR-couples app" is a name that competes head-on; a name that says "a small, private place for two" is a name that invites a different search. The finalist shortlist in §3 leans toward the latter.
 
 ---
 
@@ -70,14 +70,14 @@ The buyer searching for "couples app" or "LDR app" will see at least 15 of the p
 
 Each candidate below is a real word or coinage I evaluated. For each, I checked (a) the official site, (b) the App Store / Play Store, (c) GitHub, (d) npm, and (e) Docker Hub, where relevant. Every "primary-source URL" below was opened on 2026-08-09 via the available `webfetch` and `websearch` tools.
 
-> **Reading the collision table**: a "no primary-source collision found" entry means *no result came back in my searches* — not that the name is provably available. See §5 for the verification before adoption.
+> **Reading the collision table**: a "no primary-source collision found" entry means _no result came back in my searches_ — not that the name is provably available. See §5 for the verification before adoption.
 
 ### 2.1 Cozy domestic — small, private, "our place"
 
 The voice: a kitchen, a window seat, a shared object. Reads as a place you go together, not a tool you use.
 
 - **Mugful** — "Two mugs on a kitchen table." Gendered-neutral, image-led, easy to spell, two syllables. Pronunciation: /ˈmʌɡfʊl/. Collision: no active product found; Docker Hub `mugful` namespace returns 404 (<https://hub.docker.com/r/mugful>), npm package `mugful` 404 (<https://www.npmjs.com/package/mugful>). Risk: the word is unusual; marketing has to land the meaning on first read.
-- **Kettle** — "The kettle is on — someone's free." Domestic, warm, plays well with Together Room (a kettle going off when one's ready). Collision: `kettle.io` is in use by an unrelated mobile-app development company, and `kettleweb.com` is a social-discovery product (<https://kettleweb.com/>). Hard collision on the obvious TLDs. Keep as a *concept* (the kettle metaphor) but not as a brand.
+- **Kettle** — "The kettle is on — someone's free." Domestic, warm, plays well with Together Room (a kettle going off when one's ready). Collision: `kettle.io` is in use by an unrelated mobile-app development company, and `kettleweb.com` is a social-discovery product (<https://kettleweb.com/>). Hard collision on the obvious TLDs. Keep as a _concept_ (the kettle metaphor) but not as a brand.
 - **Hearth** — The clearest hit in this direction. Collision: Hearth Display (<https://hearthdisplay.com/>, 40,000+ families, App Store companion app), Hearthside Works (<https://www.hearthsideworks.com/>, AI tools for connection, live), Hearthly (<https://hearthly.app/>, "share your digital life with those who share your hearth", live), Hearth Connected Care (<https://www.hearthconnectedcare.com/>, family care app launching September 2026). Four active products. Hard collision. Rejected.
 - **Porch** — "A porch with two chairs facing the same view." Collision: Porch.com (home insurance, public company, <https://porchgroup.com/>), Porch.host (Airbnb host tool, <https://www.porch.host/>). Hard collision. Rejected.
 - **Porchlight** — Aiming at the same warm-object vibe. Collision: Porchlight Homes (Arizona builder, <https://porchlighthomes.com/>), Porchlight Marketing (<https://porchlightatl.com/>). Hard collision. Rejected.
@@ -107,7 +107,7 @@ The voice: a string, a line, a note that travels.
 - **Threadline** — A subtle line of connection. Collision: npm package `threadline` (a real product, Ariadne / semantic HTML extraction, ~0 weekly downloads, <https://www.npmjs.com/package/threadline>). Different domain, dormant. Soft collision.
 - **Bellbridge** — A bell that sounds across a distance. Collision: no active product found; Docker Hub `bellbridge` namespace 404 (<https://hub.docker.com/r/bellbridge>). **Possible alternative**, kept on the bench.
 
-### 2.4 Playful shorthand — what the couple calls *us*
+### 2.4 Playful shorthand — what the couple calls _us_
 
 The voice: a nickname, a private word, a smile.
 
@@ -116,7 +116,7 @@ The voice: a nickname, a private word, a smile.
 - **Closer** — Direct LDR-couples competitor (see §1.2). Multiple Closer apps, including one literally called "Closer: Relationship & couples App" by Blue Flow Technologies. Hard collision. Rejected.
 - **Snug, Snugside, Snugside** — Snug Dating (`joinsnug.com/`, $30/mo concierge dating, 50,000+ members) and Snug Family Organizer (`get.snugplanner.com/`). Hard collision. Rejected.
 
-### 2.5 Togetherness verb / activity-noun — what the couple *does*
+### 2.5 Togetherness verb / activity-noun — what the couple _does_
 
 The voice: a verb-noun, something you do together.
 
@@ -131,7 +131,7 @@ The voice: a verb-noun, something you do together.
 
 The voice: a small made-up word that feels warm and pronounceable.
 
-- **Tondel** — Coined from Italian *tondo* (round, whole, complete). Two syllables, easy to say, no obvious English meaning. Collision: Docker Hub username `tondel` is taken by a user called Tondel Fernandes (no public images, <https://hub.docker.com/r/tondel>); npm returned 403 to my package-existence check, suggesting the namespace may be in use privately. No active *product* collision found. **One of the three finalists — see §3.3.**
+- **Tondel** — Coined from Italian _tondo_ (round, whole, complete). Two syllables, easy to say, no obvious English meaning. Collision: Docker Hub username `tondel` is taken by a user called Tondel Fernandes (no public images, <https://hub.docker.com/r/tondel>); npm returned 403 to my package-existence check, suggesting the namespace may be in use privately. No active _product_ collision found. **One of the three finalists — see §3.3.**
 - **Cwtch** — Welsh for "a hug that creates a safe place." Pronounced /kʊtʃ/. Beautiful word. Collision: Cwtch (cwtch.im, Open Privacy Research Society's decentralized messaging protocol, on Google Play); Cwtch & Code / Cwtch Corner (UK SEN/ADHD app, cwtchcode.com, active 2026). Hard collision in both privacy-tech and family-wellbeing. Rejected.
 - **Kvell** — Yiddish for "beam with pride / glow." Collision: Kvell Marketing (kvell.cc, active). Hard collision. Rejected.
 - **Sotok, Twondel, Tondel, Bidewith** — see §3.2 (Bidewith) and §3.3 (Tondel).
@@ -139,10 +139,10 @@ The voice: a small made-up word that feels warm and pronounceable.
 
 ### 2.7 Distance-bridging via old English — verb "bide"
 
-The voice: something warm and unhurried. A small set of coinages built on the verb *bide* (to stay, wait, dwell). I evaluated these as a group.
+The voice: something warm and unhurried. A small set of coinages built on the verb _bide_ (to stay, wait, dwell). I evaluated these as a group.
 
-- **Bidewith** — *Bide with* = to stay with, to dwell with. Reads as a verb ("we bidewith each other") and as a brand name. Pronunciation: BYDE-with. Two syllables, stress on first. Spell: B-I-D-E-W-I-T-H. Collision: no active product found; Docker Hub `bidewith` 404 (<https://hub.docker.com/r/bidewith>). **One of the three finalists — see §3.2.**
-- **Bidewell** — *Bide well* = dwell well. Collision: Bidwell.app (UK public-sector tender tool, Operosus Ltd, <https://bidwell.app/>) — different industry but same phonetic landing. Soft collision.
+- **Bidewith** — _Bide with_ = to stay with, to dwell with. Reads as a verb ("we bidewith each other") and as a brand name. Pronunciation: BYDE-with. Two syllables, stress on first. Spell: B-I-D-E-W-I-T-H. Collision: no active product found; Docker Hub `bidewith` 404 (<https://hub.docker.com/r/bidewith>). **One of the three finalists — see §3.2.**
+- **Bidewell** — _Bide well_ = dwell well. Collision: Bidwell.app (UK public-sector tender tool, Operosus Ltd, <https://bidwell.app/>) — different industry but same phonetic landing. Soft collision.
 - **Bide** — Bare. Too short, no product differentiation, trademark search would be brutal. Rejected.
 
 ### 2.8 Rejections and the "crowded market" finding
@@ -152,7 +152,7 @@ Out of 30+ candidate names I primary-source-evaluated, **only three** — Mugful
 This is the single most important finding of this research pass: **a warm/playful English word that is not already a couples app is hard to find.** Three responses are available to the principal developer:
 
 1. **Pick a finalist from §3 and pay the trademark/domain cost** of clearing it.
-2. **Accept the market-saturated position** and lean into a name that explicitly says "small, private, two" so the differentiator is the *kind* of warmth, not the name itself.
+2. **Accept the market-saturated position** and lean into a name that explicitly says "small, private, two" so the differentiator is the _kind_ of warmth, not the name itself.
 3. **Coin harder** — go further than Tondel into a fully invented word. The risk of going further is that the meaning has to be taught, which is fine for an open-source product whose audience is technical and patient, and hard for a consumer app whose audience is on a Saturday-night dating-app bender.
 
 The finalists in §3 are a mix of (1) and (2).
@@ -166,6 +166,7 @@ The finalists in §3 are a mix of (1) and (2).
 **Direction**: cozy domestic. **Voice**: warm, intimate, slightly playful; visual-led.
 
 **Why it works for this product**:
+
 - "Two mugs on a kitchen table" is the kind of image that survives a v1.1 video feature: the same couple, same mugs, now a third tile of themselves. It does not peg the product to Guess My Answer.
 - Reads as a small, private place — exactly the privacy boundary the v1 design protects.
 - "Mugful" is two syllables, easy to spell, hard to mispronounce. Test saying it to a friend and see if they can write it down: most can.
@@ -174,42 +175,49 @@ The finalists in §3 are a mix of (1) and (2).
 
 **Repository slug**: `mugful` (kebab-case, GitHub-friendly).
 **Docker image naming** (matches the two-image architecture in `ARCHITECTURE.md`):
+
 - `docker.io/<owner>/mugful-web:1.0.0-abc1234`
 - `docker.io/<owner>/mugful-api:1.0.0-abc1234`
 
 **Collision evidence on 2026-08-09**:
+
 - `hub.docker.com/r/mugful` → 404 (no namespace squatted) <https://hub.docker.com/r/mugful>
 - `npmjs.com/package/mugful` → 404 (no package) <https://www.npmjs.com/package/mugful>
 - `websearch` for "Mugful app", "Mugful product", "Mugful couples" → no primary-source active product found.
 
 **Risks**:
+
 - The name is unusual. Logo and onboarding must land the meaning on first read.
-- The word is compound ("mug" + "ful"), so brand-safety searches need to be done on the *compound*, not on the words alone.
+- The word is compound ("mug" + "ful"), so brand-safety searches need to be done on the _compound_, not on the words alone.
 - Sound-symbolic edge: "mugful" can be misread as "mug full" by a first-time reader. Disambiguate in the logo (e.g. two mugs).
 
 **Open verification needed before adoption** (see §5).
 
 ### 3.2 Finalist F2 — Bidewith
 
-**Direction**: invented coinage, built on the old-English verb *bide*. **Voice**: gentle, unhurried, mature, a little old-fashioned in a comforting way.
+**Direction**: invented coinage, built on the old-English verb _bide_. **Voice**: gentle, unhurried, mature, a little old-fashioned in a comforting way.
 
 **Why it works for this product**:
-- *Bide* (verb, OE) = to stay, wait, dwell. "Bide with" = to stay with. The product's name describes what the couple does: they stay with each other, across distance.
+
+- _Bide_ (verb, OE) = to stay, wait, dwell. "Bide with" = to stay with. The product's name describes what the couple does: they stay with each other, across distance.
 - "Bidewith me" is a working tagline. "We bidewith" is a working verb. Few couple-app names do that.
 - The name does not peg to any activity. It scales to v1.1 video ("bide with me on a call") and to future activities without rebranding.
 - Reads as warm and old-fashioned in a way that matches the "mature, not childish" requirement without sounding archaic.
 - Three syllables: BYDE-with. Stress on the first. Easy to say. Spelling is a slight risk (see below) but unambiguous in context.
 
 **Repository slug**: `bidewith`. **Docker image naming**:
+
 - `docker.io/<owner>/bidewith-web:1.0.0-abc1234`
 - `docker.io/<owner>/bidewith-api:1.0.0-abc1234`
 
 **Collision evidence on 2026-08-09**:
+
 - `hub.docker.com/r/bidewith` → 404 (no namespace squatted) <https://hub.docker.com/r/bidewith>
 - `websearch` for "Bidewith app", "Bidewith product", "Bidewith couples" → no primary-source active product found.
 - Bidwell (`bidwell.app`, UK public-sector tender tool) is a soft phonetic neighbor but a different word.
 
 **Risks**:
+
 - Coinage: needs teaching. The first time a user sees the name, they have to read it twice.
 - "Bide" is a quiet, old word. In North American English it can sound slightly bookish or even Tolkien-esque. That's a feature for the right audience and a bug for a casual one.
 - "Bidewith" can be mis-spelled as "Bidewith" → "Bydewith" or "Bidewitht" in hurried typing. Worth a short spelling in the marketing copy.
@@ -221,21 +229,25 @@ The finalists in §3 are a mix of (1) and (2).
 **Direction**: sound-symbolic / invented coinage. **Voice**: soft, musical, two-syllable, slightly Italian, slightly Scandinavian.
 
 **Why it works for this product**:
-- Coined from Italian *tondo* — round, whole, complete. Reads as "a small complete thing" — a tondo is a Renaissance circular painting, but the word itself is just "round and whole" in everyday Italian.
+
+- Coined from Italian _tondo_ — round, whole, complete. Reads as "a small complete thing" — a tondo is a Renaissance circular painting, but the word itself is just "round and whole" in everyday Italian.
 - "Tondel" rhymes with "model" and "fondle" (rhymes, not the same word). Easy to say, two syllables, no consonant clusters. Reads warm and slightly European.
 - No peg to any activity. Easily stretches to v1.1 video and later.
 - Distinctive. Nobody else has it. As of 2026-08-09, no active product found in my searches.
 
 **Repository slug**: `tondel`. **Docker image naming**:
+
 - `docker.io/<owner>/tondel-web:1.0.0-abc1234`
 - `docker.io/<owner>/tondel-api:1.0.0-abc1234`
 
 **Collision evidence on 2026-08-09**:
-- `hub.docker.com/r/tondel` → user account "Tondel Fernandes" exists, but with no public repositories (<https://hub.docker.com/r/tondel>). The *org* namespace is unblocked, but the personal one is squatted; this is a soft risk.
+
+- `hub.docker.com/r/tondel` → user account "Tondel Fernandes" exists, but with no public repositories (<https://hub.docker.com/r/tondel>). The _org_ namespace is unblocked, but the personal one is squatted; this is a soft risk.
 - `npmjs.com/package/tondel` → 403 (suggesting a private package may exist, or rate limiting). The package is not publicly listed on the registry landing page.
 - `websearch` for "Tondel app", "Tondel product", "Tondel couples" → no primary-source active product found.
 
 **Risks**:
+
 - Coinage: most readers have not seen the word before. The meaning has to be taught. For an open-source product whose audience is technical and patient, this is acceptable; for a casual consumer it is a hurdle.
 - Italian etymology will be lost on most English readers; the name lands as "soft two-syllable round word," which is good but not specific.
 - The Docker Hub personal namespace is squatted by an unrelated user. If the team ever wants to publish under the namespace `tondel/<image>`, the squat may have to be worked around.
@@ -248,50 +260,50 @@ The finalists in §3 are a mix of (1) and (2).
 
 A short list, with reasons. Each was primary-source-checked at least once.
 
-| Name | Reason rejected | Primary source |
-|---|---|---|
-| Between | Taken by a 35M-couple product. | <https://between.us/?lang=en> |
-| Paired | Taken by the #1 couples app. | <https://paired.com/> |
-| Couply | Taken. Direct category overlap. | <https://couply.io/> |
-| Love Nudge | Taken. Owned by 5 Love Languages brand. | <https://5lovelanguages.com/resources/app> |
-| Hearth | Four active products. | <https://hearthdisplay.com/>, <https://hearthly.app/>, <https://www.hearthsideworks.com/>, <https://www.hearthconnectedcare.com/> |
-| Porch | Public-company home insurance. | <https://porchgroup.com/> |
-| Porchlight | Active builder + marketing. | <https://porchlighthomes.com/>, <https://porchlightatl.com/> |
-| Lighthouse | Google Chrome (30,580★). | <https://github.com/googlechrome/lighthouse> |
-| Snug | Two active relationship apps. | <https://joinsnug.com/>, <https://get.snugplanner.com/> |
-| Polaris | Shopify, Apache, lightup-data. | <https://polaris-react.shopify.com/>, <https://polaris.apache.org/>, <https://github.com/lightup-data/polaris> |
-| Tandem | Public-company diabetes tech. | <https://www.tandemdiabetes.com/products/software-apps/mobile-apps> |
-| Bridge | Three active products. | <https://bridgeapp.ai/>, <https://thebridgeapp.org/>, <https://brdg.app/> |
-| Ourside | Fragrance house, active e-commerce. | <https://ourside.nyc/> |
-| Ours | Direct category overlap (couples therapy). | <https://withours.com/> |
-| Ember | Registered trademark, $83.9M-funded mug brand. | <https://ember.com/trademarks> |
-| Toast | Public-company restaurant POS. | <https://pos.toasttab.com/> |
-| Plumbline | Active plumbing business. | <https://plumblineplumbingkc.com/> |
-| Cwtch | Two active products (privacy + SEN). | <https://cwtch.im/>, <https://www.cwtchcode.com/> |
-| Twos | Two active apps (notes + conversations). | <https://www.twosapp.com/>, <https://twos.net/> |
-| Hush | Three active dating apps. | <https://thehush.app/>, <https://hush.dating/>, <https://www.hushhhapp.com/> |
-| Kvell | Active marketing agency. | <https://kvell.cc/> |
-| Tether | USDT stablecoin. | <https://tether.to/> |
-| SoftSpot | Pet care + medical app. | <https://softspotapp.com/>, <https://www.softspot.online/softspot> |
-| Cozy Couples | Direct LDR-app competitor. | <https://cozycouples.co/> |
-| Closer | Direct LDR-app competitor (three products). | <https://getcloser.app/>, <https://closerapp.co/>, <https://apps.apple.com/us/app/closer-relationship-couples/id6467502209> |
-| Twine | Direct LDR-app competitor (two products). | <https://www.ourtwine.app/>, <https://www.twine-couples.com/> |
-| Inkle | US accounting SaaS, 56 employees. | <https://inkle.ai/> |
-| Inkwell | Two active products. | <https://inkwell.co/>, <https://inkwell.net/> |
-| Fika | Active Singapore matchmaker. | <https://fikaconnects.com/>, <https://apps.apple.com/se/app/fika-matchmaker-irl-events/id1528449006> |
-| Plume | Direct journaling-app competitor. | <https://getplumeapp.com/> |
-| Hearthly | Active product. | <https://hearthly.app/> |
-| Hearthside | Active product. | <https://www.hearthsideworks.com/> |
-| Cozen | Am Law 100 firm. | <https://cozen.com/> |
-| Two Notes | 18-year-old audio brand. | <https://two-notes.com/> |
-| Sundial | Two active apps. | <https://sundialapp.com/>, <https://www.thesundial.app/> |
-| Kettle | Two active products. | <https://kettle.io/>, <https://kettleweb.com/> |
-| Cardle | Russian discount-card app. | <https://www.cardle.ru/> |
-| Bonsai | Used as a feature inside Better Together. | <https://bettertogetherapp.com/> |
-| Linger | No clear product collision, but meaning too abstract for a buyer-driven App Store search. Reserved as a possible alt. | n/a |
-| Bellbridge | No clear product collision. Reserved as a possible alt. | n/a |
+| Name         | Reason rejected                                                                                                       | Primary source                                                                                                                    |
+| ------------ | --------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Between      | Taken by a 35M-couple product.                                                                                        | <https://between.us/?lang=en>                                                                                                     |
+| Paired       | Taken by the #1 couples app.                                                                                          | <https://paired.com/>                                                                                                             |
+| Couply       | Taken. Direct category overlap.                                                                                       | <https://couply.io/>                                                                                                              |
+| Love Nudge   | Taken. Owned by 5 Love Languages brand.                                                                               | <https://5lovelanguages.com/resources/app>                                                                                        |
+| Hearth       | Four active products.                                                                                                 | <https://hearthdisplay.com/>, <https://hearthly.app/>, <https://www.hearthsideworks.com/>, <https://www.hearthconnectedcare.com/> |
+| Porch        | Public-company home insurance.                                                                                        | <https://porchgroup.com/>                                                                                                         |
+| Porchlight   | Active builder + marketing.                                                                                           | <https://porchlighthomes.com/>, <https://porchlightatl.com/>                                                                      |
+| Lighthouse   | Google Chrome (30,580★).                                                                                              | <https://github.com/googlechrome/lighthouse>                                                                                      |
+| Snug         | Two active relationship apps.                                                                                         | <https://joinsnug.com/>, <https://get.snugplanner.com/>                                                                           |
+| Polaris      | Shopify, Apache, lightup-data.                                                                                        | <https://polaris-react.shopify.com/>, <https://polaris.apache.org/>, <https://github.com/lightup-data/polaris>                    |
+| Tandem       | Public-company diabetes tech.                                                                                         | <https://www.tandemdiabetes.com/products/software-apps/mobile-apps>                                                               |
+| Bridge       | Three active products.                                                                                                | <https://bridgeapp.ai/>, <https://thebridgeapp.org/>, <https://brdg.app/>                                                         |
+| Ourside      | Fragrance house, active e-commerce.                                                                                   | <https://ourside.nyc/>                                                                                                            |
+| Ours         | Direct category overlap (couples therapy).                                                                            | <https://withours.com/>                                                                                                           |
+| Ember        | Registered trademark, $83.9M-funded mug brand.                                                                        | <https://ember.com/trademarks>                                                                                                    |
+| Toast        | Public-company restaurant POS.                                                                                        | <https://pos.toasttab.com/>                                                                                                       |
+| Plumbline    | Active plumbing business.                                                                                             | <https://plumblineplumbingkc.com/>                                                                                                |
+| Cwtch        | Two active products (privacy + SEN).                                                                                  | <https://cwtch.im/>, <https://www.cwtchcode.com/>                                                                                 |
+| Twos         | Two active apps (notes + conversations).                                                                              | <https://www.twosapp.com/>, <https://twos.net/>                                                                                   |
+| Hush         | Three active dating apps.                                                                                             | <https://thehush.app/>, <https://hush.dating/>, <https://www.hushhhapp.com/>                                                      |
+| Kvell        | Active marketing agency.                                                                                              | <https://kvell.cc/>                                                                                                               |
+| Tether       | USDT stablecoin.                                                                                                      | <https://tether.to/>                                                                                                              |
+| SoftSpot     | Pet care + medical app.                                                                                               | <https://softspotapp.com/>, <https://www.softspot.online/softspot>                                                                |
+| Cozy Couples | Direct LDR-app competitor.                                                                                            | <https://cozycouples.co/>                                                                                                         |
+| Closer       | Direct LDR-app competitor (three products).                                                                           | <https://getcloser.app/>, <https://closerapp.co/>, <https://apps.apple.com/us/app/closer-relationship-couples/id6467502209>       |
+| Twine        | Direct LDR-app competitor (two products).                                                                             | <https://www.ourtwine.app/>, <https://www.twine-couples.com/>                                                                     |
+| Inkle        | US accounting SaaS, 56 employees.                                                                                     | <https://inkle.ai/>                                                                                                               |
+| Inkwell      | Two active products.                                                                                                  | <https://inkwell.co/>, <https://inkwell.net/>                                                                                     |
+| Fika         | Active Singapore matchmaker.                                                                                          | <https://fikaconnects.com/>, <https://apps.apple.com/se/app/fika-matchmaker-irl-events/id1528449006>                              |
+| Plume        | Direct journaling-app competitor.                                                                                     | <https://getplumeapp.com/>                                                                                                        |
+| Hearthly     | Active product.                                                                                                       | <https://hearthly.app/>                                                                                                           |
+| Hearthside   | Active product.                                                                                                       | <https://www.hearthsideworks.com/>                                                                                                |
+| Cozen        | Am Law 100 firm.                                                                                                      | <https://cozen.com/>                                                                                                              |
+| Two Notes    | 18-year-old audio brand.                                                                                              | <https://two-notes.com/>                                                                                                          |
+| Sundial      | Two active apps.                                                                                                      | <https://sundialapp.com/>, <https://www.thesundial.app/>                                                                          |
+| Kettle       | Two active products.                                                                                                  | <https://kettle.io/>, <https://kettleweb.com/>                                                                                    |
+| Cardle       | Russian discount-card app.                                                                                            | <https://www.cardle.ru/>                                                                                                          |
+| Bonsai       | Used as a feature inside Better Together.                                                                             | <https://bettertogetherapp.com/>                                                                                                  |
+| Linger       | No clear product collision, but meaning too abstract for a buyer-driven App Store search. Reserved as a possible alt. | n/a                                                                                                                               |
+| Bellbridge   | No clear product collision. Reserved as a possible alt.                                                               | n/a                                                                                                                               |
 
-Names with a primary-source *couples-app* collision in particular are highlighted in §1.2 — those are the ones that will compete for the same App Store search term.
+Names with a primary-source _couples-app_ collision in particular are highlighted in §1.2 — those are the ones that will compete for the same App Store search term.
 
 ---
 
@@ -305,7 +317,7 @@ Every "no primary-source collision found" in this note is a negative result from
    - EUIPO eSearch — <https://euipo.europa.eu/eSearch/>
    - WIPO Global Brand Database — <https://branddb.wipo.int/>
    - Indonesian DGIP (Ditjen KI) — <https://pdki.dgip.go.id/>
-   - Search the *compound* name, not the words. Search for goods/services class 9 (software), class 42 (SaaS), class 38 (telecommunications), class 45 (online social networking).
+   - Search the _compound_ name, not the words. Search for goods/services class 9 (software), class 42 (SaaS), class 38 (telecommunications), class 45 (online social networking).
 
 2. **Domain availability** (run on the day of adoption, at the registrar of choice):
    - For each finalist: `mugful.com`, `mugful.app`, `mugful.io`, `bidewith.com`, `bidewith.app`, `bidewith.io`, `tondel.com`, `tondel.app`, `tondel.io`.
@@ -314,7 +326,7 @@ Every "no primary-source collision found" in this note is a negative result from
 
 3. **GitHub**:
    - Confirm the exact repo name is not squatted on by a >100★ repo.
-   - Check the `github.com/<finalist>` *user/org* URL — the org is the long-term home; a squatted user account can be reported but takes time.
+   - Check the `github.com/<finalist>` _user/org_ URL — the org is the long-term home; a squatted user account can be reported but takes time.
 
 4. **npm and Docker Hub**:
    - `npm view <finalist>` to confirm the package name is available.
@@ -341,6 +353,7 @@ Every "no primary-source collision found" in this note is a negative result from
 Primary sources used in this note, grouped by topic. All URLs were opened on 2026-08-09 via the available `webfetch` and `websearch_web_search_exa` tools.
 
 ### Adjacent couples / LDR apps
+
 - Between — <https://between.us/?lang=en>, <https://apps.apple.com/us/app/between-couples-love-tracker/id458035189>, <https://play.google.com/store/apps/details?id=kr.co.vcnc.android.couple>
 - Paired — <https://paired.com/>, <https://apps.apple.com/us/app/paired-couples-relationship/id1469609343>, <https://play.google.com/store/apps/details?id=com.getpaired.app>
 - Couply — <https://couply.io/>, <https://apps.apple.com/us/app/couply-couples-relationship/id1484241314>, <https://play.google.com/store/apps/details?id=io.couply.android>
@@ -365,6 +378,7 @@ Primary sources used in this note, grouped by topic. All URLs were opened on 202
 - Ours Therapy — <https://withours.com/>
 
 ### Hard-collided names (§4)
+
 - Hearth Display — <https://hearthdisplay.com/>
 - Hearthly — <https://hearthly.app/>
 - Hearthside Works — <https://www.hearthsideworks.com/>
@@ -407,8 +421,10 @@ Primary sources used in this note, grouped by topic. All URLs were opened on 202
 - Bidwell.app — <https://bidwell.app/>
 
 ### Package / namespace lookups (negative results for finalists)
+
 - Docker Hub: `mugful` → 404, `kettle` → empty, `bellbridge` → 404, `bidewith` → 404, `polaris` → 404, `hearth` → empty, `tandem` → empty, `tondel` → user "Tondel Fernandes" exists, no public images, `linger` → empty, `tondo` → empty, `ourside` → (not checked in this pass), `hearthly` → (not checked in this pass).
 - npm: `mugful` → 404, `hearth` → 12-year-old dormant package, `tandem` → 12-year-old dormant package, `threadline` → active package (different domain), `closer` → 11-year-old dormant Clojure parser, `tondo` → 5-year-old dormant CLI, `tondel` → 403 (treated as ambiguous, not as confirmed available).
 
 ### Reference
+
 - Repository docs read for context: `README.md`, `docs/PRODUCT-SPEC.md`, `docs/ARCHITECTURE.md`, `docs/SMTP-OPTIONS-RESEARCH.md` (style reference), `CLAUDE.md`.

@@ -20,7 +20,7 @@
 - Pin the **runtime** to the LTS major recommended by the framework (Node 22 LTS, per pnpm compatibility table) and mirror it in the base image (`node:22-bookworm-slim` for web/API; never `node:latest`).
 - Pin the **database** to a PostgreSQL major that the user can live with for the whole v1 stability window. PostgreSQL 18 is the current `latest` on Docker Hub, but each major requires `pg_upgrade` or dump/restore to move up. The compatibility table below shows three viable pins, all supported by the Docker Library today.
 - Pin the **OS** in every multi-stage build to a Debian major (`bookworm`) so `apt-get install` packages remain reproducible.
-- Pin **Docker Hub tags** to `vX.Y.Z` *and* a commit SHA for the image manifest; never pin to `latest` in the production compose file.
+- Pin **Docker Hub tags** to `vX.Y.Z` _and_ a commit SHA for the image manifest; never pin to `latest` in the production compose file.
 - Pin **GitHub Actions** to the major (`@v7`, `@v6`, `@v4`) per the official action readmes; renovate/dependabot handles minor bumps.
 - Pin **runtime validation** to a single chosen library and use one of the official Fastify type providers; do not mix Zod + Valibot in the same request pipeline.
 - Use the `packageManager` field (Corepack) to pin pnpm itself.
@@ -44,7 +44,7 @@ The user explicitly named the following as not-in-v1. Confirming they do not ent
 - **Current stable major:** pnpm **11** (pnpm 12 is published as a beta and is explicitly not recommended for production by the official docs).
   Verified on 2026-08-09 at <https://pnpm.io/installation>.
 - **Bootstrap recommendation:** install pnpm 11 via Corepack and pin with the `packageManager` field in the root `package.json` (e.g. `"packageManager": "pnpm@11.x.y"`). The official Corepack note warns to update Corepack itself first (`npm i -g corepack@latest`) because of outdated signatures.
-- **Node engine requirement:** pnpm 11 requires Node.js 22+ for installation. The compatibility table (<https://pnpm.io/installation#compatibility>) shows pnpm 11 and 12 both work on Node 22, 24, and 26; pnpm 11 does *not* support Node 18 or 20. The bootstrap should target Node 22 LTS.
+- **Node engine requirement:** pnpm 11 requires Node.js 22+ for installation. The compatibility table (<https://pnpm.io/installation#compatibility>) shows pnpm 11 and 12 both work on Node 22, 24, and 26; pnpm 11 does _not_ support Node 18 or 20. The bootstrap should target Node 22 LTS.
 - **Workspace protocol gotcha:** pnpm's `workspace:` spec in `package.json` is the safe way to depend on a sibling package and refuses to resolve to a non-workspace package. Prefer `"foo": "workspace:*"` over bare version specifiers so a new internal package cannot accidentally resolve to a same-name registry package.
 - **Version-compat traps:**
   - pnpm 12 cannot be installed via Corepack yet (the official doc says Corepack expects `bin/pnpm.mjs` which the native pnpm 12 package does not have). If anyone tries to upgrade to pnpm 12 before the Corepack story lands, installation will silently produce a non-working binary.
@@ -117,7 +117,7 @@ The Fastify reference page explicitly lists three inference paths. The choice ha
   - Zod ↔ Zod-mini is also an option for size-constrained workers; the official site ships both.
 - **Valibot 1.x (current stable) + `fastify-type-provider-valibot`**
   - Valibot's docs site lists a comprehensive v0.31+ → 1.0 migration and a migration from Zod/TypeBox; the API is deliberately modular.
-  - Caveat: a *first-party* Fastify type provider for Valibot is not listed on the official Fastify reference page. Adopters typically use the community `@fastify/type-provider-valibot` (or wire their own) and `valibot-to-json-schema` for OpenAPI. This is a heavier integration path than the Zod option.
+  - Caveat: a _first-party_ Fastify type provider for Valibot is not listed on the official Fastify reference page. Adopters typically use the community `@fastify/type-provider-valibot` (or wire their own) and `valibot-to-json-schema` for OpenAPI. This is a heavier integration path than the Zod option.
 - **TypeBox 1.x (current "Latest" line) + `@fastify/type-provider-typebox`**
   - The official TypeBox repo <https://github.com/sinclairzx81/typebox> describes a "Latest" 1.x line (TypeScript 6.0–7.0+, ESM-only) and an "LTS" 0.x line (TypeScript 5.0–6.0, ESM+CJS). For a brand-new project in 2026 the 1.x line is the choice.
   - `@fastify/type-provider-typebox` is the official wrapper listed on the Fastify reference page.
@@ -173,7 +173,7 @@ The Fastify reference page explicitly lists three inference paths. The choice ha
   - 16 (released 2023-09-14): supported through 2028-11-09.
   - 15 (released 2022-10-13): supported through 2027-11-11.
   - 14 (released 2021-09-30): supported through 2026-11-12.
-  Verified at <https://www.postgresql.org/support/versioning/> on 2026-08-09; the page banner notes "PostgreSQL 19 Beta 2 Released!" on 2026-07-16.
+    Verified at <https://www.postgresql.org/support/versioning/> on 2026-08-09; the page banner notes "PostgreSQL 19 Beta 2 Released!" on 2026-07-16.
 - **Bootstrap recommendation:** pin to **PostgreSQL 17** in the production compose file as the conservative choice (one major behind `latest`, longest remaining coverage window without going bleeding-edge). Use the `postgres:17.10-bookworm` tag to keep the OS reproducible. Local/test compose may use the same tag for parity.
 - **Defer until package setup:** any extension beyond what `postgres-contrib` provides on the `postgres:17-bookworm` image. Avoid the `alpine` tag for a development DB unless the team is comfortable with musl's locale limitations (the docker-library README explicitly notes that musl-based images before PG 15 do not support locales, and PG 15+ only with ICU).
 - **Known traps (verified from the official docker-library README on 2026-08-09 at <https://hub.docker.com/_/postgres>):**
@@ -197,7 +197,7 @@ The Fastify reference page explicitly lists three inference paths. The choice ha
 - **Bootstrap recommendation:** use `drizzle-orm` + `drizzle-kit` and the `node-postgres` (`pg`) driver for v1 because:
   1. The dev/ops ecosystem (PgBouncer-style poolers, IAM auth) is friendlier without prepared statements.
   2. The official "PostgreSQL — Connect" page is explicit that per-query type parsers are easier with `node-postgres`.
-  Code-first schema with `drizzle-kit generate` for migrations; do not use `push` against production (it does not produce reviewable SQL).
+     Code-first schema with `drizzle-kit generate` for migrations; do not use `push` against production (it does not produce reviewable SQL).
 - **Version-compat traps:**
   - Drizzle 1.0 introduces "alternation-engine" and revamped relational queries. v0 → v1 changes are documented at <https://orm.drizzle.team/docs/upgrade-v1> and v0 → v1 changes at <https://orm.drizzle.team/docs/v0-v1-changes>. Do not mix v0 and v1 examples.
   - `drizzle-kit push` writes directly to the DB and is fine for local development; **never** for production. Always `generate` + review + `migrate`.

@@ -1,11 +1,11 @@
 # Current status
 
 **Last updated:** 2026-08-09
-**Phase:** Product and architecture discovery complete; implementation not started
+**Phase:** 0a tooling foundation complete; 0b local runtime and database boundary next
 **Release target:** v1 invite-only beta
 **Product name:** Mugful
 **Public repository:** https://github.com/momokii/mugful
-**Latest verified commit:** `b1c7bc11fd9658229a46b5f3835273284b9f9f67` on `master` and `origin/master`
+**Latest verified baseline:** `b4563f76ef6affe9a62bebe4df5a517e445acc89` on `master` before the authorized tooling commit
 
 ## Completed
 
@@ -19,10 +19,12 @@
 - SMTP and Indonesia UU PDP research notes created under `docs/`.
 - Naming research completed; Mugful is the selected working name pending final trademark, domain, app-store, and namespace verification.
 - Documentation baseline committed as nine atomic commits and pushed to the public GitHub repository.
+- Private pnpm workspace configured for `apps/*` and `packages/*`, pinned to Node 22 and pnpm 11.20.0.
+- Turborepo tasks, strict TypeScript, ESLint, Prettier, Vitest, frozen-lockfile installation, and root validation scripts verified locally.
+- `apps/web` and `apps/api` contain only TypeScript executable smoke shells with a `workspace:*` dependency on shared contracts; they provide no framework, HTTP, realtime, or product behavior.
 
 ## Not started
 
-- Monorepo scaffolding and package manager configuration.
 - Next.js web application.
 - Fastify API/realtime application.
 - Database schema and migrations.
@@ -34,15 +36,15 @@
 
 ## Next recommended step
 
-Create the implementation plan as small vertical slices, beginning with repository/toolchain scaffolding and a verified local Docker development environment. Do not add video, AI, analytics, Redis, or a second activity while building v1.
+Build Todo 3: the local PostgreSQL/runtime health boundary. Do not add video, AI, analytics, Redis, or a second activity while building v1.
 
 ## Command status
 
-There is no `package.json`, Compose file, application entry point, or runnable development command yet. Do not tell contributors to run commands that have not been implemented and verified.
+`pnpm install --frozen-lockfile`, `pnpm typecheck`, `pnpm lint`, `pnpm format:check`, `pnpm test`, `pnpm build`, and `pnpm dev` are verified tooling commands. `pnpm dev` runs shell entry points only; there is no application framework, HTTP server, database, Compose file, or product behavior yet.
 
 ## Known constraints
 
-- The project is pre-implementation and must not be described as production-ready.
+- The project has tooling only and must not be described as production-ready or as having a running application.
 - UU PDP research is not legal advice; counsel-needed items remain open.
 - SMTP quotas and provider policies change; re-check official sources before production setup.
 - The application-level privacy boundary is not end-to-end encryption.

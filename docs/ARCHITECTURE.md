@@ -151,15 +151,15 @@ The first release uses structured JSON logs, redaction, request/correlation IDs,
 
 ## External service inventory
 
-| Service | Environment | Purpose | Data boundary | Required now |
-|---|---|---|---|---|
-| Docker Hub | CI/production | Public web/API images | Image metadata only; no secrets | Yes |
-| Mailpit | Local/test | Captured email inspection | Local test messages only | Yes for local |
-| Resend | Production candidate | Verification/reset/invite email | Email recipient and message content; cross-border treatment may apply | Yes for production email |
-| Uptime monitor | Production | Availability checks | Public health result only | Optional |
-| Traefik | VPS | TLS and routing | Request metadata/logs | User-managed |
-| OpenAI/Anthropic/Gemini | Future only | Optional AI capabilities | Explicitly consented, minimized payloads | No |
-| coturn | Future v1.1 | WebRTC TURN relay | Network/media relay metadata | No |
+| Service                 | Environment          | Purpose                         | Data boundary                                                         | Required now             |
+| ----------------------- | -------------------- | ------------------------------- | --------------------------------------------------------------------- | ------------------------ |
+| Docker Hub              | CI/production        | Public web/API images           | Image metadata only; no secrets                                       | Yes                      |
+| Mailpit                 | Local/test           | Captured email inspection       | Local test messages only                                              | Yes for local            |
+| Resend                  | Production candidate | Verification/reset/invite email | Email recipient and message content; cross-border treatment may apply | Yes for production email |
+| Uptime monitor          | Production           | Availability checks             | Public health result only                                             | Optional                 |
+| Traefik                 | VPS                  | TLS and routing                 | Request metadata/logs                                                 | User-managed             |
+| OpenAI/Anthropic/Gemini | Future only          | Optional AI capabilities        | Explicitly consented, minimized payloads                              | No                       |
+| coturn                  | Future v1.1          | WebRTC TURN relay               | Network/media relay metadata                                          | No                       |
 
 Detailed setup runbooks must explain account creation, DNS, credentials, environment variables, testing, limits, rotation, failure modes, and removal for every service used.
 

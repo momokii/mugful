@@ -1,0 +1,17 @@
+{
+  "name": "@mugful/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm run build && pnpm run start",
+    "build": "tsc --project tsconfig.build.json",
+    "start": "node dist/main.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "pnpm --filter @mugful/contracts build && vitest run"
+  },
+  "dependencies": {
+    "@mugful/contracts": "workspace:*"
+  }
+}

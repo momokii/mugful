@@ -4,6 +4,7 @@ node_modules/
 dist/
 build/
 coverage/
+.turbo/
 *.tsbuildinfo
 
 # Local environment and secrets

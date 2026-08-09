@@ -1,6 +1,6 @@
 # Development guide
 
-**Status:** Pre-implementation guide. Exact commands are added only when the toolchain exists and have been verified locally.
+**Status:** 0a tooling foundation verified. The application framework, local runtime, and product behavior remain unimplemented.
 
 This document is the handoff point for a fresh agent or contributor who does not have the conversation history.
 
@@ -25,18 +25,27 @@ Then inspect the current Git state:
 
 ## Current state
 
-Mugful is a public documentation-only repository. Product and architecture discovery is complete, but application implementation has not started. The public repository is `https://github.com/momokii/mugful`; the latest verified branch is `master` at commit `f3d599d`.
+Mugful has a private pnpm workspace with strict TypeScript tooling and TypeScript-only web/API shells. Product and architecture discovery is complete, but no application framework, HTTP server, database, or product behavior has been implemented. The public repository is `https://github.com/momokii/mugful`.
 
-There is currently no runnable application command. The following are planned, not available yet:
+Use Node 22 and the committed pnpm 11.20.0 pin. The following commands have been verified locally:
 
-- package installation or workspace scripts;
+- `pnpm install --frozen-lockfile`;
+- `pnpm typecheck`;
+- `pnpm lint`;
+- `pnpm format:check`;
+- `pnpm test`;
+- `pnpm build`;
+- `pnpm dev`, which compiles and prints labels from the two shell entry points.
+
+The following are planned, not available yet:
+
 - Next.js web development server;
 - Fastify API development server;
 - PostgreSQL Compose services;
 - Mailpit Compose service;
 - tests, CI workflows, Docker builds, and deployment scripts.
 
-Do not claim any of these commands work until they exist and have been run successfully.
+Do not describe the shell commands as application runtime commands or claim any planned service exists until it has been implemented and verified.
 
 ## Locked stack
 
@@ -54,12 +63,10 @@ Do not claim any of these commands work until they exist and have been run succe
 
 Do not start with the game UI. Build and verify the foundation vertically:
 
-1. Scaffold the monorepo and strict TypeScript configuration.
-2. Add linting, formatting, type checking, and test commands.
-3. Add development Compose services for PostgreSQL and Mailpit.
-4. Add validated environment configuration and a safe `.env.example`.
-5. Add minimal web/API health boundaries.
-6. Add CI checks and update this guide with commands that actually work.
+1. Add development Compose services for PostgreSQL and Mailpit.
+2. Add validated environment configuration and a safe `.env.example`.
+3. Add minimal web/API health boundaries.
+4. Add CI checks and update this guide with commands that actually work.
 
 The first slice is complete only when a fresh contributor can clone the repository, follow the README, start the local dependencies, run validation, and understand the result.
 

@@ -1,0 +1,9 @@
+node_modules/
+dist/
+coverage/
+.turbo/
+.omo/
+.codegraph/
+docs/**
+DESIGN.md
+CLAUDE.md

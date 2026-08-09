@@ -7,17 +7,17 @@ This document records the categories of configuration the implementation must ex
 
 ## Configuration categories
 
-| Category | Examples of responsibility | Secret? |
-|---|---|---|
-| Runtime | Environment name, log level, public origin | Usually no |
-| Database | PostgreSQL connection and migration settings | Yes |
-| Sessions | Cookie policy, session lifetime, signing/encryption material | Yes |
-| Private content | Application encryption key reference and rotation metadata | Yes |
-| SMTP | Host, port, TLS mode, sender, provider credentials | Credentials yes |
-| Feature flags | Registration mode, maintenance mode, activity availability | No, but audited |
-| Docker/deployment | Image tags, registry credentials, release selection | Registry credential yes |
-| Observability | Health endpoint and uptime configuration | Usually no |
-| Future providers | AI or TURN settings only when their roadmap milestone is approved | Yes |
+| Category          | Examples of responsibility                                        | Secret?                 |
+| ----------------- | ----------------------------------------------------------------- | ----------------------- |
+| Runtime           | Environment name, log level, public origin                        | Usually no              |
+| Database          | PostgreSQL connection and migration settings                      | Yes                     |
+| Sessions          | Cookie policy, session lifetime, signing/encryption material      | Yes                     |
+| Private content   | Application encryption key reference and rotation metadata        | Yes                     |
+| SMTP              | Host, port, TLS mode, sender, provider credentials                | Credentials yes         |
+| Feature flags     | Registration mode, maintenance mode, activity availability        | No, but audited         |
+| Docker/deployment | Image tags, registry credentials, release selection               | Registry credential yes |
+| Observability     | Health endpoint and uptime configuration                          | Usually no              |
+| Future providers  | AI or TURN settings only when their roadmap milestone is approved | Yes                     |
 
 ## Secret handling
 

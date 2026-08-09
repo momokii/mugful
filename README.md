@@ -2,7 +2,7 @@
 
 A private, playful web space for adults in long-distance relationships. The first release focuses on one shared activity: **Guess My Answer**.
 
-> **Status:** Product and architecture confirmed. Application implementation has not started yet.
+> **Status:** The TypeScript monorepo tooling foundation is verified. No application framework, runtime, or product behavior exists yet.
 
 ## Product direction
 
@@ -24,7 +24,20 @@ v1 deliberately does **not** include native video, AI, behavioral analytics, or 
 
 ## Current repository state
 
-This repository currently contains the confirmed product, architecture, design-system, privacy, SMTP, roadmap, and contributor documentation. There is no runnable application yet, so application commands will be added when implementation begins.
+This repository contains the confirmed product, architecture, design-system, privacy, SMTP, roadmap, and contributor documentation, plus a private pnpm 11 workspace with Turborepo tasks, strict TypeScript, ESLint, Prettier, and Vitest smoke tests. `apps/web` and `apps/api` are TypeScript-only executable shells; they do not start a web server or API.
+
+With Node 22 and pnpm 11.20.0 installed, a contributor can verify the tooling foundation with:
+
+```sh
+pnpm install --frozen-lockfile
+pnpm typecheck
+pnpm lint
+pnpm format:check
+pnpm test
+pnpm build
+```
+
+`pnpm dev` executes both shell entry points after compiling them. It is not an application development server.
 
 ## Documentation map
 
