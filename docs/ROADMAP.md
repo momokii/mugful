@@ -4,7 +4,7 @@ This roadmap is intentionally outcome-based. A milestone is not complete because
 
 ## Current status
 
-**Phase:** Foundation and Todo 4 complete; Todo 5 identity implementation is in progress through verified persistence/configuration checkpoint 5B1.
+**Phase:** Foundation and Todo 4 complete; Todo 5 identity implementation is in progress through verified email-delivery checkpoint 5C.
 
 Completed discovery artifacts:
 
@@ -56,7 +56,7 @@ Each slice must include its behavior tests, documentation updates, accessibility
 - 5E: negative-path matrix.
 - 5F: final acceptance.
 
-Only 5A and 5B1 are complete. Todo 5 is not complete until all checkpoints are verified.
+Checkpoints 5A, 5B1, 5B2, and 5C are complete. Todo 5 is not complete until all checkpoints are verified.
 
 ## Phase 2 — v1 invite-only beta
 

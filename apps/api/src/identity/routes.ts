@@ -3,6 +3,8 @@ import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 
 import { createCsrfProtection } from "./csrf.js";
+import type { IdentityEmailService } from "./email-service.js";
+import { registerIdentityEmailRoutes } from "./email-routes.js";
 import { sessionTokenSchema } from "./session.js";
 import type { IdentityService } from "./service.js";
 
@@ -29,6 +31,7 @@ const sessionParamsSchema = z.object({ sessionId: z.string().uuid() });
 
 type IdentityRouteDependencies = Readonly<{
   csrfSecret: string;
+  identityEmailService: IdentityEmailService;
   identityService: IdentityService;
   productionCookies: boolean;
   registrationEnabled: boolean;
@@ -132,6 +135,12 @@ export const registerIdentityRoutes = (
       ? dependencies.identityService.authenticate(parsedToken.data)
       : undefined;
   };
+
+  registerIdentityEmailRoutes(app, {
+    identityEmailService: dependencies.identityEmailService,
+    sendForbidden,
+    verifyUnsafeRequest,
+  });
 
   app.get("/v1/csrf", (_request, reply) => {
     const issued = csrf.create();

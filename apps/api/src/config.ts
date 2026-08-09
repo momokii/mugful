@@ -9,6 +9,7 @@ const databaseUrlSchema = z
   );
 
 const secretSchema = z.string().min(32);
+const smtpPortSchema = z.coerce.number().int().min(1).max(65_535);
 const webOriginSchema = z
   .string()
   .url()
@@ -17,29 +18,55 @@ const webOriginSchema = z
     return value === origin || value === `${origin}/`;
   });
 
-const apiConfigSchema = z.object({
-  API_HOST: z.string().min(1).default("127.0.0.1"),
-  API_PORT: z.coerce.number().int().min(1).max(65_535).default(3001),
-  CSRF_SECRET: secretSchema,
-  DATABASE_URL: databaseUrlSchema,
-  RATE_LIMIT_PRINCIPAL_PEPPER: secretSchema,
-  REGISTRATION_DEFAULT_ENABLED: z
-    .enum(["true", "false"])
-    .default("false")
-    .transform((value) => value === "true"),
-  SESSION_TOKEN_PEPPER: secretSchema,
-  WEB_ORIGIN: webOriginSchema,
-});
+const apiConfigSchema = z
+  .object({
+    API_HOST: z.string().min(1).default("127.0.0.1"),
+    API_PORT: z.coerce.number().int().min(1).max(65_535).default(3001),
+    CSRF_SECRET: secretSchema,
+    DATABASE_URL: databaseUrlSchema,
+    RATE_LIMIT_PRINCIPAL_PEPPER: secretSchema,
+    REGISTRATION_DEFAULT_ENABLED: z
+      .enum(["true", "false"])
+      .default("false")
+      .transform((value) => value === "true"),
+    SESSION_TOKEN_PEPPER: secretSchema,
+    IDENTITY_TOKEN_PEPPER: secretSchema,
+    SMTP_FROM: z.string().min(3).max(320),
+    SMTP_HOST: z.string().min(1).max(253),
+    SMTP_PASS: z.string().min(1).optional(),
+    SMTP_PORT: smtpPortSchema,
+    SMTP_SECURE: z
+      .enum(["true", "false"])
+      .transform((value) => value === "true"),
+    SMTP_USER: z.string().min(1).optional(),
+    WEB_ORIGIN: webOriginSchema,
+  })
+  .superRefine((value, context) => {
+    if ((value.SMTP_USER === undefined) !== (value.SMTP_PASS === undefined))
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "SMTP credentials must be configured together",
+      });
+  });
 
 export type ApiConfig = Readonly<{
   csrfSecret: string;
+  databaseUrl: string;
   host: string;
+  identityTokenPepper: string;
   port: number;
   rateLimitPrincipalPepper: string;
   registrationDefaultEnabled: boolean;
   sessionTokenPepper: string;
+  smtp: Readonly<{
+    from: string;
+    host: string;
+    password: string | undefined;
+    port: number;
+    secure: boolean;
+    username: string | undefined;
+  }>;
   webOrigin: string;
-  databaseUrl: string;
 }>;
 
 type Environment = Readonly<Record<string, string | undefined>>;
@@ -63,12 +90,21 @@ export const parseApiConfig = (environment: Environment): ApiConfig => {
 
   return {
     csrfSecret: result.data.CSRF_SECRET,
+    databaseUrl: result.data.DATABASE_URL,
     host: result.data.API_HOST,
+    identityTokenPepper: result.data.IDENTITY_TOKEN_PEPPER,
     port: result.data.API_PORT,
     rateLimitPrincipalPepper: result.data.RATE_LIMIT_PRINCIPAL_PEPPER,
     registrationDefaultEnabled: result.data.REGISTRATION_DEFAULT_ENABLED,
     sessionTokenPepper: result.data.SESSION_TOKEN_PEPPER,
+    smtp: {
+      from: result.data.SMTP_FROM,
+      host: result.data.SMTP_HOST,
+      password: result.data.SMTP_PASS,
+      port: result.data.SMTP_PORT,
+      secure: result.data.SMTP_SECURE,
+      username: result.data.SMTP_USER,
+    },
     webOrigin: result.data.WEB_ORIGIN.replace(/\/$/, ""),
-    databaseUrl: result.data.DATABASE_URL,
   };
 };

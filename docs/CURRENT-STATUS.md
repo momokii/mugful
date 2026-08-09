@@ -1,11 +1,11 @@
 # Current status
 
-**Last updated:** 2026-08-09
+**Last updated:** 2026-08-10
 **Phase:** 0b local runtime/database health boundary and Todo 4 accessible web shell complete; Todo 5 identity work in progress
 **Release target:** v1 invite-only beta
 **Product name:** Mugful
 **Public repository:** https://github.com/momokii/mugful
-**Latest verified baseline:** `ff5bd7f` on `master` before Todo 5B1 implementation
+**Latest verified baseline:** `30fb9ef` on `master` before Todo 5C implementation
 
 ## Completed
 
@@ -29,12 +29,13 @@
 - Internal Argon2id password hash/verify policy, opaque token HMAC/expiry/single-use guards, session token/cookie-option types, and versioned consent vocabulary have focused unit coverage. The manual migration was applied and schema-checked against local PostgreSQL Compose.
 - Todo 5B1 identity policy persistence/configuration is verified: additive `0002_identity_policy.sql` adds normalized-email uniqueness, disabled-by-default registration policy/audit state, session lifecycle metadata, and HMAC-keyed rate-limit buckets without raw email or IP columns; `0003_rate_limit_hash_constraint.sql` enforces lowercase 64-character SHA-256 hex storage.
 - Todo 5B2 identity HTTP checkpoint is verified against an isolated Compose PostgreSQL database through Fastify injection: `/v1` CSRF issuance, default-closed/config-gated atomic registration with adult/terms/privacy consent, verified-account login, logout, current session, password change session rotation, session listing, and owned non-current session revocation. Unsafe routes require same-origin plus signed/bound CSRF; authentication throttling persists only HMAC-principal keys; raw passwords and session tokens are neither logged nor stored. Registration creates no session before future email verification.
+- Todo 5C email checkpoint is verified against isolated Compose PostgreSQL and Mailpit services: provider-neutral Nodemailer SMTP configuration, local-only loopback Mailpit, registration verification email, verification resend/confirm, and password forgot/reset HTTP commands. Messages contain only fragment token links. Token persistence is HMAC-only; replacement, expiry, atomic single use, absent-email generic output, SMTP failure recovery, session revocation after reset, and no token in API responses are covered through Fastify injection and Mailpit capture.
 
 ## Not started
 
 - Next.js web application beyond the Todo 4 static shell.
 - Fastify API/realtime application.
-- Email verification/reset delivery, invitations, Privacy Center, OpenAPI documentation, and web authentication UI.
+- Invitations, Privacy Center, OpenAPI documentation, and web authentication UI.
 - Identity persistence transaction orchestration for future account-and-consent creation.
 - Prompt catalog and Guess My Answer state machine.
 - Docker Compose configurations and deployment scripts.

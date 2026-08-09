@@ -29,7 +29,7 @@ Traefik remains the VPS-level reverse proxy. Its labels, external network name, 
 
 ## Implemented local runtime boundary
 
-`compose.yaml` intentionally runs only PostgreSQL 17.10-bookworm, bound to localhost with password authentication, a named volume at `/var/lib/postgresql/data`, and a TCP-capable `pg_isready` check. It is not production Compose. Fastify liveness is database-independent; readiness runs a read-only check and returns generic 503 on failure. The Next rewrite maps `/api/:path*` to `${API_INTERNAL_ORIGIN}/:path*`, stripping `/api`. Manual `db:generate` and `db:migrate` commands own migrations; startup, development, Fastify construction, readiness, and Compose never run migration code.
+`compose.yaml` runs PostgreSQL 17.10-bookworm and development-only Mailpit, both bound to localhost. PostgreSQL uses password authentication, a named volume at `/var/lib/postgresql/data`, and a TCP-capable `pg_isready` check; Mailpit exposes loopback SMTP and capture UI ports only. It is not production Compose. Fastify liveness is database-independent; readiness runs a read-only check and returns generic 503 on failure. The Next rewrite maps `/api/:path*` to `${API_INTERNAL_ORIGIN}/:path*`, stripping `/api`. Manual `db:generate` and `db:migrate` commands own migrations; startup, development, Fastify construction, readiness, and Compose never run migration code.
 
 ## Architectural principles
 
@@ -57,7 +57,7 @@ PostgreSQL stores accounts, sessions, couple membership, invite metadata, prompt
 
 ### Mailpit and SMTP
 
-Mailpit is development-only. Production uses the provider-neutral SMTP interface. Resend Free is the first documented candidate; Brevo and Google Workspace SMTP Relay are alternatives. Email delivery must never be required to run the local test suite.
+Mailpit is development/test-only and receives configuration exclusively through the provider-neutral SMTP interface. Production provider provisioning is out of scope; Resend Free remains the first documented candidate, while Brevo and Google Workspace SMTP Relay remain alternatives. Email delivery is opt-in for ordinary local tests; the dedicated isolated integration suite explicitly enables PostgreSQL and Mailpit.
 
 ## Domain state
 
@@ -104,7 +104,9 @@ Cancellation is valid from the pending pre-reveal states (`active` and `waiting-
 - Invite, verification, and reset tokens are single-use, short-lived, and stored only as hashes.
 - Superadmin authentication requires passkey MFA with TOTP recovery.
 
-Todo 5B2 exposes only the internal `/v1` identity checkpoint: CSRF issuance; config-gated registration; verified-account login; logout; current session; password change; active-device listing; and owned non-current device revocation. Every unsafe identity command requires an exact same-origin `Origin` header plus a signed CSRF token bound to a browser CSRF cookie. Login and registration use durable PostgreSQL rate-limit buckets keyed only by an HMAC of their normalized principal. Generic credential and registration responses avoid account enumeration. Password change creates a replacement opaque session and invalidates every prior account session in one transaction. Migrations remain explicit manual operations; startup and health boundaries do not execute them.
+Todo 5B2 exposes the internal `/v1` identity checkpoint: CSRF issuance; config-gated registration; verified-account login; logout; current session; password change; active-device listing; and owned non-current device revocation. Todo 5C adds verification resend/confirm and password forgot/reset commands. Every unsafe identity command requires an exact same-origin `Origin` header plus a signed CSRF token bound to a browser CSRF cookie. Login, registration, and email requests use durable PostgreSQL rate-limit buckets keyed only by an HMAC of their normalized principal. Generic credential, registration, and absent-email responses avoid account enumeration. Verification and reset tokens are random, HMAC-persisted, replaced when reissued, atomically consumed, and sent only in URL fragments. Token/account state commits before mail delivery; failed delivery remains generic and can be retried. Password reset invalidates every account session without issuing one; verification does not create a session. Migrations remain explicit manual operations; startup and health boundaries do not execute them.
+
+The future `/verify-email` and `/reset-password` UI pages must read tokens from fragments only and set `Referrer-Policy: no-referrer` plus `Cache-Control: no-store`; Todo 5C does not add those pages.
 
 Session-cookie policy is deployment-specific and not caller-configurable: production uses the `__Host-mugful-session` name with `Secure`, `HttpOnly`, `SameSite=Lax`, and `Path=/` without `Domain`; the explicit local-development helper uses `mugful-session` with `secure: false` for local HTTP only.
 

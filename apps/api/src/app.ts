@@ -1,6 +1,7 @@
 import fastify from "fastify";
 
 import { registerIdentityRoutes } from "./identity/routes.js";
+import type { IdentityEmailService } from "./identity/email-service.js";
 import type { IdentityService } from "./identity/service.js";
 
 export type DatabaseChecker = Readonly<{
@@ -11,6 +12,7 @@ export type AppDependencies = Readonly<{
   databaseChecker: DatabaseChecker;
   identity?: Readonly<{
     csrfSecret: string;
+    identityEmailService: IdentityEmailService;
     identityService: IdentityService;
     productionCookies: boolean;
     registrationEnabled: boolean;

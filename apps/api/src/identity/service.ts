@@ -15,6 +15,8 @@ import {
   type SessionPepper,
   type SessionToken,
 } from "./session.js";
+import type { IdentityEmailService } from "./email-service.js";
+import { registerAccount } from "./registration.js";
 
 const dummyPasswordHash = passwordHashSchema.parse(
   "$argon2id$v=19$m=19456,t=2,p=1$QmFzZTY0RW5jb2RlZE5vbmNl$X5QPRks9+P3ocvcRAem5WktvO0LsQ0wTuWTTruhScxc",
@@ -82,6 +84,7 @@ export type IdentityService = Readonly<{
 }>;
 
 type ServiceDependencies = Readonly<{
+  emailService: IdentityEmailService;
   rateLimitPrincipalPepper: RateLimitPrincipalPepper;
   repository: IdentityRepository;
   sessionPepper: SessionPepper;
@@ -179,46 +182,7 @@ export const createIdentityService = (
     );
     return { ...session, email: account.email };
   },
-  register: async (input) => {
-    const email = canonicalEmail(input.email);
-    if (
-      !(await consumeRateLimitAttempt(dependencies.repository, {
-        pepper: dependencies.rateLimitPrincipalPepper,
-        principal: `register:${email}`,
-      }))
-    )
-      return "rate-limited";
-    const passwordHash = await hashPassword(input.password);
-    try {
-      await dependencies.repository.transaction(async (transaction) => {
-        const account = await transaction.query<Readonly<{ id: string }>>(
-          "INSERT INTO accounts (email, normalized_email, display_name, password_hash) VALUES ($1, $1, $2, $3) RETURNING id",
-          [email, input.displayName, passwordHash],
-        );
-        const [createdAccount] = account.rows;
-        if (createdAccount === undefined)
-          throw new Error("Account creation failed");
-        await transaction.query(
-          "INSERT INTO account_consents (account_id, kind, version) VALUES ($1, 'adult_attestation', $2), ($1, 'terms', $3), ($1, 'privacy', $4)",
-          [
-            createdAccount.id,
-            "adult-v1",
-            input.termsVersion,
-            input.privacyVersion,
-          ],
-        );
-      });
-    } catch (error) {
-      if (
-        !(error instanceof Error) ||
-        !("code" in error) ||
-        typeof error.code !== "string" ||
-        error.code !== "23505"
-      )
-        throw error;
-    }
-    return "accepted";
-  },
+  register: async (input) => registerAccount(dependencies, input),
   revokeSession: async (input) => {
     if (input.sessionId === input.currentSessionId) return "forbidden";
     const result = await dependencies.repository.query(

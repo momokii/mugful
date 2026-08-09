@@ -13,6 +13,11 @@ describe("parseApiConfig", () => {
       CSRF_SECRET: "c".repeat(32),
       RATE_LIMIT_PRINCIPAL_PEPPER: "r".repeat(32),
       SESSION_TOKEN_PEPPER: "s".repeat(32),
+      IDENTITY_TOKEN_PEPPER: "t".repeat(32),
+      SMTP_FROM: "Mugful <noreply@mugful.test>",
+      SMTP_HOST: "mailpit",
+      SMTP_PORT: "1025",
+      SMTP_SECURE: "false",
       WEB_ORIGIN: "https://mugful.example",
     };
 
@@ -26,9 +31,18 @@ describe("parseApiConfig", () => {
       databaseUrl:
         "postgresql://mugful:local-only-password@127.0.0.1:5432/mugful",
       csrfSecret: "c".repeat(32),
+      identityTokenPepper: "t".repeat(32),
       rateLimitPrincipalPepper: "r".repeat(32),
       registrationDefaultEnabled: false,
       sessionTokenPepper: "s".repeat(32),
+      smtp: {
+        from: "Mugful <noreply@mugful.test>",
+        host: "mailpit",
+        password: undefined,
+        port: 1025,
+        secure: false,
+        username: undefined,
+      },
       webOrigin: "https://mugful.example",
     });
   });
@@ -55,6 +69,11 @@ describe("parseApiConfig", () => {
       CSRF_SECRET: "c".repeat(32),
       RATE_LIMIT_PRINCIPAL_PEPPER: "r".repeat(32),
       SESSION_TOKEN_PEPPER: "s".repeat(32),
+      IDENTITY_TOKEN_PEPPER: "t".repeat(32),
+      SMTP_FROM: "Mugful <noreply@mugful.test>",
+      SMTP_HOST: "mailpit",
+      SMTP_PORT: "1025",
+      SMTP_SECURE: "false",
       WEB_ORIGIN: "https://mugful.example",
     };
 
@@ -73,6 +92,11 @@ describe("parseApiConfig", () => {
       CSRF_SECRET: "c".repeat(32),
       RATE_LIMIT_PRINCIPAL_PEPPER: "r".repeat(32),
       SESSION_TOKEN_PEPPER: "s".repeat(32),
+      IDENTITY_TOKEN_PEPPER: "t".repeat(32),
+      SMTP_FROM: "Mugful <noreply@mugful.test>",
+      SMTP_HOST: "mailpit",
+      SMTP_PORT: "1025",
+      SMTP_SECURE: "false",
       WEB_ORIGIN: "https://mugful.example/login",
     };
 

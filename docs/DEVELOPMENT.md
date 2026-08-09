@@ -1,6 +1,6 @@
 # Development guide
 
-**Status:** 0b local runtime foundation, Todo 4 accessible web shell, and Todo 5A/5B1/5B2 identity checkpoints verified. Todo 5 remains in progress; product behavior remains unimplemented.
+**Status:** 0b local runtime foundation, Todo 4 accessible web shell, and Todo 5A/5B1/5B2/5C identity checkpoints verified. Todo 5 remains in progress; product behavior remains unimplemented.
 
 This document is the handoff point for a fresh agent or contributor who does not have the conversation history.
 
@@ -25,7 +25,7 @@ Then inspect the current Git state:
 
 ## Current state
 
-Mugful has strict TypeScript tooling, a local-only PostgreSQL 17 Compose service, Fastify health API, minimal Next.js proxy, a static Next.js public/auth shell, manual identity persistence migrations, and a bounded internal identity HTTP checkpoint. Todo 5B2 exposes `/v1` CSRF issuance, registration, login, logout, current session, password change, active session listing, and owned non-current session revocation. Registration is still closed by default and registration never creates a session until future email verification.
+Mugful has strict TypeScript tooling, local-only PostgreSQL 17 and Mailpit Compose services, Fastify health API, minimal Next.js proxy, a static Next.js public/auth shell, manual identity persistence migrations, and bounded internal identity HTTP checkpoints. Todo 5B2 exposes `/v1` CSRF issuance, registration, login, logout, current session, password change, active session listing, and owned non-current session revocation. Todo 5C adds CSRF/origin-protected verification resend/confirm and password forgot/reset commands. Registration remains closed by default and registration never creates a session until email verification.
 
 Use Node 22 and the committed pnpm 11.20.0 pin. The following commands have been verified locally:
 
@@ -46,7 +46,6 @@ The following are planned, not available yet:
 - Next.js product development server beyond the verified static shell;
 - Fastify API development server;
 - PostgreSQL Compose services;
-- Mailpit Compose service;
 - tests, CI workflows, Docker builds, and deployment scripts.
 
 Do not describe the shell commands as application runtime commands or claim any planned service exists until it has been implemented and verified.
@@ -66,7 +65,7 @@ Do not describe the shell commands as application runtime commands or claim any 
 ## Local runtime
 
 1. Create ignored `.env` from `.env.example` and replace the local-only password in both database variables.
-2. Run `docker compose -f compose.yaml up -d postgres` and `docker compose -f compose.yaml exec postgres pg_isready -h 127.0.0.1 -U mugful -d mugful`.
+2. Run `docker compose -f compose.yaml up -d postgres mailpit` and `docker compose -f compose.yaml exec postgres pg_isready -h 127.0.0.1 -U mugful -d mugful`. Mailpit’s local capture UI is `http://127.0.0.1:8025`.
 3. Apply the reviewed migration explicitly with `pnpm --filter @mugful/api db:migrate`.
 4. Start Fastify and Next with their package `dev` commands. Verify liveness, readiness, and `http://127.0.0.1:3000/api/health/live` with curl.
 5. Clean with `docker compose -f compose.yaml down -v`.
@@ -76,6 +75,8 @@ Compose health only proves PostgreSQL accepts TCP connections. Fastify liveness 
 Todo 5A migration verification also runs `MUGFUL_RUN_DATABASE_TESTS=true DATABASE_URL=<local URL> pnpm --filter @mugful/api test -- src/identity/schema.integration.test.ts` after the manual migration. The test is skipped unless explicitly enabled so ordinary unit runs do not require PostgreSQL.
 
 Todo 5B2 HTTP verification requires a manually migrated, isolated PostgreSQL database and runs `MUGFUL_RUN_DATABASE_TESTS=true MUGFUL_TEST_DATABASE_URL=<isolated URL> pnpm --filter @mugful/api test -- src/identity/http-auth.integration.test.ts src/identity/http-session.integration.test.ts`. The suite uses Fastify injection against the real database; application startup does not execute migrations.
+
+Todo 5C integration verification uses an isolated Compose PostgreSQL and Mailpit pair, manually applies migrations, and runs `MUGFUL_RUN_DATABASE_TESTS=true MUGFUL_TEST_DATABASE_URL=<isolated URL> MUGFUL_TEST_MAILPIT_URL=<isolated Mailpit URL> MUGFUL_TEST_SMTP_PORT=<isolated SMTP port> pnpm --filter @mugful/api test -- src/identity/http-email.integration.test.ts`. It captures SMTP delivery through Mailpit’s API, checks fragment-only links, HMAC-only database storage, single use and expiry, generic absent-address responses, and unavailable-SMTP resend recovery. It does not run migrations on startup or require a production provider.
 
 ## First implementation slice
 
