@@ -104,7 +104,7 @@ Cancellation is valid from the pending pre-reveal states (`active` and `waiting-
 - Invite, verification, and reset tokens are single-use, short-lived, and stored only as hashes.
 - Superadmin authentication requires passkey MFA with TOTP recovery.
 
-Todo 5A intentionally has no routes, cookie issuance, CSRF middleware, rate limiting, email delivery, or identity transaction service. Migrations remain explicit manual operations; startup and health boundaries do not execute them.
+Todo 5B2 exposes only the internal `/v1` identity checkpoint: CSRF issuance; config-gated registration; verified-account login; logout; current session; password change; active-device listing; and owned non-current device revocation. Every unsafe identity command requires an exact same-origin `Origin` header plus a signed CSRF token bound to a browser CSRF cookie. Login and registration use durable PostgreSQL rate-limit buckets keyed only by an HMAC of their normalized principal. Generic credential and registration responses avoid account enumeration. Password change creates a replacement opaque session and invalidates every prior account session in one transaction. Migrations remain explicit manual operations; startup and health boundaries do not execute them.
 
 Session-cookie policy is deployment-specific and not caller-configurable: production uses the `__Host-mugful-session` name with `Secure`, `HttpOnly`, `SameSite=Lax`, and `Path=/` without `Domain`; the explicit local-development helper uses `mugful-session` with `secure: false` for local HTTP only.
 

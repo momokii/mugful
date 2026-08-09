@@ -3,10 +3,15 @@ import { sql } from "drizzle-orm";
 import { Pool } from "pg";
 
 import type { DatabaseChecker } from "./app.js";
+import {
+  createIdentityRepository,
+  type IdentityRepository,
+} from "./identity/repository.js";
 
 export type DatabaseConnection = Readonly<{
   checker: DatabaseChecker;
   close: () => Promise<void>;
+  identityRepository: IdentityRepository;
 }>;
 
 export const createDatabaseConnection = (
@@ -30,5 +35,6 @@ export const createDatabaseConnection = (
     close: async () => {
       await pool.end();
     },
+    identityRepository: createIdentityRepository(pool),
   };
 };

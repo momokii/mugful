@@ -27,13 +27,14 @@
 - Production-server Playwright browser checks and screenshots are verified at 375px, 768px, and 1280px for the public/auth shell; evidence is stored under `.omo/evidence/task-4-*`.
 - Todo 5A identity persistence primitives are implemented and verified: `0001_identity.sql` adds accounts, versioned adult/terms/privacy consent records, hashed opaque sessions, and hashed single-use expiring identity tokens without raw credential or token columns.
 - Internal Argon2id password hash/verify policy, opaque token HMAC/expiry/single-use guards, session token/cookie-option types, and versioned consent vocabulary have focused unit coverage. The manual migration was applied and schema-checked against local PostgreSQL Compose.
-- Todo 5B1 identity policy persistence/configuration is verified: additive `0002_identity_policy.sql` adds normalized-email uniqueness, disabled-by-default registration policy/audit state, session lifecycle metadata, and HMAC-keyed rate-limit buckets without raw email or IP columns; `0003_rate_limit_hash_constraint.sql` enforces lowercase 64-character SHA-256 hex storage. Session/CSRF/origin/registration defaults are runtime-validated; no HTTP identity behavior is implemented.
+- Todo 5B1 identity policy persistence/configuration is verified: additive `0002_identity_policy.sql` adds normalized-email uniqueness, disabled-by-default registration policy/audit state, session lifecycle metadata, and HMAC-keyed rate-limit buckets without raw email or IP columns; `0003_rate_limit_hash_constraint.sql` enforces lowercase 64-character SHA-256 hex storage.
+- Todo 5B2 identity HTTP checkpoint is verified against an isolated Compose PostgreSQL database through Fastify injection: `/v1` CSRF issuance, default-closed/config-gated atomic registration with adult/terms/privacy consent, verified-account login, logout, current session, password change session rotation, session listing, and owned non-current session revocation. Unsafe routes require same-origin plus signed/bound CSRF; authentication throttling persists only HMAC-principal keys; raw passwords and session tokens are neither logged nor stored. Registration creates no session before future email verification.
 
 ## Not started
 
 - Next.js web application beyond the Todo 4 static shell.
 - Fastify API/realtime application.
-- Authentication routes, session issuance, CSRF handling, invitations, email verification/reset delivery, and Privacy Center.
+- Email verification/reset delivery, invitations, Privacy Center, OpenAPI documentation, and web authentication UI.
 - Identity persistence transaction orchestration for future account-and-consent creation.
 - Prompt catalog and Guess My Answer state machine.
 - Docker Compose configurations and deployment scripts.

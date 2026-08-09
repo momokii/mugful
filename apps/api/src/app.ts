@@ -1,11 +1,22 @@
 import fastify from "fastify";
 
+import { registerIdentityRoutes } from "./identity/routes.js";
+import type { IdentityService } from "./identity/service.js";
+
 export type DatabaseChecker = Readonly<{
   check: () => Promise<void>;
 }>;
 
 export type AppDependencies = Readonly<{
   databaseChecker: DatabaseChecker;
+  identity?: Readonly<{
+    csrfSecret: string;
+    identityService: IdentityService;
+    productionCookies: boolean;
+    registrationEnabled: boolean;
+    sessionCookieName: string;
+    webOrigin: string;
+  }>;
 }>;
 
 export const createApp = (dependencies: AppDependencies) => {
@@ -19,6 +30,9 @@ export const createApp = (dependencies: AppDependencies) => {
       .then(() => reply.code(200).send({ status: "ready" }))
       .catch(() => reply.code(503).send({ status: "unavailable" })),
   );
+
+  if (dependencies.identity !== undefined)
+    registerIdentityRoutes(app, dependencies.identity);
 
   app.setErrorHandler((_error, _request, reply) => {
     reply.code(503).send({ status: "unavailable" });

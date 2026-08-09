@@ -1,6 +1,6 @@
 # Development guide
 
-**Status:** 0b local runtime foundation, Todo 4 accessible web shell, Todo 5A identity persistence primitives, and Todo 5B1 identity policy persistence/configuration verified. Todo 5 remains in progress; product behavior remains unimplemented.
+**Status:** 0b local runtime foundation, Todo 4 accessible web shell, and Todo 5A/5B1/5B2 identity checkpoints verified. Todo 5 remains in progress; product behavior remains unimplemented.
 
 This document is the handoff point for a fresh agent or contributor who does not have the conversation history.
 
@@ -25,7 +25,7 @@ Then inspect the current Git state:
 
 ## Current state
 
-Mugful has strict TypeScript tooling, a local-only PostgreSQL 17 Compose service, Fastify health API, minimal Next.js proxy, a static Next.js public/auth shell, and manual identity persistence migrations. Todo 5A supplies internal account/consent/session/token schema and primitives; Todo 5B1 adds identity-policy schema/configuration only. Neither exposes authentication behavior.
+Mugful has strict TypeScript tooling, a local-only PostgreSQL 17 Compose service, Fastify health API, minimal Next.js proxy, a static Next.js public/auth shell, manual identity persistence migrations, and a bounded internal identity HTTP checkpoint. Todo 5B2 exposes `/v1` CSRF issuance, registration, login, logout, current session, password change, active session listing, and owned non-current session revocation. Registration is still closed by default and registration never creates a session until future email verification.
 
 Use Node 22 and the committed pnpm 11.20.0 pin. The following commands have been verified locally:
 
@@ -74,6 +74,8 @@ Do not describe the shell commands as application runtime commands or claim any 
 Compose health only proves PostgreSQL accepts TCP connections. Fastify liveness never queries PostgreSQL; readiness uses a read-only query and returns generic 503 on failure. Startup, development, Fastify construction, readiness, and Compose never import or run migration code.
 
 Todo 5A migration verification also runs `MUGFUL_RUN_DATABASE_TESTS=true DATABASE_URL=<local URL> pnpm --filter @mugful/api test -- src/identity/schema.integration.test.ts` after the manual migration. The test is skipped unless explicitly enabled so ordinary unit runs do not require PostgreSQL.
+
+Todo 5B2 HTTP verification requires a manually migrated, isolated PostgreSQL database and runs `MUGFUL_RUN_DATABASE_TESTS=true MUGFUL_TEST_DATABASE_URL=<isolated URL> pnpm --filter @mugful/api test -- src/identity/http-auth.integration.test.ts src/identity/http-session.integration.test.ts`. The suite uses Fastify injection against the real database; application startup does not execute migrations.
 
 ## First implementation slice
 
