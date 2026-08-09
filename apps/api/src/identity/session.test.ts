@@ -59,4 +59,17 @@ describe("session primitives", () => {
       secure: false,
     });
   });
+
+  it("rejects a session pepper shorter than the runtime configuration minimum", () => {
+    // Given: a pepper that is shorter than 32 characters
+    const shortPepper = "s".repeat(31);
+
+    // When: the session primitive parses it
+    const parse = (): void => {
+      sessionPepperSchema.parse(shortPepper);
+    };
+
+    // Then: the primitive enforces the same minimum as runtime configuration
+    expect(parse).toThrow();
+  });
 });

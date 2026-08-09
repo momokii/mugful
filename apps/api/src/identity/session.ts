@@ -7,7 +7,7 @@ export const sessionTokenHashSchema = z
   .string()
   .regex(/^[a-f0-9]{64}$/)
   .brand<"SessionTokenHash">();
-export const sessionPepperSchema = z.string().min(16).brand<"SessionPepper">();
+export const sessionPepperSchema = z.string().min(32).brand<"SessionPepper">();
 
 export type SessionToken = z.infer<typeof sessionTokenSchema>;
 export type SessionTokenHash = z.infer<typeof sessionTokenHashSchema>;
