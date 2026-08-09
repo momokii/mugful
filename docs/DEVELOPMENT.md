@@ -29,11 +29,14 @@ Mugful has strict TypeScript tooling, a local-only PostgreSQL 17 Compose service
 
 Use Node 22 and the committed pnpm 11.20.0 pin. The following commands have been verified locally:
 
+Before running the build, create the ignored environment file with `cp .env.example .env`. The build wrapper reads the server-only `API_INTERNAL_ORIGIN` from that file and still rejects missing or invalid configuration.
+
 - `pnpm install --frozen-lockfile`;
 - `pnpm typecheck`;
 - `pnpm lint`;
 - `pnpm format:check`;
 - `pnpm test`;
+- `cp .env.example .env`;
 - `pnpm build`;
 - `API_INTERNAL_ORIGIN=http://127.0.0.1:3001 pnpm --filter @mugful/web e2e`, which runs the production-server Playwright checks at 375px, 768px, and 1280px and writes evidence under `.omo/evidence/task-4-*`;
 - `pnpm dev`, which compiles and prints labels from the two shell entry points.

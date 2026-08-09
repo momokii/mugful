@@ -15,7 +15,7 @@ export default function RegisterPage() {
       eyebrow="A place for two"
       title="Create your Mugful space"
     >
-      <form className={styles.form} method="post">
+      <form className={styles.form}>
         <div className={styles.field}>
           <label htmlFor="register-name">Your name</label>
           <input
@@ -52,7 +52,7 @@ export default function RegisterPage() {
           This screen is a visual foundation. Registration will be connected in
           the auth slice.
         </p>
-        <button className={styles.submit} type="submit">
+        <button className={styles.submit} type="button">
           Create space
         </button>
       </form>

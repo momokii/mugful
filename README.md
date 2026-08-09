@@ -34,6 +34,7 @@ pnpm typecheck
 pnpm lint
 pnpm format:check
 pnpm test
+cp .env.example .env
 pnpm build
 ```
 

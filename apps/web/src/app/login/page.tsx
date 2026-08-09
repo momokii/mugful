@@ -15,7 +15,7 @@ export default function LoginPage() {
       eyebrow="Welcome back"
       title="Sign in to Mugful"
     >
-      <form className={styles.form} method="post">
+      <form className={styles.form}>
         <div className={styles.field}>
           <label htmlFor="login-email">Email address</label>
           <input
@@ -40,7 +40,7 @@ export default function LoginPage() {
           This screen is a visual foundation. Sign in will be connected in the
           auth slice.
         </p>
-        <button className={styles.submit} type="submit">
+        <button className={styles.submit} type="button">
           Continue
         </button>
       </form>

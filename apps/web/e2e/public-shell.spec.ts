@@ -1,6 +1,43 @@
 import { expect, test } from "@playwright/test";
 
 const routes = ["/", "/login", "/register"] as const;
+const colorSchemes = ["light", "dark"] as const;
+
+const relativeLuminance = (
+  red: number,
+  green: number,
+  blue: number,
+): number => {
+  const linearize = (channel: number): number => {
+    const normalized = channel / 255;
+    return normalized <= 0.03928
+      ? normalized / 12.92
+      : ((normalized + 0.055) / 1.055) ** 2.4;
+  };
+
+  return (
+    0.2126 * linearize(red) +
+    0.7152 * linearize(green) +
+    0.0722 * linearize(blue)
+  );
+};
+
+const contrastRatio = (foreground: string, background: string): number => {
+  const parseRgb = (value: string): readonly [number, number, number] => {
+    const channels = value.match(/\d+/g);
+    if (!channels || channels.length < 3) {
+      throw new Error(`Unable to parse browser color: ${value}`);
+    }
+
+    return [Number(channels[0]), Number(channels[1]), Number(channels[2])];
+  };
+
+  const foregroundLuminance = relativeLuminance(...parseRgb(foreground));
+  const backgroundLuminance = relativeLuminance(...parseRgb(background));
+  const lighter = Math.max(foregroundLuminance, backgroundLuminance);
+  const darker = Math.min(foregroundLuminance, backgroundLuminance);
+  return (lighter + 0.05) / (darker + 0.05);
+};
 
 test.describe("public and auth shell", () => {
   for (const route of routes) {
@@ -41,6 +78,71 @@ test.describe("public and auth shell", () => {
       "",
     );
     expect(requests.some((url) => url.includes("/api/"))).toBe(false);
+  });
+
+  test("auth text and action pairings meet WCAG AA in both themes", async ({
+    browser,
+  }) => {
+    for (const colorScheme of colorSchemes) {
+      const context = await browser.newContext({
+        baseURL: "http://127.0.0.1:3100",
+        colorScheme,
+      });
+      const page = await context.newPage();
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await page.goto("/login");
+      const colors = await page.evaluate(() => {
+        const panel = document.querySelector("section");
+        const label = document.querySelector("label");
+        const hint = document.querySelector("form p");
+        const button = document.querySelector("form button");
+        if (!panel || !label || !hint || !button) {
+          throw new Error("Auth contrast fixtures are missing");
+        }
+
+        return {
+          label: [
+            getComputedStyle(label).color,
+            getComputedStyle(panel).backgroundColor,
+          ] as const,
+          hint: [
+            getComputedStyle(hint).color,
+            getComputedStyle(panel).backgroundColor,
+          ] as const,
+          action: [
+            getComputedStyle(button).color,
+            getComputedStyle(button).backgroundColor,
+          ] as const,
+        };
+      });
+
+      for (const [name, [foreground, background]] of Object.entries(colors)) {
+        expect(
+          contrastRatio(foreground, background),
+          `${colorScheme} ${name}`,
+        ).toBeGreaterThanOrEqual(4.5);
+      }
+
+      const action = page.getByRole("button", { name: "Continue" });
+      await action.hover();
+      await expect(action).toHaveCSS(
+        "background-color",
+        colorScheme === "light" ? "rgb(238, 241, 239)" : "rgb(23, 29, 32)",
+      );
+      const hoverColors = await page.evaluate(() => {
+        const button = document.querySelector("form button");
+        if (!button) throw new Error("Auth action fixture is missing");
+        return [
+          getComputedStyle(button).color,
+          getComputedStyle(button).backgroundColor,
+        ] as const;
+      });
+      expect(
+        contrastRatio(hoverColors[0], hoverColors[1]),
+        `${colorScheme} action hover`,
+      ).toBeGreaterThanOrEqual(4.5);
+      await context.close();
+    }
   });
 
   test("keyboard focus is visible and reduced motion is honored", async ({
@@ -94,5 +196,35 @@ test.describe("public and auth shell", () => {
     await expect(page.getByLabel("Create a password")).toHaveValue(
       "eight-char",
     );
+  });
+
+  test("filled auth forms stay static when their action is attempted", async ({
+    page,
+  }) => {
+    const mutations: string[] = [];
+    page.on("request", (request) => {
+      if (request.method() !== "GET")
+        mutations.push(`${request.method()} ${request.url()}`);
+    });
+
+    for (const route of ["/login", "/register"] as const) {
+      await page.goto(route);
+      const initialUrl = page.url();
+      mutations.length = 0;
+      if (route === "/login") {
+        await page.getByLabel("Email address").fill("ari@example.com");
+        await page.getByLabel("Password").fill("a-secure-password");
+        await page.getByRole("button", { name: "Continue" }).click();
+      } else {
+        await page.getByLabel("Your name").fill("Ari");
+        await page.getByLabel("Email address").fill("ari@example.com");
+        await page.getByLabel("Create a password").fill("a-secure-password");
+        await page.getByRole("button", { name: "Create space" }).click();
+      }
+
+      expect(page.url()).toBe(initialUrl);
+      expect(mutations).toEqual([]);
+      await expect(page.getByText(/success|created/i)).toHaveCount(0);
+    }
   });
 });
