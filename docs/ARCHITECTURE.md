@@ -1,6 +1,6 @@
 # Architecture
 
-**Status:** Confirmed target architecture; implementation not started
+**Status:** Confirmed target architecture; 0b local runtime boundary implemented
 **Scope:** v1 LDR couples beta
 
 ## Architecture summary
@@ -26,6 +26,10 @@ Fastify API
 ```
 
 Traefik remains the VPS-level reverse proxy. Its labels, external network name, and domain are deployment inputs rather than application assumptions.
+
+## Implemented local runtime boundary
+
+`compose.yaml` intentionally runs only PostgreSQL 17.10-bookworm, bound to localhost with password authentication, a named volume at `/var/lib/postgresql/data`, and a TCP-capable `pg_isready` check. It is not production Compose. Fastify liveness is database-independent; readiness runs a read-only check and returns generic 503 on failure. The Next rewrite maps `/api/:path*` to `${API_INTERNAL_ORIGIN}/:path*`, stripping `/api`. Manual `db:generate` and `db:migrate` commands own migrations; startup, development, Fastify construction, readiness, and Compose never run migration code.
 
 ## Architectural principles
 

@@ -1,6 +1,6 @@
 # Development guide
 
-**Status:** 0a tooling foundation verified. The application framework, local runtime, and product behavior remain unimplemented.
+**Status:** 0b local runtime foundation verified. Product behavior remains unimplemented.
 
 This document is the handoff point for a fresh agent or contributor who does not have the conversation history.
 
@@ -25,7 +25,7 @@ Then inspect the current Git state:
 
 ## Current state
 
-Mugful has a private pnpm workspace with strict TypeScript tooling and TypeScript-only web/API shells. Product and architecture discovery is complete, but no application framework, HTTP server, database, or product behavior has been implemented. The public repository is `https://github.com/momokii/mugful`.
+Mugful has strict TypeScript tooling, a local-only PostgreSQL 17 Compose service, Fastify health API, and minimal Next.js proxy. No auth, domain schema, realtime behavior, or product UI exists.
 
 Use Node 22 and the committed pnpm 11.20.0 pin. The following commands have been verified locally:
 
@@ -58,6 +58,16 @@ Do not describe the shell commands as application runtime commands or claim any 
 - TanStack Query for server state.
 - Docker Compose for development, testing, and VPS deployment.
 - Public Docker Hub web/API images tagged with semantic versions and commit SHAs.
+
+## Local runtime
+
+1. Create ignored `.env` from `.env.example` and replace the local-only password in both database variables.
+2. Run `docker compose -f compose.yaml up -d postgres` and `docker compose -f compose.yaml exec postgres pg_isready -h 127.0.0.1 -U mugful -d mugful`.
+3. Apply the reviewed migration explicitly with `pnpm --filter @mugful/api db:migrate`.
+4. Start Fastify and Next with their package `dev` commands. Verify liveness, readiness, and `http://127.0.0.1:3000/api/health/live` with curl.
+5. Clean with `docker compose -f compose.yaml down -v`.
+
+Compose health only proves PostgreSQL accepts TCP connections. Fastify liveness never queries PostgreSQL; readiness uses a read-only query and returns generic 503 on failure. Startup, development, Fastify construction, readiness, and Compose never import or run migration code.
 
 ## First implementation slice
 

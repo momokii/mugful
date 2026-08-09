@@ -1,9 +1,18 @@
 # Environment reference
 
-**Status:** Planning reference; exact variable names are finalized with the first Compose configuration.
+**Status:** 0b local runtime reference. `.env.example` contains safe placeholders only.
 **Rule:** Never put real values, credentials, private keys, or production environment files in the repository.
 
-This document records the categories of configuration the implementation must expose. The final reference must be generated from the validated configuration schema so documentation and runtime validation cannot drift.
+Zod validates API and server-side web configuration. Invalid values fail with generic errors and never echo connection URLs or credentials.
+
+| Variable                       | Consumer                 | Secret | Rule                                           |
+| ------------------------------ | ------------------------ | ------ | ---------------------------------------------- |
+| `POSTGRES_DB`, `POSTGRES_USER` | Compose                  | No     | Required non-empty values                      |
+| `POSTGRES_PASSWORD`            | Compose                  | Yes    | Required; trust authentication is prohibited   |
+| `POSTGRES_PORT`                | Compose                  | No     | Defaults to `5432`, bound only to `127.0.0.1`  |
+| `DATABASE_URL`                 | API and manual migration | Yes    | Valid `postgres://` or `postgresql://` URL     |
+| `API_HOST`, `API_PORT`         | Fastify                  | No     | Defaults to `127.0.0.1:3001`                   |
+| `API_INTERNAL_ORIGIN`          | Next rewrite             | No     | Required server-only URL without `/api` suffix |
 
 ## Configuration categories
 

@@ -2,7 +2,7 @@
 
 A private, playful web space for adults in long-distance relationships. The first release focuses on one shared activity: **Guess My Answer**.
 
-> **Status:** The TypeScript monorepo tooling foundation is verified. No application framework, runtime, or product behavior exists yet.
+> **Status:** The local PostgreSQL, Fastify health API, and Next proxy foundation is verified. Product behavior does not exist yet.
 
 ## Product direction
 
@@ -24,7 +24,7 @@ v1 deliberately does **not** include native video, AI, behavioral analytics, or 
 
 ## Current repository state
 
-This repository contains the confirmed product, architecture, design-system, privacy, SMTP, roadmap, and contributor documentation, plus a private pnpm 11 workspace with Turborepo tasks, strict TypeScript, ESLint, Prettier, and Vitest smoke tests. `apps/web` and `apps/api` are TypeScript-only executable shells; they do not start a web server or API.
+This repository contains a local-only PostgreSQL 17 Compose service, Fastify liveness/readiness API, and minimal Next.js proxy. No auth, domain data, realtime, or product UI exists.
 
 With Node 22 and pnpm 11.20.0 installed, a contributor can verify the tooling foundation with:
 
@@ -37,7 +37,7 @@ pnpm test
 pnpm build
 ```
 
-`pnpm dev` executes both shell entry points after compiling them. It is not an application development server.
+Create ignored `.env` from `.env.example`, replace its local-only password consistently, then run `docker compose -f compose.yaml up -d postgres`, `pnpm --filter @mugful/api dev`, and `pnpm --filter @mugful/web dev`. Liveness is `http://127.0.0.1:3001/health/live`; the proxy is `http://127.0.0.1:3000/api/health/live`. Run the reviewed bootstrap migration only explicitly with `pnpm --filter @mugful/api db:migrate`.
 
 ## Documentation map
 

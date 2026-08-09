@@ -1,7 +1,7 @@
 # Current status
 
 **Last updated:** 2026-08-09
-**Phase:** 0a tooling foundation complete; 0b local runtime and database boundary next
+**Phase:** 0b local runtime and database health boundary complete
 **Release target:** v1 invite-only beta
 **Product name:** Mugful
 **Public repository:** https://github.com/momokii/mugful
@@ -22,6 +22,7 @@
 - Private pnpm workspace configured for `apps/*` and `packages/*`, pinned to Node 22 and pnpm 11.20.0.
 - Turborepo tasks, strict TypeScript, ESLint, Prettier, Vitest, frozen-lockfile installation, and root validation scripts verified locally.
 - `apps/web` and `apps/api` contain only TypeScript executable smoke shells with a `workspace:*` dependency on shared contracts; they provide no framework, HTTP, realtime, or product behavior.
+- Local-only PostgreSQL 17 Compose, Fastify liveness/readiness, Drizzle/node-postgres, one manual neutral migration, validated environment, and minimal Next proxy are implemented and verified.
 
 ## Not started
 
@@ -36,11 +37,11 @@
 
 ## Next recommended step
 
-Build Todo 3: the local PostgreSQL/runtime health boundary. Do not add video, AI, analytics, Redis, or a second activity while building v1.
+Build Todo 4 or 5 from the foundation plan. Do not add video, AI, analytics, Redis, or a second activity while building v1.
 
 ## Command status
 
-`pnpm install --frozen-lockfile`, `pnpm typecheck`, `pnpm lint`, `pnpm format:check`, `pnpm test`, `pnpm build`, and `pnpm dev` are verified tooling commands. `pnpm dev` runs shell entry points only; there is no application framework, HTTP server, database, Compose file, or product behavior yet.
+`pnpm install --frozen-lockfile`, `pnpm typecheck`, `pnpm lint`, `pnpm format:check`, `pnpm test`, and `pnpm build` are verified. Local runtime verification additionally requires the documented Compose, manual migration, API, and Next proxy checks.
 
 ## Known constraints
 

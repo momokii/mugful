@@ -17,7 +17,8 @@ Every external service must have a setup path that a new contributor can follow 
 
 | Service                   | Status                                                            | Documentation                                            |
 | ------------------------- | ----------------------------------------------------------------- | -------------------------------------------------------- |
-| Mailpit                   | Required for local email testing                                  | [`SMTP-OPTIONS-RESEARCH.md`](./SMTP-OPTIONS-RESEARCH.md) |
+| PostgreSQL 17             | Local-only Compose dependency for the 0b runtime boundary         | [`DEVELOPMENT.md`](./DEVELOPMENT.md)                     |
+| Mailpit                   | Future local email testing; not in the 0b Compose file            | [`SMTP-OPTIONS-RESEARCH.md`](./SMTP-OPTIONS-RESEARCH.md) |
 | Resend                    | First production SMTP candidate; cross-border treatment may apply | [`SMTP-OPTIONS-RESEARCH.md`](./SMTP-OPTIONS-RESEARCH.md) |
 | Brevo                     | Production SMTP alternative                                       | [`SMTP-OPTIONS-RESEARCH.md`](./SMTP-OPTIONS-RESEARCH.md) |
 | Docker Hub                | Public web/API image registry                                     | Architecture and deployment docs                         |
