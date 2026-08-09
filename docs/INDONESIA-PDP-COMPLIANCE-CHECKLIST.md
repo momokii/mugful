@@ -1,0 +1,271 @@
+# Indonesia PDP Law (UU No. 27/2022) — Compliance Checklist for Mugful
+
+> **Status**: Research note — **NOT legal advice**.
+> **Research date**: 8 August 2026.
+> **Scope**: v1 consumer web app for two-person LDR couples, hosted on a personal VPS behind Traefik, with optional OpenAI / Anthropic / Gemini integrations.
+> **Convention used in this document**:
+> - **MUST (Law)** = explicit, statutory obligation in UU No. 27 Tahun 2022 (UU PDP) or its Penjelasan.
+> - **SHOULD (Recommendation)** = prudent engineering / privacy-by-design recommendation, not a direct statutory text. Flagged for product/engineering discussion.
+> - **Counsel-needed** = interpretation is unsettled or context-dependent; confirm with Indonesian legal counsel before relying on it.
+
+---
+
+## 0. Document map & primary sources
+
+All article references below are to **Undang-Undang Nomor 27 Tahun 2022 tentang Pelindungan Data Pribadi** (UU PDP), promulgated 17 October 2022, published in Lembaran Negara RI No. 196, Tambahan Lembaran Negara No. 6820. The 2-year transition (Pasal 74) ended 17 October 2024; UU PDP is now in full effect.
+
+### Authoritative primary sources used
+
+| Source | URL | Use |
+|---|---|---|
+| BPK – UU No. 27/2022 record | https://peraturan.bpk.go.id/Details/229798/uu-no-27-tahun-2022 | Statute record, status, MK decision list |
+| BPK – downloadable PDF (Salinan) | https://peraturan.bpk.go.id/Download/224884/UU%20Nomor%2027%20Tahun%202022.pdf | Full text, 50 hlm. + Penjelasan hlm. 35–50 |
+| JDIH Komdigi – statute page | https://jdih.komdigi.go.id/produk_hukum/view/id/832/t/undangundang+nomor+27+tahun+2022 | Mirror of full text, per-article navigation |
+| JDIH Kemenkeu – mirror | https://jdih.kemenkeu.go.id/dok/uu-27-tahun-2022 | Statute record |
+| Peraturan.info – article-by-article view | https://peraturan.info/uu/2022/27/isi | Article-level Indonesian text |
+| Pasal.id – UU No. 27/2022 | https://pasal.id/peraturan/uu/uu-no-27-tahun-2022 | Article-level search |
+| Wikisource – scanned PDF transcription | https://id.wikisource.org/wiki/Halaman:UU_Nomor_27_Tahun_2022_Tentang_Perlindungan_Data_Pribadi.pdf/1 through /33 | Validated OCR (community-maintained) |
+| MK – Putusan 151/PUU-XXII/2024 | https://s.mkri.id/public/content/persidangan/putusan/putusan_mkri_12970_1753859809.pdf | Constitutional review of Pasal 53(1) |
+| MK – Putusan 137/PUU-XXIII/2025 | (Reported by APPDI: https://appdi.org/unpacking-constitutional-court-decision-on-adequacy-appropriate-safeguards-and-consent-for-international-data-transfer-decision-no-137-puu-xxiii-2025_/) | Constitutional review of Pasal 56 (cross-border) |
+
+### State of the implementing regulations (as of 8 August 2026)
+
+- **Lembaga Pelindungan Data Pribadi (PDP Authority / "Lembaga")** — mandated by Pasal 58–61. As of August 2026 **not yet established**. The RPerpres had not been signed; a draft RPP (peraturan pelaksanaan) had completed harmonization at Kemenkumham and was awaiting presidential signature, with the Perpres for the Lembaga separately being processed at KemenPANRB. In the interim, **Komdigi (Direktorat Jenderal Pengawasan Ruang Digital)** is performing supervisory functions. (Source: Kompas, 27 July 2026; CNBC Indonesia, 4 Feb 2026; Bisnis.com, 22 Jan 2025; Antara, 17 Jan 2025 — all reporting on Komdigi statements.)
+- **Peraturan Pemerintah (PP) pelaksanaan UU PDP** — also not yet enacted. The RPP reportedly contains ~216 articles covering cross-border transfers (Bab VIII draft), administrative sanctions, the DPO, and other operational details. **Counsel-needed**: any specific reference to the RPP in the checklist below is to *draft* provisions and may shift before promulgation.
+- **Pasal 75 saving clause**: prior instruments (PP 71/2019 on PSTE, Permen Kominfo 20/2016 on PDP in Electronic Systems) remain in force to the extent not in conflict with UU PDP. In particular, **Permen Kominfo 20/2016** still imposes a **coordination/reporting duty with the Ministry (now Komdigi) before and after any cross-border personal data transfer** (Pasal 22). (Source: Mondaq / Makarim summaries; cross-referenced with Permen 20/2016.) **MUST (Law) until PP supersedes it**.
+
+### Notes on jurisprudence that affects this checklist
+
+- **MK 151/PUU-XXII/2024 (30 July 2025)**: the word "**dan**" at the end of Pasal 53(1)(b) is constitutionally conditioned to be read as "**dan/atau**". Effect: a Controller or Processor must appoint a **Pejabat/Petugas Pelindungan Data Pribadi (PPDP / DPO)** when **any one** of the three Pasal 53(1) criteria is met (not only when all three are met). Source: MKRI press release, GRPLAW summary, Paralegal.id.
+- **MK 137/PUU-XXIII/2025 (19 January 2026)**: the three-layer cross-border mechanism in Pasal 56 (adequacy → safeguards → consent) is constitutionally sound. Adequacy assessment is an executive function, not a parliamentary one. No additional risk-disclosure overlay was imposed on consent under Pasal 56(4). (Reported by APPDI; primary MK PDF not located in this research session — verify with counsel before relying on it.)
+
+---
+
+## 1. Scope, definitions, and applicability
+
+| # | Item | Status | Citation |
+|---|---|---|---|
+| 1.1 | **UU PDP applies to us.** The product is operated by an "orang perseorangan atau korporasi" (Pasal 1 angka 7) and processes the personal data of data subjects (Pasal 1 angka 6) in the course of "perbuatan hukum" — i.e., we are a **Pengendali Data Pribadi** ("Controller") under Pasal 1 angka 4 because we determine the purposes and means of processing. | MUST (Law) | UU PDP Pasal 1 angka 4; Pasal 2(1) |
+| 1.2 | **Even extraterritorial reach**: UU PDP also applies if the processing happens outside Indonesia but has legal consequences inside Indonesia or affects Indonesian data subjects abroad. Couples outside Indonesia remain in scope. | MUST (Law) | UU PDP Pasal 2(1)(b) |
+| 1.3 | **Personal household exclusion** (Pasal 2(2)) does **not** apply — the app is a service offered to multiple couples, not the operator's purely personal activity. | MUST (Law) | UU PDP Pasal 2(2) |
+| 1.4 | **Type of data processed** — define and inventory it. The app's likely data set spans both **general** (full name, sex, citizenship, religion, marital status, identifiers like email/phone, IP, account metadata) and potentially **specific** (Pasal 4(2)): e.g., **child data** if minors use the app, or any future health/biometric/financial data. Tag each field with the Pasal 4 category. | MUST (Law) | UU PDP Pasal 4; Penjelasan Pasal 4 |
+| 1.5 | **Sensitive data watchlist** — if the AI seam ever ingests free-form prompt content that reveals health, biometric, genetic, child-related, or financial data, that content is **specific personal data** even if it was not collected as such. Update the data inventory accordingly. | MUST (Law) | UU PDP Pasal 4(2); Penjelasan |
+| 1.6 | **Principles (Pasal 3; Pasal 16(2))**: limited & specific, lawful, transparent, purpose-bound, accurate/complete/not misleading/up-to-date/accountable, secure, accountable/provable, retained only as long as needed, deletable on request. Engineer to these from day one. | MUST (Law) | UU PDP Pasal 3; Pasal 16(2) |
+| 1.7 | **Define the role of the AI providers** in the data inventory. OpenAI, Anthropic, and Gemini are **Prosesor Data Pribadi** (Processors) acting on our instructions (Pasal 1 angka 5; Pasal 51). The app operator remains the Controller. Document this in every DPA / terms-of-service with the AI vendor. | MUST (Law) | UU PDP Pasal 1 angka 5; Pasal 51 |
+
+---
+
+## 2. Lawful basis & consent
+
+| # | Item | Status | Citation |
+|---|---|---|---|
+| 2.1 | **Identify a basis before any processing.** The Controller must have at least one of the six Pasal 20(2) bases: (a) **explicit consent**; (b) contract performance or pre-contractual steps at the data subject's request; (c) legal obligation; (d) vital interests; (e) public interest / public service / statutory authority; (f) other legitimate interests balanced against the data subject's rights. | MUST (Law) | UU PDP Pasal 20 |
+| 2.2 | **Default basis for this product is (a) explicit consent.** The service is a voluntary consumer app. Map each processing activity to one of (a)–(f) and document the choice. (b) applies to fulfilling the invite/registration flow. | MUST (Law) | UU PDP Pasal 20(2) |
+| 2.3 | **If using consent, the consent must be** (i) written or recorded; (ii) delivered electronically or non-electronically; (iii) have the same legal force in either form; (iv) be separable, in an understandable and accessible format, in **Bahasa Indonesia**; (v) be a real, demonstrable affirmative act. **Non-compliant consent is void (*batal demi hukum*)** — and so is any contract clause containing a data-processing request that does not carry such consent. | MUST (Law) | UU PDP Pasal 22, 23, 24; Penjelasan Pasal 22(4) huruf c ("bahasa" = Bahasa Indonesia) |
+| 2.4 | **Onboarding flow must obtain consent *before* the first processing operation** (account creation, IP log, email collection). Pre-ticked boxes and bundled consents are not valid. | MUST (Law) | UU PDP Pasal 22(4), 23 |
+| 2.5 | **Right to withdraw consent (Pasal 9)** must be operational. Withdrawal must be **as easy as giving consent**. On receipt, processing must stop **within 3 × 24 hours** (Pasal 40(2)). | MUST (Law) | UU PDP Pasal 9, 40(1)–(2) |
+| 2.6 | **Retention of consent evidence** — the Controller must be able to **show the consent that was given** (Pasal 24). Store a tamper-evident consent log (version of policy, timestamp, user, scope, IP, UA). | MUST (Law) | UU PDP Pasal 24 |
+| 2.7 | **Children & minors** (Pasal 25) — if any user is a child, processing requires consent of a parent/guardian. The Penjelasan to Pasal 4(2) letter e says only "Cukup jelas", so **what counts as a "child" is not statutorily fixed in UU PDP itself**; expect PP to fill this. **Counsel-needed**: confirm the age threshold (likely to mirror the Indonesian age of majority — 18 — and/or UU 35/2014 on child protection, but verify). Add a date-of-age gate at registration; reject or block minor accounts until parental consent is recorded. | MUST (Law) + Counsel-needed | UU PDP Pasal 25; Penjelasan |
+| 2.8 | **Disability** (Pasal 26) — if any user has a guardian, processing requires that guardian's consent. Ensure accessibility of the consent surface. | MUST (Law) | UU PDP Pasal 26 |
+| 2.9 | **Invite-link & paired-couple flow** — design the consent UI so that *each* person consents independently. The "private prompt revealed only after both submit" mechanic is a *processing* purpose and must be named in the consent text. | MUST (Law) | UU PDP Pasal 20(2)(a); 21(1)(b) |
+| 2.10 | **AI provider opt-in** — sending any prompt content to OpenAI/Anthropic/Gemini is a **transfer to a third-party Processor** and (because the AI runs outside Indonesia, see §8) a **cross-border transfer**. Make this purpose explicit in the consent text. | MUST (Law) | UU PDP Pasal 21(1)(e); Pasal 56 |
+
+---
+
+## 3. Privacy notice (informasi kepada Subjek Data Pribadi)
+
+| # | Item | Status | Citation |
+|---|---|---|---|
+| 3.1 | **Notice at first collection** — at the moment consent is sought, the Controller must provide (Pasal 21(1)): (a) legality of processing; (b) **purpose**; (c) **type and relevance** of the data; (d) **retention period**; (e) details of what is being collected; (f) period of processing; (g) **rights of the data subject** as listed in Pasal 5–13. | MUST (Law) | UU PDP Pasal 21(1) |
+| 3.2 | **Notice on material change** — if any of (a)–(g) changes, the Controller must notify the data subject **before** the change takes effect. | MUST (Law) | UU PDP Pasal 21(2) |
+| 3.3 | **Language** — privacy notice must be in **Bahasa Indonesia** at minimum (Pasal 22(4) huruf c Penjelasan). A bilingual notice is acceptable; English-only is not. | MUST (Law) | Penjelasan Pasal 22(4) huruf c |
+| 3.4 | **Format** — easily accessible, plain language, visually distinct from other terms. | MUST (Law) | UU PDP Pasal 22(4) |
+| 3.5 | **Record of processing activity (RoPA / "daftar kegiatan pemrosesan")** — Pasal 31 requires the Controller to **record all processing activities**. The Penjelasan implies an internal register. **SHOULD**: maintain this as code/data (e.g., a YAML/JSON catalogue of fields × purposes × bases × retention × processors). | MUST (Law) | UU PDP Pasal 31 |
+| 3.6 | **Access to data and audit trail** — on request, give the data subject access to (i) their data and (ii) the processing audit trail **within 3 × 24 hours** (Pasal 32(2)). | MUST (Law) | UU PDP Pasal 32 |
+| 3.7 | **Cookies / analytics / Traefik access logs** — these are processing operations. Either: (i) declare them in the privacy notice and obtain consent, or (ii) argue they fall under another Pasal 20(2) basis (typically (f) "legitimate interests" — but this requires a balancing test; see §10). | MUST (Law) | UU PDP Pasal 20(2); Penjelasan Pasal 16(2) huruf a |
+
+---
+
+## 4. Data-subject rights — operational obligations
+
+| Right | Article | Operational deadline | Engineering checklist |
+|---|---|---|---|
+| Information (identity, basis, purpose, accountability) | Pasal 5 | At collection / on change | Already covered in §3. |
+| Correct / update / complete | Pasal 6 | **3 × 24 hours** from request (Pasal 30(1)) | Profile-edit UI; backend rejects stale writes. |
+| Access + copy | Pasal 7; Pasal 32(1) | **3 × 24 hours** from request (Pasal 32(2)) | "Export my data" endpoint; PDF/JSON. Free by default; Penjelasan to Pasal 7 allows charging in narrow conditions. |
+| Stop processing, delete, destroy | Pasal 8 | See §5 retention. | Hard-delete + soft-delete-then-purge tombstone; cascade to backups. |
+| Withdraw consent | Pasal 9 | Stop processing within **3 × 24 hours** (Pasal 40(2)) | One-click "withdraw & delete account". |
+| Object to automated decisions incl. profiling (Pasal 10) | Pasal 10(1) | PP-guided procedure (Pasal 10(2)) | If AI ever produces legal/significant effects (e.g., summarising the relationship in a way the couple acts on), expose an objection path. |
+| Restrict / delay processing | Pasal 11 | **3 × 24 hours** from request (Pasal 41(1)) | Implement restriction flag; allow reactivation. |
+| Sue & receive damages | Pasal 12 | Procedure in PP | T&C acknowledge this. |
+| Data portability | Pasal 13 | Procedure in PP (Pasal 13(3)) | JSON export of own data. |
+| Application channel | Pasal 14 | All requests in Pasal 6–11 must be **recorded** applications to the Controller. | Provide a privacy request webform + an email; respond within 3×24h. |
+| Exceptions | Pasal 15 | Rights under 8, 9, 10(1), 11, 13(1)(2) can be **excepted** for: national defense & security, law enforcement, public/state interest, financial-system supervision, or statistical/scientific research — **only as implemented by statute**. None of these likely apply to this app. | **Counsel-needed** if any of these ever becomes relevant. |
+
+---
+
+## 5. Retention, deletion, destruction
+
+| # | Item | Status | Citation |
+|---|---|---|---|
+| 5.1 | **Define and publish a retention schedule.** Retention is per-purpose. Couple-shared prompts and account profile data should have a finite retention tied to (a) account life, (b) purpose completion, or (c) the longest of any mandatory record-keeping period (none for a consumer app of this type). | MUST (Law) | UU PDP Pasal 16(2) huruf g; Pasal 42(1)(b) |
+| 5.2 | **End of processing triggers** (Pasal 42(1)) — stop when: (a) the retention period ends, (b) the purpose is achieved, or (c) the data subject requests it. | MUST (Law) | UU PDP Pasal 42 |
+| 5.3 | **Deletion triggers** (Pasal 43(1)) — delete (anonymise or purge) when: (a) data is no longer needed; (b) consent is withdrawn; (c) data subject requests deletion; or (d) the data was obtained/processing was unlawful. **3 × 24 hours** where a request triggers it (Pasal 43 read with Pasal 40(2) / 42(2)). | MUST (Law) | UU PDP Pasal 43 |
+| 5.4 | **Destruction** (Pasal 44) — when retention period is over *and* the destruction schedule says so; or on data subject request; or when the data was unlawfully obtained. "Memusnahkan" = actions that eliminate, erase, destroy the data so it can no longer identify the subject (Penjelasan Pasal 44(1)). | MUST (Law) | UU PDP Pasal 44; Penjelasan |
+| 5.5 | **Notify the data subject** of any deletion or destruction (Pasal 45). | MUST (Law) | UU PDP Pasal 45 |
+| 5.6 | **Backups & logs** — implement a deletion-aware backup rotation; document any retention exception (e.g., fraud-prevention logs); run a periodic deletion job. | SHOULD | Derived from Pasal 42–44 |
+| 5.7 | **Single-use invite links** — once the invite is used or expired, the link secret must be purged from operational tables; only an opaque ID may be retained if needed for audit. | MUST (Law) + SHOULD | UU PDP Pasal 16(2) huruf a, g |
+| 5.8 | **Operational-only superadmin** — any access log of superadmin actions is a processing record. Define and publish a *short* retention for these logs (e.g., 90–180 days) and document why. | SHOULD | UU PDP Pasal 16(2) huruf g; Pasal 31 |
+| 5.9 | **Couple-content isolation** — the requirement that superadmin cannot see private couple content should be *enforced in the data model* (separate DB schema, no decrypt key) rather than only by policy. | MUST (Law) | UU PDP Pasal 35, 36, 38 |
+
+---
+
+## 6. Security safeguards
+
+| # | Item | Status | Citation |
+|---|---|---|---|
+| 6.1 | **"Protect and ensure the security" of any personal data processed** (Pasal 35) — by (a) preparing and applying technical/operational steps, and (b) setting a security level appropriate to the nature and risk. | MUST (Law) | UU PDP Pasal 35 |
+| 6.2 | **Confidentiality of personal data** (Pasal 36). | MUST (Law) | UU PDP Pasal 36 |
+| 6.3 | **Supervision of any party involved in processing** under the Controller's control (Pasal 37) — extends to the AI providers and any sub-Processor. | MUST (Law) | UU PDP Pasal 37 |
+| 6.4 | **Protect personal data from unlawful processing** (Pasal 38). | MUST (Law) | UU PDP Pasal 38 |
+| 6.5 | **Prevent unauthorised access** (Pasal 39) — by reliable, secure, and responsible security systems for any electronic processing. Implementation per prevailing regulations (currently PP 71/2019 art. 16 et seq. via Pasal 75 saving clause). | MUST (Law) | UU PDP Pasal 39(1)–(3) |
+| 6.6 | **Concrete technical measures expected by the regulator community** (derived from Pasal 35/36/39 and from PP 71/2019 as it remains in force): TLS 1.2+ in transit; AES-256 at rest; per-row access controls in Postgres; principle-of-least-privilege roles; key management separate from app servers; security event logging; vulnerability management; an incident-response runbook. | SHOULD | Derived from Pasal 35–39; PP 71/2019 |
+| 6.7 | **Single-use invite link** — high-entropy random token; rate-limited attempt counter; one-time redemption then invalidation. | SHOULD | Risk-reduction |
+| 6.8 | **MFA on superadmin** — non-negotiable, even for "operational-only" accounts. | SHOULD | Pasal 35, 36, 38 |
+| 6.9 | **Backups encrypted + tested restore** — periodic, off-VPS, with recovery-time objective documented. | SHOULD | Pasal 35, 39 |
+| 6.10 | **Traefik / reverse-proxy logs** — these are personal data (IP, UA, path). Minimise, set retention, and treat as personal data. | MUST (Law) + SHOULD | UU PDP Pasal 16(2) huruf a, g; Pasal 31 |
+
+---
+
+## 7. Breach response (kegagalan Pelindungan Data Pribadi)
+
+| # | Item | Status | Citation |
+|---|---|---|---|
+| 7.1 | **Statutory definition** — breach = failure to protect confidentiality, integrity, or availability, including any unauthorised destruction, loss, alteration, disclosure, or access (Penjelasan Pasal 46(1)). | MUST (Law) | UU PDP Pasal 46(1); Penjelasan |
+| 7.2 | **Written notification to the data subject within 3 × 24 hours** of becoming aware. | MUST (Law) | UU PDP Pasal 46(1) |
+| 7.3 | **Written notification to the Lembaga** within the same 3 × 24 hours. **Counsel-needed**: until Lembaga exists, the practical recipient is Komdigi (Direktorat Jenderal Pengawasan Ruang Digital). Document the address used and the time of sending. | MUST (Law) + Counsel-needed | UU PDP Pasal 46(1) |
+| 7.4 | **Notice content (minimum)** — (a) what data was exposed; (b) when and how; (c) handling and recovery efforts. | MUST (Law) | UU PDP Pasal 46(2) |
+| 7.5 | **Public notice** required "in certain cases" (Pasal 46(3)) — Penjelasan clarifies "in certain cases" = when the failure disrupts public service and/or has serious impact on public interest. Likely not triggered for a small consumer app, but **must** be assessed for each incident. | MUST (Law) | UU PDP Pasal 46(3); Penjelasan |
+| 7.6 | **Liability** — Controller "wajib bertanggung jawab atas pemrosesan Data Pribadi dan menunjukkan pertanggungjawaban" (Pasal 47). Document the incident, the response, and the evidence. | MUST (Law) | UU PDP Pasal 47 |
+| 7.7 | **Exceptions (Pasal 50)** — Pasal 46(1) obligations can be excepted for national defense & security, law enforcement, public/state interest, financial-system supervision, statistical/scientific research. None likely applicable; **Counsel-needed** if any is ever invoked. | MUST (Law) + Counsel-needed | UU PDP Pasal 50 |
+| 7.8 | **Operational runbook** — on-call rota, decision tree, draft notice templates in Bahasa Indonesia, list of contacts (Komdigi), internal SLAs. | SHOULD | Derived from Pasal 46 |
+| 7.9 | **Processors must notify the Controller** of any breach — codify in the DPA with the AI provider. | MUST (Law) | UU PDP Pasal 51(1)–(3) read with Pasal 37 |
+| 7.10 | **Notification clock is from the Controller's awareness** (Penjelasan implies this), not from occurrence. The clock on Processor → Controller should be tight (e.g., "without undue delay" ≤ 24 hours) in the DPA. | SHOULD | Derived from Pasal 37, 46 |
+
+---
+
+## 8. Processors, controllers, and cross-border transfers
+
+| # | Item | Status | Citation |
+|---|---|---|---|
+| 8.1 | **Identify roles for every other party.** OpenAI / Anthropic / Gemini = **Processors** (Pasal 1 angka 5; Pasal 51). The app operator = **Controller**. The data subject's partner is *not* a Controller or Processor in the UU PDP sense — they are a data subject. | MUST (Law) | UU PDP Pasal 1 angka 4–5; Pasal 51 |
+| 8.2 | **Processor obligations** — process only on the Controller's documented instructions; sub-processing requires the Controller's prior written consent; the Processor is liable to the Controller for unauthorised processing. Controller obligations in Pasal 29, 31, 35, 36, 37, 38, 39 also bind the Processor. | MUST (Law) | UU PDP Pasal 51, 52 |
+| 8.3 | **Domestic transfer** (Pasal 55) — any transfer between Controllers inside Indonesia is allowed; both sender and recipient must protect the data per UU PDP. | MUST (Law) | UU PDP Pasal 55 |
+| 8.4 | **Cross-border transfer** (Pasal 56) is a *three-layer cascade*: | MUST (Law) | UU PDP Pasal 56 |
+| | **(2) Adequacy first.** The Controller must ensure the destination country has a level of protection **equal to or higher than** UU PDP. As of 8 August 2026, **no country has been formally declared adequate by Indonesia** (no Lembaga, no published adequacy list, and the RPP setting out the procedure is still awaiting signature). The 19 Feb 2026 RI–US Agreement on Reciprocal Trade (ART) anticipated an adequacy statement, but under Article 84 of UU 7/2004 on Trade it must still be ratified, and under Article 56(2) the assessment belongs to the Lembaga once established. | MUST (Law) + Counsel-needed | UU PDP Pasal 56(2); MK 137/PUU-XXIII/2025 |
+| | **(3) If adequacy is not met**, the Controller must ensure **adequate and binding** protection (e.g., a Data Processing Agreement with SCC-style clauses, Binding Corporate Rules, or bilateral agreement). | MUST (Law) | UU PDP Pasal 56(3) |
+| | **(4) If neither (2) nor (3) is met**, the Controller must obtain **the data subject's consent** to the transfer. MK 137/PUU-XXIII/2025 did not impose a GDPR-style Article 49(1)(a) risk-disclosure overlay on that consent. | MUST (Law) | UU PDP Pasal 56(4); MK 137/PUU-XXIII/2025 |
+| 8.5 | **Practical posture for AI providers today** — given (8.4) the **safest live path is**: (a) execute a Data Processing Agreement with each AI vendor that mirrors Pasal 51(1)–(6) obligations; (b) include SCC-style cross-border clauses (the vendor's own EU SCCs are commonly incorporated, e.g., OpenAI's DPA — see https://conductatlas.com/platform/openai/openai-data-processing-addendum/international-data-transfer-mechanisms-sccs/); (c) obtain **specific, opt-in consent** from each user for sending prompt content to that vendor; (d) keep a Transfer Impact Assessment. | SHOULD (prudent) | Derived from Pasal 56(3) & (4); industry practice |
+| 8.6 | **Permen Kominfo 20/2016 coordination duty (still in force per Pasal 75)** — submit a "transfer plan" to Komdigi (now via the relevant Ditjen) before cross-border transfers, and a "transfer implementation report" after. Verify current submission channel with Komdigi. | MUST (Law) | UU PDP Pasal 75; Permen Kominfo 20/2016 Pasal 22 |
+| 8.7 | **Provider-neutral AI seam** — design the abstraction so that any future provider (Anthropic, Gemini, in-country provider) is interchangeable; the lawful-basis text in the privacy notice and the DPA clauses should be **vendor-name-neutral**. | SHOULD | Privacy-by-design |
+| 8.8 | **Data minimisation to AI** — strip PII (names, emails, phone numbers, account IDs) from prompt payloads before they leave the VPS; map to opaque hashes when identity linkage is required downstream. | MUST (Law) + SHOULD | UU PDP Pasal 16(2) huruf a, Pasal 27; risk reduction |
+| 8.9 | **Log every cross-border transfer** for the activity record required by Pasal 31 and for the Permen 20/2016 reports. | MUST (Law) | UU PDP Pasal 31; Permen 20/2016 |
+| 8.10 | **No onward transfer to sub-Processors** of the AI vendor without the Controller's prior written consent (Pasal 51(4)–(5)). Pass this requirement into the DPA. | MUST (Law) | UU PDP Pasal 51(4)–(5) |
+
+---
+
+## 9. Children and minors, and the couple-only design
+
+| # | Item | Status | Citation |
+|---|---|---|---|
+| 9.1 | **The product is for adults in a romantic relationship.** Despite the "child data" specific-category in Pasal 4(2) letter e, the design itself excludes children — the *couple* are by definition the users. Add an age gate at sign-up (recommend 18, with hard block below; a soft block for 17 with parental consent as a future option only if business model ever changes). | MUST (Law) + Counsel-needed (age threshold) | UU PDP Pasal 25; Penjelasan Pasal 4(2) huruf e |
+| 9.2 | **If a child ever uses the app** (e.g., a partner is 16), Pasal 25(2) requires parent/guardian consent. Without it, processing must stop. | MUST (Law) | UU PDP Pasal 25(2) |
+| 9.3 | **Disability (Pasal 26)** — if any user is under guardianship, the guardian's consent is required. | MUST (Law) | UU PDP Pasal 26 |
+| 9.4 | **Child data received incidentally** (e.g., a prompt answers about a user's child) becomes "specific personal data" once on the system. Tag, retain per the strictest schedule, and exclude from AI seam by default. | MUST (Law) | UU PDP Pasal 4(2) huruf e |
+
+---
+
+## 10. Administrative roles — DPO (PPDP), DPIA, accountability
+
+| # | Item | Status | Citation |
+|---|---|---|---|
+| 10.1 | **PPDP (DPO) appointment triggers** — per **Pasal 53(1) as judicially re-read** in MK 151/PUU-XXII/2024, a PPDP is required when **any one** of these is true: (a) processing for public service; (b) core activities of the Controller/Processor involve regular & systematic monitoring of personal data on a large scale; (c) core activities consist of large-scale processing of specific personal data or criminal-record-related data. | MUST (Law) | UU PDP Pasal 53(1) read with MK 151/PUU-XXII/2024 |
+| 10.2 | **Does the LDR app hit any trigger?** | Counsel-needed | — |
+| | - **(a) Public service?** No. | | |
+| | - **(b) Regular & systematic monitoring on a large scale?** Likely no for v1 (small user count) — but the *judgment's broader reading* and the trend in the law mean "large scale" thresholds will be defined in the PP. If the app scales, this could flip on. | | |
+| | - **(c) Large-scale processing of specific personal data?** Currently no (the app does not knowingly process health, biometric, genetic, crime, child, or financial data). But: free-form prompts can incidentally contain specific personal data; and **"data anak"** is a *specific* category. | | |
+| | **Conclusion**: probably no formal PPDP is required for v1 — **but** the safer posture is to designate one person (the founder is acceptable for a small operation; the role can be outsourced, Pasal 53(3)) to future-proof the design and to be the named contact for any data-subject request and for Komdigi/Lembaga. | SHOULD | Derived from Pasal 53 |
+| 10.3 | **PPDP qualifications (Pasal 53(2))** — professionalism, knowledge of law & practice, ability to perform tasks. | MUST (Law) | UU PDP Pasal 53(2) |
+| 10.4 | **PPDP tasks (Pasal 54(1))** — inform & advise the Controller/Processor; monitor compliance; advise on DPIA; act as liaison with the Lembaga on processing issues. | MUST (Law) | UU PDP Pasal 54(1) |
+| 10.5 | **DPIA / Penilaian Dampak Pelindungan Data Pribadi (Pasal 34)** — required when processing has a "high potential risk" to data subjects. Triggers include: automated decision-making with legal/significant effect; **specific personal data**; **large-scale** processing; systematic evaluation/scoring/monitoring; data matching/combining; **use of new technology**; processing that restricts the data subject's rights. | MUST (Law) | UU PDP Pasal 34(1)–(2) |
+| 10.6 | **Does this app trigger DPIA?** The **AI seam** plausibly triggers several: (b) specific personal data (incidental), (d) systematic evaluation, (f) new technology (LLMs). Conduct a DPIA before enabling the AI seam in production. | MUST (Law) | UU PDP Pasal 34 |
+| 10.7 | **Accountability & demonstrability** (Pasal 16(2) huruf h; Pasal 47) — the Controller must be able to **prove** it complies. Keep dated, versioned artefacts: privacy notice, DPIA, RoPA, consent logs, breach response log, processor DPAs, training material. | MUST (Law) | UU PDP Pasal 16(2) huruf h; Pasal 47 |
+| 10.8 | **Cooperate with the Lembaga** (Pasal 49) — execute any order issued by the Lembaga in the course of its duties. Until the Lembaga exists, treat Komdigi accordingly. | MUST (Law) | UU PDP Pasal 49 |
+
+---
+
+## 11. Sanctions, enforcement, and the operational risk picture
+
+| # | Item | Status | Citation |
+|---|---|---|---|
+| 11.1 | **Administrative sanctions** (Pasal 57) for breach of the listed articles (Pasal 20(1), 21, 24, 25(2), 26(3), 27, 28, 29, 30, 31, 32(1), 33, 34(1), 35, 36, 37, 38, 39(1), 40(1), 41(1)&(3), 42(1), 43(1), 44(1), 45, 46(1)&(3), 47, 48(1), 49, 51(1)&(5), 52, 53(1), 55(2), 56(2)–(4)): (a) written warning, (b) temporary suspension, (c) deletion/destruction, (d) **administrative fine up to 2% of annual revenue or annual income** of the relevant variable. | MUST (Law) | UU PDP Pasal 57 |
+| 11.2 | **Criminal sanctions** (Pasal 67–72) — up to 6 years' imprisonment and/or IDR 6 billion fine for intentionally falsifying personal data (Pasal 66 → Pasal 68); 5 years/IDR 5 billion for unauthorised collection/use (Pasal 65(1)&(3) → Pasal 67(1)&(3)); 4 years/IDR 4 billion for unauthorised disclosure (Pasal 65(2) → Pasal 67(2)). **Corporations** can be fined up to 10× those caps (Pasal 70(3)) and face additional penalties including freezing, closure, license revocation, dissolution (Pasal 70(4)). | MUST (Law) | UU PDP Pasal 65–72 |
+| 11.3 | **Until the Lembaga is formed**, administrative sanctions are not formally leviable by an independent authority, but Komdigi has indicated it will continue to receive and process reports (and existing sectoral rules under Pasal 75 still permit sectoral enforcement). The risk is therefore not zero. | Counsel-needed | UU PDP Pasal 49, 57(4), 60, 75; Komdigi press, 2024 |
+| 11.4 | **Civil exposure** — Pasal 12 gives the data subject an express right to sue for damages. Class actions and tort claims are theoretically available. | MUST (Law) + Counsel-needed | UU PDP Pasal 12 |
+| 11.5 | **Dispute resolution** (Pasal 64) — arbitration, court, or ADR. The T&C of the app should nominate a forum (an Indonesian forum is safest for an Indonesia-targeted product). | SHOULD | UU PDP Pasal 64 |
+
+---
+
+## 12. Engineering-side recommendations (privacy-by-design, *not* direct legal text)
+
+These are prudent engineering practices, not statutory requirements. Items derived from the statute are marked accordingly.
+
+| # | Recommendation | Source / rationale |
+|---|---|---|
+| 12.1 | **Single-tenant Postgres, no shared-everything schemas.** Reduce blast radius. | Operational security. |
+| 12.2 | **Encrypt the couple-content table with a key the superadmin does not hold** (envelope encryption, customer-managed key in a separate KMS). This is the cleanest way to honour the "superadmin can't see private couple content" promise. | Reinforces Pasal 35, 36. |
+| 12.3 | **Invite-link secret stored hashed-at-rest** (e.g., HMAC) so a DB dump doesn't yield live tokens. | Pasal 35. |
+| 12.4 | **AI seam — fail-closed**: if consent is missing or the vendor's DPA is not in force, no prompt is sent. | Reinforces Pasal 20, 22, 56. |
+| 12.5 | **Synthetic monitoring only**; no production-data fixtures. | Pasal 27. |
+| 12.6 | **Container image SBOM + signed images**; supply-chain hardening. | Pasal 35, 39. |
+| 12.7 | **Centralised structured logging** of security events to a separate log store with a short retention. | Pasal 31, 35. |
+| 12.8 | **Disaster recovery exercise quarterly**; document RTO/RPO. | Operational; supports Pasal 47 accountability. |
+| 12.9 | **Document the legitimate-interest balancing test** if any non-consent processing is contemplated (e.g., anti-abuse logging). | Pasal 20(2)(f) — note this is a *legal* basis, not a *technical* control. |
+| 12.10 | **Treat Permen 20/2016 reporting forms as a working draft** and prepare templates (transfer plan, transfer report) so they can be sent within the next Komdigi-defined window. | Permen 20/2016 Pasal 22 (still in force). |
+
+---
+
+## 13. Open questions to take to Indonesian legal counsel
+
+These are the points where the law is ambiguous, the implementing regulations are still in draft, or the practical posture requires a contextual judgement that should not be made unilaterally.
+
+1. **DPO / PPDP appointment** — does the *combined* reading of "core activities … large-scale" and the MK 151 ruling create a trigger for a small but AI-integrated consumer app? When does the *AI seam* count as "use of new technology" under Pasal 34(2)(f) for DPIA purposes?
+2. **Cross-border transfer to the US** — given the 19 Feb 2026 RI–US ART and the pending RPP, is a SCC-only path still the right posture, or should the app wait for a Komdigi/Lembaga adequacy signal?
+3. **Child age threshold** — what is the operative definition of "anak" until the RPP issues? Should we adopt 18 (Indonesian majority age under the Civil Code / UU 35/2014) as the floor?
+4. **Permen 20/2016 reporting** — what is the current submission channel under Komdigi (the unit that was *Direktorat Tata Kelola Ditjen Aptika* has been reorganised under Perpres 174/2024 into *Ditjen Pengawasan Ruang Digital*)?
+5. **Public-service exception to DPO** — confirm that "consumer app for romantic couples" is not "pelayanan publik" under Pasal 53(1)(a).
+6. **Data-subject rights exceptions under Pasal 15** — none of the five grounds apply to us, but document that decision so that any future change (e.g., a court order) has a clean basis.
+7. **Children & the "private prompts revealed only after both submit" mechanic** — does the "anak" specific-category in Pasal 4(2)(e) reach a user's *child* mentioned in a prompt, even if the user is the parent? Counsel view wanted on the default scrubber scope.
+8. **Damages forum and choice-of-law** in the T&C (Pasal 12, 64).
+
+---
+
+## 14. Minimum artefacts to produce before v1 launch
+
+| Artefact | Owner | Law/Recommendation | Notes |
+|---|---|---|---|
+| Privacy notice (Bahasa Indonesia primary; English secondary) | Product + Counsel | Pasal 21, 22(4) | Names basis (Pasal 20), purpose, retention, third parties, rights. |
+| Cookie / log notice | Product | Pasal 20(2), 21 | Cover Traefik logs, session cookies, any analytics. |
+| Data Processing Agreement with each AI vendor | Engineering + Counsel | Pasal 51(1)–(5), 37, 56(3) | Vendor's own DPA can be the start, with Indonesian-law addendum. |
+| Standard consent capture + withdrawal flow | Product + Engineering | Pasal 9, 20(2)(a), 22, 24 | Bahasa Indonesia, separable, demonstrable, one-click withdrawal. |
+| Data Processing Agreement with the hosting provider (VPS) | Engineering | Pasal 51 | Even a single-tenant VPS counts as a Processor. |
+| Records of Processing Activities (RoPA) | Engineering | Pasal 31 | YAML/JSON catalogue of fields × purposes × bases × retention × recipients. |
+| DPIA report for the AI seam | Engineering + Product | Pasal 34 | Before AI goes live. |
+| Retention schedule | Product | Pasal 16(2) g, 42–45 | Account life, prompt data, log data, backup data. |
+| Breach response runbook (Bahasa Indonesia draft notice) | Engineering + Legal | Pasal 46, 50 | Includes clock (3×24h) and recipient list (Komdigi). |
+| DPO designation (best practice) | Product | Pasal 53 | Founder, with documented role. |
+| Cross-border transfer log + Permen 20/2016 templates | Engineering | Pasal 31, 56; Permen 20/2016 | Even if no transfer happens today, prepared. |
+
+---
+
+*End of checklist. This document is research output, not legal advice. Confirm the items marked "Counsel-needed" with an Indonesian PDP practitioner before relying on them in a launch decision.*
