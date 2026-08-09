@@ -4,7 +4,7 @@ This roadmap is intentionally outcome-based. A milestone is not complete because
 
 ## Current status
 
-**Phase:** Product and architecture confirmed; implementation not started.
+**Phase:** Foundation and Todo 4 complete; Todo 5 identity implementation is in progress at checkpoint 5A.
 
 Completed discovery artifacts:
 
@@ -45,6 +45,17 @@ Build in small, user-visible slices rather than horizontal infrastructure batche
 9. Operational metrics, backup/restore, deployment script, Docker release images, and runbooks.
 
 Each slice must include its behavior tests, documentation updates, accessibility states, and security review appropriate to its data.
+
+### Todo 5 recovery checkpoints
+
+- 5A: internal identity persistence primitives, reviewed migration, unit coverage, and real PostgreSQL schema verification.
+- 5B: identity API behavior.
+- 5C: email delivery integration.
+- 5D: identity UI.
+- 5E: negative-path matrix.
+- 5F: final acceptance.
+
+Only 5A is complete. Todo 5 is not complete until all checkpoints are verified.
 
 ## Phase 2 — v1 invite-only beta
 

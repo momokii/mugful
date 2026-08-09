@@ -1,6 +1,6 @@
 # Architecture
 
-**Status:** Confirmed target architecture; 0b local runtime boundary implemented
+**Status:** Confirmed target architecture; 0b local runtime boundary and Todo 5A identity persistence primitives implemented
 **Scope:** v1 LDR couples beta
 
 ## Architecture summary
@@ -95,6 +95,7 @@ Cancellation is valid from the pending pre-reveal states (`active` and `waiting-
 
 ## Authentication and session model
 
+- Todo 5A persists accounts, independently versioned adult-attestation/terms/privacy consent records, sessions, and email-verification/password-reset token metadata. Account creation and all required consent inserts are deliberately left to a future atomic transaction boundary.
 - Email/password accounts use a memory-hard password hash.
 - Sessions are opaque random tokens in secure HTTP-only cookies.
 - Only a session-token hash is stored in PostgreSQL.
@@ -102,6 +103,8 @@ Cancellation is valid from the pending pre-reveal states (`active` and `waiting-
 - CSRF protection applies to cookie-authenticated mutations.
 - Invite, verification, and reset tokens are single-use, short-lived, and stored only as hashes.
 - Superadmin authentication requires passkey MFA with TOTP recovery.
+
+Todo 5A intentionally has no routes, cookie issuance, CSRF middleware, rate limiting, email delivery, or identity transaction service. Migrations remain explicit manual operations; startup and health boundaries do not execute them.
 
 ## Privacy and authorization model
 

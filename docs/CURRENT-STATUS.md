@@ -1,11 +1,11 @@
 # Current status
 
 **Last updated:** 2026-08-09
-**Phase:** 0b local runtime/database health boundary and Todo 4 accessible web shell complete
+**Phase:** 0b local runtime/database health boundary and Todo 4 accessible web shell complete; Todo 5 identity work in progress
 **Release target:** v1 invite-only beta
 **Product name:** Mugful
 **Public repository:** https://github.com/momokii/mugful
-**Latest verified baseline:** `0381e23` on `master` before Todo 4 implementation
+**Latest verified baseline:** `9b21a26` on `master` before Todo 5A implementation
 
 ## Completed
 
@@ -25,13 +25,15 @@
 - Local-only PostgreSQL 17 Compose, Fastify liveness/readiness, Drizzle/node-postgres, one manual neutral migration, validated environment, and minimal Next proxy are implemented and verified.
 - Accessible static public/auth shell is implemented at `/`, `/login`, and `/register` with documented Mugful tokens, CSS Modules, semantic landmarks, dark color-scheme support, reduced-motion support, visible focus, and responsive no-overflow behavior.
 - Production-server Playwright browser checks and screenshots are verified at 375px, 768px, and 1280px for the public/auth shell; evidence is stored under `.omo/evidence/task-4-*`.
+- Todo 5A identity persistence primitives are implemented and verified: `0001_identity.sql` adds accounts, versioned adult/terms/privacy consent records, hashed opaque sessions, and hashed single-use expiring identity tokens without raw credential or token columns.
+- Internal Argon2id password hash/verify policy, opaque token HMAC/expiry/single-use guards, session token/cookie-option types, and versioned consent vocabulary have focused unit coverage. The manual migration was applied and schema-checked against local PostgreSQL Compose.
 
 ## Not started
 
 - Next.js web application beyond the Todo 4 static shell.
 - Fastify API/realtime application.
-- Database schema and migrations.
-- Authentication, invitations, and Privacy Center.
+- Authentication routes, session issuance, CSRF handling, invitations, email verification/reset delivery, and Privacy Center.
+- Identity persistence transaction orchestration for future account-and-consent creation.
 - Prompt catalog and Guess My Answer state machine.
 - Docker Compose configurations and deployment scripts.
 - CI workflows and Docker Hub publication.
@@ -39,7 +41,7 @@
 
 ## Next recommended step
 
-Build Todo 4 or 5 from the foundation plan. Do not add video, AI, analytics, Redis, or a second activity while building v1.
+Continue Todo 5 with the API checkpoint only after preserving Todo 5A's hashed-secret and explicit-manual-migration boundaries. Do not add video, AI, analytics, Redis, or a second activity while building v1.
 
 ## Command status
 

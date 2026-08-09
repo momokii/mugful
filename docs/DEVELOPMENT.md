@@ -1,6 +1,6 @@
 # Development guide
 
-**Status:** 0b local runtime foundation and Todo 4 accessible web shell verified. Product behavior remains unimplemented.
+**Status:** 0b local runtime foundation, Todo 4 accessible web shell, and Todo 5A identity persistence primitives verified. Todo 5 remains in progress; product behavior remains unimplemented.
 
 This document is the handoff point for a fresh agent or contributor who does not have the conversation history.
 
@@ -25,7 +25,7 @@ Then inspect the current Git state:
 
 ## Current state
 
-Mugful has strict TypeScript tooling, a local-only PostgreSQL 17 Compose service, Fastify health API, minimal Next.js proxy, and a static Next.js public/auth shell. Auth, domain schema, realtime behavior, and product activity UI remain unimplemented.
+Mugful has strict TypeScript tooling, a local-only PostgreSQL 17 Compose service, Fastify health API, minimal Next.js proxy, a static Next.js public/auth shell, and a manual identity persistence migration. Todo 5A supplies only internal account/consent/session/token schema and primitives; it does not expose authentication behavior.
 
 Use Node 22 and the committed pnpm 11.20.0 pin. The following commands have been verified locally:
 
@@ -72,6 +72,8 @@ Do not describe the shell commands as application runtime commands or claim any 
 5. Clean with `docker compose -f compose.yaml down -v`.
 
 Compose health only proves PostgreSQL accepts TCP connections. Fastify liveness never queries PostgreSQL; readiness uses a read-only query and returns generic 503 on failure. Startup, development, Fastify construction, readiness, and Compose never import or run migration code.
+
+Todo 5A migration verification also runs `MUGFUL_RUN_DATABASE_TESTS=true DATABASE_URL=<local URL> pnpm --filter @mugful/api test -- src/identity/schema.integration.test.ts` after the manual migration. The test is skipped unless explicitly enabled so ordinary unit runs do not require PostgreSQL.
 
 ## First implementation slice
 
