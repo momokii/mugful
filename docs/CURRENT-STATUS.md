@@ -5,7 +5,7 @@
 **Release target:** v1 invite-only beta
 **Product name:** Mugful
 **Public repository:** https://github.com/momokii/mugful
-**Latest verified commit:** `f3d599d` on `master` and `origin/master`
+**Latest verified commit:** `b1c7bc11fd9658229a46b5f3835273284b9f9f67` on `master` and `origin/master`
 
 ## Completed
 
