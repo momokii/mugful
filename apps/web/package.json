@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/build.mjs",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src",
@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@mugful/contracts": "workspace:*",
+    "@next/env": "^15.5.23",
     "next": "^15.5.9",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

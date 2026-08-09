@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 
+import { readFile } from "node:fs/promises";
+
 import { createNextConfig, parseWebConfig } from "../next.config.js";
 
 describe("web runtime configuration", () => {
@@ -32,5 +34,22 @@ describe("web runtime configuration", () => {
         source: "/api/:path*",
       },
     ]);
+  });
+
+  it("documents a root environment that supplies the server-only build origin", async () => {
+    // Given: the environment file used by the documented root setup
+    const environmentFile = await readFile(
+      new URL("../../../.env.example", import.meta.url),
+      "utf8",
+    );
+
+    // When: its API internal origin is read from the real root file
+    const match = /^API_INTERNAL_ORIGIN=(.+)$/m.exec(environmentFile);
+
+    // Then: the value satisfies the real web configuration parser
+    expect(match?.[1]).toBeDefined();
+    expect(parseWebConfig({ API_INTERNAL_ORIGIN: match?.[1] })).toEqual({
+      apiInternalOrigin: "http://127.0.0.1:3001",
+    });
   });
 });
