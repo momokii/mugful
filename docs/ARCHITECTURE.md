@@ -106,6 +106,8 @@ Cancellation is valid from the pending pre-reveal states (`active` and `waiting-
 
 Todo 5A intentionally has no routes, cookie issuance, CSRF middleware, rate limiting, email delivery, or identity transaction service. Migrations remain explicit manual operations; startup and health boundaries do not execute them.
 
+Session-cookie policy is deployment-specific and not caller-configurable: production uses the `__Host-mugful-session` name with `Secure`, `HttpOnly`, `SameSite=Lax`, and `Path=/` without `Domain`; the explicit local-development helper uses `mugful-session` with `secure: false` for local HTTP only.
+
 ## Privacy and authorization model
 
 The application operator is treated as a UU PDP Controller. The VPS provider, SMTP provider, and future external processors require documented processor and transfer treatment. The privacy model is:

@@ -24,27 +24,88 @@ export const hashSessionToken = (input: {
     createHmac("sha256", input.pepper).update(input.token).digest("hex"),
   );
 
-export type SessionCookieOptions = Readonly<{
+type SessionCookieTiming = Readonly<{
   expires: Date;
-  httpOnly: true;
-  maxAge: number;
-  path: "/";
-  sameSite: "lax";
+  now: Date;
+}>;
+
+type SessionCookiePolicy = Readonly<{
+  name: string;
   secure: boolean;
 }>;
 
-export const buildSessionCookieOptions = (input: {
-  readonly expiresAt: Date;
-  readonly now: Date;
-  readonly secure: boolean;
-}): SessionCookieOptions => ({
-  expires: input.expiresAt,
+export type ProductionSessionCookieOptions = Readonly<{
+  expires: Date;
+  httpOnly: true;
+  maxAge: number;
+  name: "__Host-mugful-session";
+  path: "/";
+  sameSite: "lax";
+  secure: true;
+}>;
+
+export type LocalDevelopmentSessionCookieOptions = Readonly<{
+  expires: Date;
+  httpOnly: true;
+  maxAge: number;
+  name: "mugful-session";
+  path: "/";
+  sameSite: "lax";
+  secure: false;
+}>;
+
+const productionCookiePolicy = {
+  name: "__Host-mugful-session",
+  secure: true,
+} as const;
+
+const localDevelopmentCookiePolicy = {
+  name: "mugful-session",
+  secure: false,
+} as const;
+
+const buildSessionCookieOptions = <TPolicy extends SessionCookiePolicy>(
+  input: SessionCookieTiming,
+  policy: TPolicy,
+): Readonly<{
+  expires: Date;
+  httpOnly: true;
+  maxAge: number;
+  name: TPolicy["name"];
+  path: "/";
+  sameSite: "lax";
+  secure: TPolicy["secure"];
+}> => ({
+  expires: input.expires,
   httpOnly: true,
   maxAge: Math.max(
     0,
-    Math.floor((input.expiresAt.getTime() - input.now.getTime()) / 1_000),
+    Math.floor((input.expires.getTime() - input.now.getTime()) / 1_000),
   ),
+  name: policy.name,
   path: "/",
   sameSite: "lax",
-  secure: input.secure,
+  secure: policy.secure,
 });
+
+export const buildProductionSessionCookieOptions = (
+  input: Readonly<{
+    expiresAt: Date;
+    now: Date;
+  }>,
+): ProductionSessionCookieOptions =>
+  buildSessionCookieOptions(
+    { expires: input.expiresAt, now: input.now },
+    productionCookiePolicy,
+  );
+
+export const buildLocalDevelopmentSessionCookieOptions = (
+  input: Readonly<{
+    expiresAt: Date;
+    now: Date;
+  }>,
+): LocalDevelopmentSessionCookieOptions =>
+  buildSessionCookieOptions(
+    { expires: input.expiresAt, now: input.now },
+    localDevelopmentCookiePolicy,
+  );
