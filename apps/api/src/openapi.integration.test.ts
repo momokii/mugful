@@ -60,6 +60,8 @@ describe("OpenAPI identity contract", () => {
     expect(registration).toBeDefined();
     expect(JSON.stringify(registration)).toContain('"privacyAccepted"');
     expect(JSON.stringify(registration)).toContain('"termsAccepted"');
+    expect(JSON.stringify(registration)).not.toContain('"privacyVersion"');
+    expect(JSON.stringify(registration)).not.toContain('"termsVersion"');
 
     await context.app.close();
     await context.pool.end();

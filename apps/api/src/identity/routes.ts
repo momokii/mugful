@@ -15,9 +15,7 @@ const registrationSchema = z.object({
   email: z.string().trim().email().max(320),
   password: z.string().min(12).max(256),
   privacyAccepted: z.literal(true),
-  privacyVersion: z.string().min(1).max(64),
   termsAccepted: z.literal(true),
-  termsVersion: z.string().min(1).max(64),
 });
 
 const loginSchema = z.object({

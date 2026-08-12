@@ -1,6 +1,7 @@
 import type { IdentityEmailService } from "./email-service.js";
 import type { RateLimitPrincipalPepper } from "./rate-limit.js";
 import { consumeRateLimitAttempt } from "./rate-limit-store.js";
+import { currentConsentVersions } from "./consent.js";
 import { hashPassword } from "./password.js";
 import type { IdentityRepository } from "./repository.js";
 
@@ -10,9 +11,7 @@ type RegistrationInput = Readonly<{
   email: string;
   password: string;
   privacyAccepted: true;
-  privacyVersion: string;
   termsAccepted: true;
-  termsVersion: string;
 }>;
 
 type RegistrationDependencies = Readonly<{
@@ -45,7 +44,12 @@ export const registerAccount = async (
       if (row === undefined) throw new Error("Account creation failed");
       await transaction.query(
         "INSERT INTO account_consents (account_id, kind, version) VALUES ($1, 'adult_attestation', $2), ($1, 'terms', $3), ($1, 'privacy', $4)",
-        [row.id, "adult-v1", input.termsVersion, input.privacyVersion],
+        [
+          row.id,
+          currentConsentVersions.adult_attestation,
+          currentConsentVersions.terms,
+          currentConsentVersions.privacy,
+        ],
       );
       return { email, id: row.id };
     });

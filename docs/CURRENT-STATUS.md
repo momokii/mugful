@@ -5,7 +5,7 @@
 **Release target:** v1 invite-only beta
 **Product name:** Mugful
 **Public repository:** https://github.com/momokii/mugful
-**Latest implementation baseline:** `d957ac0` on `master` before Todo 5F blocker resolution
+**Latest implementation baseline:** `446b989` on `master` before the final Todo 5F follow-up
 
 ## Completed
 
@@ -32,7 +32,7 @@
 - Todo 5C email checkpoint is verified against isolated Compose PostgreSQL and Mailpit services: provider-neutral Nodemailer SMTP configuration, local-only loopback Mailpit, registration verification email, verification resend/confirm, and password forgot/reset HTTP commands. Messages contain only fragment token links. Token persistence is HMAC-only; replacement, expiry, atomic single use, absent-email generic output, SMTP failure recovery, session revocation after reset, and no token in API responses are covered through Fastify injection and Mailpit capture.
 - Todo 5D thin identity UI is implemented and browser-verified against a fresh isolated PostgreSQL/Mailpit lifecycle: CSRF-protected registration, verification resend/confirm, login/logout, forgot/reset, password change, active-session revoke, fragment-only token handling, and responsive accessible light/dark shell behavior. Todo 5 remains in progress because invitations, privacy, and product behavior are not implemented.
 - Todo 5E identity contract/security checkpoint is verified: Fastify generates a JSON-only `/openapi.json` document for every implemented identity endpoint and status response, with no Swagger UI route or secret/token/password examples. Isolated PostgreSQL/Mailpit Fastify-injection tests cover default-closed registration, generic enumeration-resistant responses, unverified login denial, signed CSRF binding and Origin checks, verification/reset replay and expiry, session rotation/revocation and cross-account restrictions, HMAC-principal limiting with `Retry-After`, SMTP generic failure/recovery, and secret-free API/OpenAPI outputs. Todo 5 remains in progress pending final checkpoint 5F.
-- Todo 5F blocker resolution is implemented but not yet independently reviewed: API and web use Zod 4; registration requires three separate, unchecked affirmative inputs for adult self-attestation, Terms version, and Privacy Notice version, persisting the existing three consent records atomically. The Bahasa-first legal notices are versioned at `terms-v1` and `privacy-v1`. The minimal authenticated Privacy Center at `/privacy` reads Terms/Privacy acceptance versions and timestamps, email-verification status, and links to password/session controls and legal notices. It intentionally excludes export, correction, deletion, withdrawal, and restriction operations. The lifecycle uses a strict heading locator for Active sessions.
+- Todo 5F blocker resolution is implemented but not yet independently reviewed: API and web use Zod 4; registration requires three separate, unchecked affirmative inputs for adult self-attestation, Terms, and Privacy Notice. The server alone selects `adult-v1`, `terms-v1`, and `privacy-v1` and persists the three consent records atomically; caller-supplied legal-version fields cannot alter what is stored. The Bahasa-first legal notices identify the current server-owned `terms-v1` and `privacy-v1` versions. The minimal authenticated Privacy Center at `/privacy` reads Terms/Privacy acceptance versions and timestamps, email-verification status, and links to password/session controls and legal notices. It intentionally excludes export, correction, deletion, withdrawal, and restriction operations. The lifecycle uses a strict heading locator for Active sessions.
 
 ## Not started
 
@@ -46,7 +46,7 @@
 
 ## Next recommended step
 
-Run independent final review of Todo 5F after the full isolated API/PostgreSQL/Mailpit/Chromium matrix passes twice. Keep Todo 5 in progress until that review passes. Do not add privacy-request operations, video, AI, analytics, Redis, or a second activity while building v1.
+Run independent final review of Todo 5F after the full isolated API/PostgreSQL/Mailpit/Chromium matrix passes twice. Keep Todo 5 in progress until that review passes. Do not add privacy-request operations, video, AI, analytics, Redis, or a second activity while building v1. Team-mode security review remains unavailable.
 
 ## Command status
 

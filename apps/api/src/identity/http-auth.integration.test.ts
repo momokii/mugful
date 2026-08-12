@@ -40,9 +40,7 @@ describe.skipIf(!databaseTestsEnabled)(
           email: "ada@example.test",
           password: "correct horse battery staple",
           privacyAccepted: true,
-          privacyVersion: "privacy-v1",
           termsAccepted: true,
-          termsVersion: "terms-v1",
         },
       });
 
@@ -52,11 +50,11 @@ describe.skipIf(!databaseTestsEnabled)(
       await closed.pool.end();
     });
 
-    it("creates every required consent atomically without a session", async () => {
+    it("creates server-versioned required consents atomically without a session", async () => {
       // Given: enabled registration and a valid CSRF exchange
       const csrf = await csrfFor(context.app);
 
-      // When: an adult submits all required consent versions
+      // When: an adult submits all required affirmative consents
       const response = await context.app.inject({
         method: "POST",
         url: "/v1/auth/register",
@@ -67,9 +65,7 @@ describe.skipIf(!databaseTestsEnabled)(
           email: " Ada@Example.Test ",
           password: "correct horse battery staple",
           privacyAccepted: true,
-          privacyVersion: "privacy-v1",
           termsAccepted: true,
-          termsVersion: "terms-v1",
         },
       });
 
@@ -77,12 +73,51 @@ describe.skipIf(!databaseTestsEnabled)(
       expect(response.statusCode).toBe(202);
       expect(response.headers["set-cookie"]).toBeUndefined();
       const account = await context.pool.query<
-        Readonly<{ email: string; consent_count: number }>
+        Readonly<{ email: string; consent_count: number; versions: string[] }>
       >(
-        "SELECT accounts.email, count(account_consents.kind)::int AS consent_count FROM accounts LEFT JOIN account_consents ON account_consents.account_id = accounts.id GROUP BY accounts.email",
+        "SELECT accounts.email, count(account_consents.kind)::int AS consent_count, array_agg(account_consents.version ORDER BY account_consents.kind) AS versions FROM accounts LEFT JOIN account_consents ON account_consents.account_id = accounts.id GROUP BY accounts.email",
       );
       expect(account.rows).toEqual([
-        { email: "ada@example.test", consent_count: 3 },
+        {
+          email: "ada@example.test",
+          consent_count: 3,
+          versions: ["adult-v1", "privacy-v1", "terms-v1"],
+        },
+      ]);
+    });
+
+    it("ignores caller-supplied legal versions and persists canonical versions", async () => {
+      // Given: enabled registration and a valid CSRF exchange
+      const csrf = await csrfFor(context.app);
+
+      // When: a caller submits obsolete legal-version fields alongside affirmative consents
+      const response = await context.app.inject({
+        method: "POST",
+        url: "/v1/auth/register",
+        headers: unsafeHeaders({ cookie: csrf.cookie, csrfToken: csrf.token }),
+        payload: {
+          adultAttestation: true,
+          displayName: "Ada",
+          email: "ada@example.test",
+          password: "correct horse battery staple",
+          privacyAccepted: true,
+          privacyVersion: "privacy-v0",
+          termsAccepted: true,
+          termsVersion: "terms-v0",
+        },
+      });
+
+      // Then: caller input cannot select the versions recorded for either legal notice
+      expect(response.statusCode).toBe(202);
+      expect(
+        (
+          await context.pool.query<Readonly<{ kind: string; version: string }>>(
+            "SELECT kind, version FROM account_consents WHERE kind IN ('privacy', 'terms') ORDER BY kind",
+          )
+        ).rows,
+      ).toEqual([
+        { kind: "privacy", version: "privacy-v1" },
+        { kind: "terms", version: "terms-v1" },
       ]);
     });
 
@@ -108,9 +143,7 @@ describe.skipIf(!databaseTestsEnabled)(
             email: "ada@example.test",
             password: "correct horse battery staple",
             privacyAccepted: true,
-            privacyVersion: "privacy-v1",
             termsAccepted: true,
-            termsVersion: "terms-v1",
           },
         });
 
@@ -141,7 +174,6 @@ describe.skipIf(!databaseTestsEnabled)(
           email: "ada@example.test",
           password: "correct horse battery staple",
           privacyAccepted: true,
-          termsVersion: "terms-v1",
         },
       });
 
@@ -162,9 +194,7 @@ describe.skipIf(!databaseTestsEnabled)(
           email: "ada@example.test",
           password: "correct horse battery staple",
           privacyAccepted: true,
-          privacyVersion: "privacy-v1",
           termsAccepted: false,
-          termsVersion: "terms-v1",
         },
       });
 
@@ -185,9 +215,7 @@ describe.skipIf(!databaseTestsEnabled)(
           email: "ada@example.test",
           password: "correct horse battery staple",
           privacyAccepted: false,
-          privacyVersion: "privacy-v1",
           termsAccepted: true,
-          termsVersion: "terms-v1",
         },
       });
 
@@ -208,9 +236,7 @@ describe.skipIf(!databaseTestsEnabled)(
           email: "ada@example.test",
           password: "correct horse battery staple",
           privacyAccepted: true,
-          privacyVersion: "privacy-v1",
           termsAccepted: true,
-          termsVersion: "terms-v1",
         },
       });
 
@@ -230,9 +256,7 @@ describe.skipIf(!databaseTestsEnabled)(
         email: "ada@example.test",
         password: "correct horse battery staple",
         privacyAccepted: true,
-        privacyVersion: "privacy-v1",
         termsAccepted: true,
-        termsVersion: "terms-v1",
       };
       await context.app.inject({
         method: "POST",
@@ -263,9 +287,7 @@ describe.skipIf(!databaseTestsEnabled)(
         email: "ada@example.test",
         password: "correct horse battery staple",
         privacyAccepted: true,
-        privacyVersion: "privacy-v1",
         termsAccepted: true,
-        termsVersion: "terms-v1",
       };
 
       // When: either CSRF binding or Origin is absent

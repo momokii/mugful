@@ -80,9 +80,7 @@ export const identityOpenApiSchemas = {
         "email",
         "password",
         "privacyAccepted",
-        "privacyVersion",
         "termsAccepted",
-        "termsVersion",
       ],
       properties: {
         adultAttestation: { type: "boolean", const: true },
@@ -90,9 +88,7 @@ export const identityOpenApiSchemas = {
         email,
         password,
         privacyAccepted: { type: "boolean", const: true },
-        privacyVersion: { type: "string", minLength: 1, maxLength: 64 },
         termsAccepted: { type: "boolean", const: true },
-        termsVersion: { type: "string", minLength: 1, maxLength: 64 },
       },
     },
     response: {

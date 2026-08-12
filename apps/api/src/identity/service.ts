@@ -62,9 +62,7 @@ export type IdentityService = Readonly<{
       email: string;
       password: string;
       privacyAccepted: true;
-      privacyVersion: string;
       termsAccepted: true;
-      termsVersion: string;
     }>,
   ) => Promise<"accepted" | "rate-limited">;
   privacySummary: (accountId: string) => Promise<

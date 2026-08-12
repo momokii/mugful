@@ -57,9 +57,7 @@ describe.skipIf(!databaseTestsEnabled)(
           email: "bea@example.test",
           password,
           privacyAccepted: true,
-          privacyVersion: "privacy-v1",
           termsAccepted: true,
-          termsVersion: "terms-v1",
         },
       });
 

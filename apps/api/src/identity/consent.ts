@@ -7,6 +7,11 @@ export const requiredConsentKinds = [
 ] as const;
 
 export const consentKindSchema = z.enum(requiredConsentKinds);
+export const currentConsentVersions = {
+  adult_attestation: "adult-v1",
+  privacy: "privacy-v1",
+  terms: "terms-v1",
+} as const;
 export const consentVersionSchema = z
   .string()
   .min(1)

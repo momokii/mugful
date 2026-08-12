@@ -41,14 +41,12 @@ Before running the build, create the ignored environment file with `cp .env.exam
 - `scripts/run-auth-lifecycle.sh`, which creates an isolated PostgreSQL/Mailpit lifecycle and runs API/OpenAPI plus real-Chromium enabled/default-closed flows, including the authenticated Privacy Center, at 375px, 768px, and 1280px;
 - `pnpm dev`, which compiles and prints labels from the two shell entry points.
 
-The following are planned, not available yet:
+The following remain planned, not available yet:
 
-- Next.js product development server beyond the verified static shell;
-- Fastify API development server;
-- PostgreSQL Compose services;
-- tests, CI workflows, Docker builds, and deployment scripts.
+- Guess My Answer product behavior beyond the verified identity shell;
+- CI workflows, Docker builds, and deployment scripts.
 
-Do not describe the shell commands as application runtime commands or claim any planned service exists until it has been implemented and verified.
+Do not describe planned product or deployment work as implemented.
 
 ## Locked stack
 

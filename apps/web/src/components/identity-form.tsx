@@ -14,11 +14,6 @@ type Mode = "forgot" | "login" | "password" | "register" | "reset" | "verify";
 
 type IdentityFormProperties = Readonly<{ mode: Mode }>;
 
-const versions = {
-  privacyVersion: "privacy-v1",
-  termsVersion: "terms-v1",
-} as const;
-
 export function IdentityForm({ mode }: IdentityFormProperties) {
   const [message, setMessage] = useState<string | undefined>();
   const [pending, setPending] = useState(false);
@@ -46,7 +41,6 @@ export function IdentityForm({ mode }: IdentityFormProperties) {
               password,
               privacyAccepted: values.get("privacy") === "on",
               termsAccepted: values.get("terms") === "on",
-              ...versions,
             });
           case "login":
             return mutateIdentity("/auth/login", "POST", { email, password });
