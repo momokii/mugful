@@ -2,19 +2,28 @@ import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./e2e",
-  outputDir: "../../.omo/evidence/task-4-test-output",
+  outputDir:
+    process.env["PLAYWRIGHT_OUTPUT_DIR"] ??
+    "../../.omo/evidence/task-4-test-output",
   reporter: [
     ["list"],
-    ["json", { outputFile: "../../.omo/evidence/task-4-playwright.json" }],
+    [
+      "json",
+      {
+        outputFile:
+          process.env["PLAYWRIGHT_REPORT_FILE"] ??
+          "../../.omo/evidence/task-4-playwright.json",
+      },
+    ],
   ],
   use: {
-    baseURL: "http://127.0.0.1:3100",
+    baseURL: process.env["PLAYWRIGHT_BASE_URL"] ?? "http://127.0.0.1:3100",
     trace: "retain-on-failure",
   },
   webServer: {
     cwd: ".",
     url: "http://127.0.0.1:3100",
-    command: "pnpm exec next start -p 3100",
+    command: "./node_modules/.bin/next start -p 3100",
     reuseExistingServer: false,
     timeout: 120_000,
   },

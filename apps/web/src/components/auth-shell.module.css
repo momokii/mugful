@@ -99,6 +99,83 @@
   color: var(--text-primary);
 }
 
+.submit:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.checkbox {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.checkbox input {
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  accent-color: var(--accent-primary);
+}
+
+.status {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.security {
+  margin-top: var(--space-10);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.security h2 {
+  margin: 0 0 var(--space-3);
+  font-size: 22px;
+}
+
+.sessions {
+  display: grid;
+  gap: var(--space-2);
+  padding: 0;
+  list-style: none;
+}
+
+.sessions li {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.sessions button {
+  min-height: 36px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.logout {
+  min-height: 44px;
+  margin-top: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  font-weight: 600;
+}
+
 .footerLink {
   margin: var(--space-6) 0 0;
   color: var(--text-secondary);

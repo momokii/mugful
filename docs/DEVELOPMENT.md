@@ -1,6 +1,6 @@
 # Development guide
 
-**Status:** 0b local runtime foundation, Todo 4 accessible web shell, and Todo 5A/5B1/5B2/5C identity checkpoints verified. Todo 5 remains in progress; product behavior remains unimplemented.
+**Status:** 0b local runtime foundation, Todo 4 accessible web shell, and Todo 5A/5B1/5B2/5C identity checkpoints verified. Todo 5 remains in progress; the thin identity UI is verified, while product behavior remains unimplemented.
 
 This document is the handoff point for a fresh agent or contributor who does not have the conversation history.
 
@@ -77,6 +77,8 @@ Todo 5A migration verification also runs `MUGFUL_RUN_DATABASE_TESTS=true DATABAS
 Todo 5B2 HTTP verification requires a manually migrated, isolated PostgreSQL database and runs `MUGFUL_RUN_DATABASE_TESTS=true MUGFUL_TEST_DATABASE_URL=<isolated URL> pnpm --filter @mugful/api test -- src/identity/http-auth.integration.test.ts src/identity/http-session.integration.test.ts`. The suite uses Fastify injection against the real database; application startup does not execute migrations.
 
 Todo 5C integration verification uses an isolated Compose PostgreSQL and Mailpit pair, manually applies migrations, and runs `MUGFUL_RUN_DATABASE_TESTS=true MUGFUL_TEST_DATABASE_URL=<isolated URL> MUGFUL_TEST_MAILPIT_URL=<isolated Mailpit URL> MUGFUL_TEST_SMTP_PORT=<isolated SMTP port> pnpm --filter @mugful/api test -- src/identity/http-email.integration.test.ts`. It captures SMTP delivery through Mailpit’s API, checks fragment-only links, HMAC-only database storage, single use and expiry, generic absent-address responses, and unavailable-SMTP resend recovery. It does not run migrations on startup or require a production provider.
+
+Todo 5D browser verification is `scripts/run-auth-lifecycle.sh`. It creates a unique Compose project and brand-new PostgreSQL volume for every run, applies migrations explicitly, starts production-built API and Next processes on isolated ports, runs serial real-Chromium auth lifecycle checks with unique addresses, then removes processes, containers, volumes, temporary environment files, and Playwright evidence. It covers enabled registration, Mailpit verification and reset links, fragment-token removal, session revoke through the production proxy, logout, password change, and responsive token-page checks at 375px, 768px, and 1280px. A proxy revoke failure is reported only with a sanitized direct-versus-proxy comparison.
 
 ## First implementation slice
 

@@ -2,7 +2,7 @@
 
 A private, playful web space for adults in long-distance relationships. The first release focuses on one shared activity: **Guess My Answer**.
 
-> **Status:** The local runtime foundation, Todo 4 accessible public/auth UI shell, and Todo 5A-5C identity checkpoints are verified. Todo 5 remains in progress; identity UI and product behavior remain unimplemented.
+> **Status:** The local runtime foundation, Todo 4 accessible public/auth UI shell, and Todo 5A-5D identity checkpoints are verified. Todo 5 remains in progress; product behavior remains unimplemented.
 
 ## Product direction
 
@@ -24,7 +24,7 @@ v1 deliberately does **not** include native video, AI, behavioral analytics, or 
 
 ## Current repository state
 
-This repository contains local-only PostgreSQL 17 and Mailpit Compose services, Fastify liveness/readiness API, minimal Next.js proxy, static accessible Mugful public/auth shell, and manual identity migrations. Todo 5A provides account, versioned consent, hashed-session, and hashed identity-token tables plus internal password/token/cookie primitives. Todo 5B1 adds disabled-by-default registration policy/audit persistence, normalized-email uniqueness, session lifecycle metadata, HMAC-keyed rate-limit bucket storage, and validated identity configuration. Todo 5B2 adds the internal `/v1` registration, login, logout, current-session, password-change, and device-session API with CSRF/origin checks, durable HMAC-principal throttling, and real PostgreSQL Fastify-injection coverage. Todo 5C adds provider-neutral SMTP delivery for verification resend/confirm and password forgot/reset commands. Tokens are HMAC-persisted, short-lived, replaced on resend, atomically single-use, and sent only in fragment links. Registration remains closed by default; account creation does not create a session before email verification. UI, OpenAPI, and product behavior remain unimplemented.
+This repository contains local-only PostgreSQL 17 and Mailpit Compose services, Fastify liveness/readiness API, minimal Next.js proxy, static accessible Mugful public/auth shell, and manual identity migrations. Todo 5A provides account, versioned consent, hashed-session, and hashed identity-token tables plus internal password/token/cookie primitives. Todo 5B1 adds disabled-by-default registration policy/audit persistence, normalized-email uniqueness, session lifecycle metadata, HMAC-keyed rate-limit bucket storage, and validated identity configuration. Todo 5B2 adds the internal `/v1` registration, login, logout, current-session, password-change, and device-session API with CSRF/origin checks, durable HMAC-principal throttling, and real PostgreSQL Fastify-injection coverage. Todo 5C adds provider-neutral SMTP delivery for verification resend/confirm and password forgot/reset commands. Todo 5D wires these existing contracts into a CSRF-protected accessible identity UI with fragment-only verification/reset tokens and account-session controls. Tokens are HMAC-persisted, short-lived, replaced on resend, atomically single-use, and sent only in fragment links. Registration remains closed by default; account creation does not create a session before email verification. OpenAPI and product behavior remain unimplemented.
 
 With Node 22 and pnpm 11.20.0 installed, a contributor can verify the tooling foundation with:
 

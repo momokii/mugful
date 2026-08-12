@@ -63,11 +63,7 @@ test.describe("public and auth shell", () => {
     });
   }
 
-  test("auth forms expose labels, native validation, and no API calls", async ({
-    page,
-  }) => {
-    const requests: string[] = [];
-    page.on("request", (request) => requests.push(request.url()));
+  test("auth forms expose labels and native validation", async ({ page }) => {
     await page.goto("/login");
 
     await expect(page.getByLabel("Email address")).toBeVisible();
@@ -77,7 +73,6 @@ test.describe("public and auth shell", () => {
       "required",
       "",
     );
-    expect(requests.some((url) => url.includes("/api/"))).toBe(false);
   });
 
   test("auth text and action pairings meet WCAG AA in both themes", async ({
@@ -182,9 +177,7 @@ test.describe("public and auth shell", () => {
     await context.close();
   });
 
-  test("auth fields retain entered values without an application handler", async ({
-    page,
-  }) => {
+  test("auth fields retain entered values", async ({ page }) => {
     await page.goto("/register");
     await page.getByLabel("Your name").fill("Ari");
     await page.getByLabel("Email address").fill("ari@example.com");
@@ -196,35 +189,5 @@ test.describe("public and auth shell", () => {
     await expect(page.getByLabel("Create a password")).toHaveValue(
       "eight-char",
     );
-  });
-
-  test("filled auth forms stay static when their action is attempted", async ({
-    page,
-  }) => {
-    const mutations: string[] = [];
-    page.on("request", (request) => {
-      if (request.method() !== "GET")
-        mutations.push(`${request.method()} ${request.url()}`);
-    });
-
-    for (const route of ["/login", "/register"] as const) {
-      await page.goto(route);
-      const initialUrl = page.url();
-      mutations.length = 0;
-      if (route === "/login") {
-        await page.getByLabel("Email address").fill("ari@example.com");
-        await page.getByLabel("Password").fill("a-secure-password");
-        await page.getByRole("button", { name: "Continue" }).click();
-      } else {
-        await page.getByLabel("Your name").fill("Ari");
-        await page.getByLabel("Email address").fill("ari@example.com");
-        await page.getByLabel("Create a password").fill("a-secure-password");
-        await page.getByRole("button", { name: "Create space" }).click();
-      }
-
-      expect(page.url()).toBe(initialUrl);
-      expect(mutations).toEqual([]);
-      await expect(page.getByText(/success|created/i)).toHaveCount(0);
-    }
   });
 });

@@ -27,6 +27,24 @@ export const createNextConfig = (environment: Environment): NextConfig => {
   const config = parseWebConfig(environment);
 
   return {
+    async headers() {
+      return [
+        {
+          headers: [
+            { key: "Cache-Control", value: "no-store" },
+            { key: "Referrer-Policy", value: "no-referrer" },
+          ],
+          source: "/verify-email",
+        },
+        {
+          headers: [
+            { key: "Cache-Control", value: "no-store" },
+            { key: "Referrer-Policy", value: "no-referrer" },
+          ],
+          source: "/reset-password",
+        },
+      ];
+    },
     async rewrites() {
       return [
         {
@@ -39,6 +57,9 @@ export const createNextConfig = (environment: Environment): NextConfig => {
 };
 
 const nextConfig: NextConfig = {
+  async headers() {
+    return createNextConfig(process.env).headers?.() ?? [];
+  },
   async rewrites() {
     return createNextConfig(process.env).rewrites?.() ?? [];
   },
