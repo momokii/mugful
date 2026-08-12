@@ -12,6 +12,7 @@ export const createChildEnvironment = (baseline, apiInternalOrigin) => {
       PATH: baseline.PATH,
       NODE_ENV: baseline.NODE_ENV,
       API_INTERNAL_ORIGIN: apiInternalOrigin,
+      NEXT_DIST_DIR: baseline.NEXT_DIST_DIR,
     }).filter(([, value]) => value !== undefined),
   );
 };

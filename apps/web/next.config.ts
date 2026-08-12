@@ -27,6 +27,7 @@ export const createNextConfig = (environment: Environment): NextConfig => {
   const config = parseWebConfig(environment);
 
   return {
+    distDir: environment.NEXT_DIST_DIR ?? ".next",
     async headers() {
       return [
         {
@@ -57,6 +58,7 @@ export const createNextConfig = (environment: Environment): NextConfig => {
 };
 
 const nextConfig: NextConfig = {
+  distDir: process.env["NEXT_DIST_DIR"] ?? ".next",
   async headers() {
     return createNextConfig(process.env).headers?.() ?? [];
   },

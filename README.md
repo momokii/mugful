@@ -2,7 +2,7 @@
 
 A private, playful web space for adults in long-distance relationships. The first release focuses on one shared activity: **Guess My Answer**.
 
-> **Status:** The local runtime foundation, Todo 4 accessible public/auth UI shell, and Todo 5A-5D identity checkpoints are verified. Todo 5 remains in progress; product behavior remains unimplemented.
+> **Status:** The local runtime foundation, Todo 4 accessible public/auth UI shell, and Todo 5A-5E identity checkpoints plus the 5F identity-consent foundation are implemented. Todo 5 remains in progress pending an independent final review; product behavior remains unimplemented.
 
 ## Product direction
 
@@ -24,7 +24,7 @@ v1 deliberately does **not** include native video, AI, behavioral analytics, or 
 
 ## Current repository state
 
-This repository contains local-only PostgreSQL 17 and Mailpit Compose services, Fastify liveness/readiness API, minimal Next.js proxy, static accessible Mugful public/auth shell, and manual identity migrations. Todo 5A provides account, versioned consent, hashed-session, and hashed identity-token tables plus internal password/token/cookie primitives. Todo 5B1 adds disabled-by-default registration policy/audit persistence, normalized-email uniqueness, session lifecycle metadata, HMAC-keyed rate-limit bucket storage, and validated identity configuration. Todo 5B2 adds the internal `/v1` registration, login, logout, current-session, password-change, and device-session API with CSRF/origin checks, durable HMAC-principal throttling, and real PostgreSQL Fastify-injection coverage. Todo 5C adds provider-neutral SMTP delivery for verification resend/confirm and password forgot/reset commands. Todo 5D wires these existing contracts into a CSRF-protected accessible identity UI with fragment-only verification/reset tokens and account-session controls. Todo 5E exposes a JSON-only `/openapi.json` contract for the implemented identity endpoints and verifies their adverse security paths against isolated PostgreSQL/Mailpit dependencies. Tokens are HMAC-persisted, short-lived, replaced on resend, atomically single-use, and sent only in fragment links. Registration remains closed by default; account creation does not create a session before email verification. Product behavior remains unimplemented.
+This repository contains local-only PostgreSQL 17 and Mailpit Compose services, Fastify liveness/readiness API, a minimal Next.js proxy, and manual identity migrations. Todo 5A-5E provide the bounded account, email verification, secure-session, reset, OpenAPI, and negative-path identity foundation. Registration records separate adult self-attestation, Terms, and Privacy Notice affirmations as three atomic, versioned consent records. The Bahasa-first registration flow has no preselected consent. Authenticated users can read their Terms/Privacy consent versions and timestamps, email-verification status, and links to account-security/session controls through `/privacy`. It intentionally does not implement privacy export, correction, deletion, withdrawal, or restriction operations. Tokens are HMAC-persisted, short-lived, replaced on resend, atomically single-use, and sent only in fragment links. Registration remains closed by default; account creation does not create a session before email verification. Todo 5 remains in progress pending independent final review; product behavior remains unimplemented.
 
 With Node 22 and pnpm 11.20.0 installed, a contributor can verify the tooling foundation with:
 
@@ -38,7 +38,7 @@ cp .env.example .env
 pnpm build
 ```
 
-The web shell also has a production-server Playwright check covering `/`, `/login`, and `/register` at mobile, tablet, and desktop widths. Run it after a production build with `API_INTERNAL_ORIGIN=http://127.0.0.1:3001 pnpm --filter @mugful/web e2e`.
+The web shell has production-server Playwright coverage for public/auth routes and the authenticated identity lifecycle, including `/privacy`, at mobile, tablet, and desktop widths. Run the isolated API/PostgreSQL/Mailpit/browser lifecycle through `scripts/run-auth-lifecycle.sh` after the regular production build.
 
 Create ignored `.env` from `.env.example`, replace its local-only password consistently, then run `docker compose -f compose.yaml up -d postgres mailpit`, `pnpm --filter @mugful/api dev`, and `pnpm --filter @mugful/web dev`. Mailpit is available only on `http://127.0.0.1:8025`; it captures local messages and is not a production provider. Liveness is `http://127.0.0.1:3001/health/live`; the proxy is `http://127.0.0.1:3000/api/health/live`. Run the reviewed bootstrap migration only explicitly with `pnpm --filter @mugful/api db:migrate`.
 

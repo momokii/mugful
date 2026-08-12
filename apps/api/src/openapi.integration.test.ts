@@ -34,6 +34,7 @@ describe("OpenAPI identity contract", () => {
       "/v1/auth/login": { post: ["200", "400", "401", "403", "429"] },
       "/v1/auth/logout": { post: ["204", "403"] },
       "/v1/auth/session": { get: ["200", "401"] },
+      "/v1/auth/privacy": { get: ["200", "401"] },
       "/v1/auth/password": { post: ["200", "400", "401", "403"] },
       "/v1/auth/sessions": { get: ["200", "401"] },
       "/v1/auth/sessions/{sessionId}": { delete: ["204", "401", "403"] },
@@ -55,6 +56,10 @@ describe("OpenAPI identity contract", () => {
         );
     }
     expect(JSON.stringify(document)).not.toContain('"example"');
+    const registration = document.paths["/v1/auth/register"]?.["post"];
+    expect(registration).toBeDefined();
+    expect(JSON.stringify(registration)).toContain('"privacyAccepted"');
+    expect(JSON.stringify(registration)).toContain('"termsAccepted"');
 
     await context.app.close();
     await context.pool.end();

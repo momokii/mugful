@@ -79,7 +79,9 @@ export const identityOpenApiSchemas = {
         "displayName",
         "email",
         "password",
+        "privacyAccepted",
         "privacyVersion",
+        "termsAccepted",
         "termsVersion",
       ],
       properties: {
@@ -87,7 +89,9 @@ export const identityOpenApiSchemas = {
         displayName: { type: "string", minLength: 1, maxLength: 80 },
         email,
         password,
+        privacyAccepted: { type: "boolean", const: true },
         privacyVersion: { type: "string", minLength: 1, maxLength: 64 },
+        termsAccepted: { type: "boolean", const: true },
         termsVersion: { type: "string", minLength: 1, maxLength: 64 },
       },
     },
@@ -143,6 +147,38 @@ export const identityOpenApiSchemas = {
         additionalProperties: false,
         required: ["session"],
         properties: { session },
+      },
+      401: unauthorized,
+    },
+  },
+  privacySummary: {
+    operationId: "getIdentityPrivacySummary",
+    summary: "Read identity consent and security status",
+    tags: ["Identity"],
+    security: sessionSecurity,
+    response: {
+      200: {
+        description:
+          "Versioned Terms and Privacy consents with account status.",
+        type: "object",
+        additionalProperties: false,
+        required: ["consents", "emailVerified"],
+        properties: {
+          consents: {
+            type: "array",
+            items: {
+              type: "object",
+              additionalProperties: false,
+              required: ["grantedAt", "kind", "version"],
+              properties: {
+                grantedAt: { type: "string", format: "date-time" },
+                kind: { type: "string", enum: ["privacy", "terms"] },
+                version: { type: "string" },
+              },
+            },
+          },
+          emailVerified: { type: "boolean" },
+        },
       },
       401: unauthorized,
     },

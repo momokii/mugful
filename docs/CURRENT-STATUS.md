@@ -5,7 +5,7 @@
 **Release target:** v1 invite-only beta
 **Product name:** Mugful
 **Public repository:** https://github.com/momokii/mugful
-**Latest verified baseline:** `21187a5` on `master` before Todo 5D implementation
+**Latest implementation baseline:** `d957ac0` on `master` before Todo 5F blocker resolution
 
 ## Completed
 
@@ -32,13 +32,13 @@
 - Todo 5C email checkpoint is verified against isolated Compose PostgreSQL and Mailpit services: provider-neutral Nodemailer SMTP configuration, local-only loopback Mailpit, registration verification email, verification resend/confirm, and password forgot/reset HTTP commands. Messages contain only fragment token links. Token persistence is HMAC-only; replacement, expiry, atomic single use, absent-email generic output, SMTP failure recovery, session revocation after reset, and no token in API responses are covered through Fastify injection and Mailpit capture.
 - Todo 5D thin identity UI is implemented and browser-verified against a fresh isolated PostgreSQL/Mailpit lifecycle: CSRF-protected registration, verification resend/confirm, login/logout, forgot/reset, password change, active-session revoke, fragment-only token handling, and responsive accessible light/dark shell behavior. Todo 5 remains in progress because invitations, privacy, and product behavior are not implemented.
 - Todo 5E identity contract/security checkpoint is verified: Fastify generates a JSON-only `/openapi.json` document for every implemented identity endpoint and status response, with no Swagger UI route or secret/token/password examples. Isolated PostgreSQL/Mailpit Fastify-injection tests cover default-closed registration, generic enumeration-resistant responses, unverified login denial, signed CSRF binding and Origin checks, verification/reset replay and expiry, session rotation/revocation and cross-account restrictions, HMAC-principal limiting with `Retry-After`, SMTP generic failure/recovery, and secret-free API/OpenAPI outputs. Todo 5 remains in progress pending final checkpoint 5F.
+- Todo 5F blocker resolution is implemented but not yet independently reviewed: API and web use Zod 4; registration requires three separate, unchecked affirmative inputs for adult self-attestation, Terms version, and Privacy Notice version, persisting the existing three consent records atomically. The Bahasa-first legal notices are versioned at `terms-v1` and `privacy-v1`. The minimal authenticated Privacy Center at `/privacy` reads Terms/Privacy acceptance versions and timestamps, email-verification status, and links to password/session controls and legal notices. It intentionally excludes export, correction, deletion, withdrawal, and restriction operations. The lifecycle uses a strict heading locator for Active sessions.
 
 ## Not started
 
 - Next.js web application beyond the Todo 4 static shell.
 - Fastify API/realtime application.
-- Invitations and Privacy Center.
-- Identity persistence transaction orchestration for future account-and-consent creation.
+- Invitations and privacy-request operations (export, correction, deletion, withdrawal, and restriction).
 - Prompt catalog and Guess My Answer state machine.
 - Docker Compose configurations and deployment scripts.
 - CI workflows and Docker Hub publication.
@@ -46,7 +46,7 @@
 
 ## Next recommended step
 
-Continue Todo 5 with the API checkpoint only after preserving Todo 5A's hashed-secret and explicit-manual-migration boundaries. Do not add video, AI, analytics, Redis, or a second activity while building v1.
+Run independent final review of Todo 5F after the full isolated API/PostgreSQL/Mailpit/Chromium matrix passes twice. Keep Todo 5 in progress until that review passes. Do not add privacy-request operations, video, AI, analytics, Redis, or a second activity while building v1.
 
 ## Command status
 
@@ -54,7 +54,7 @@ Continue Todo 5 with the API checkpoint only after preserving Todo 5A's hashed-s
 
 ## Known constraints
 
-- The project has tooling only and must not be described as production-ready or as having a running application.
+- The project is not production-ready; only the bounded identity foundation and its local/test lifecycle are implemented.
 - UU PDP research is not legal advice; counsel-needed items remain open.
 - SMTP quotas and provider policies change; re-check official sources before production setup.
 - The application-level privacy boundary is not end-to-end encryption.

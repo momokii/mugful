@@ -1,5 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
+const lifecycleBaseUrl = process.env["PLAYWRIGHT_BASE_URL"];
+
 export default defineConfig({
   testDir: "./e2e",
   outputDir:
@@ -17,16 +19,20 @@ export default defineConfig({
     ],
   ],
   use: {
-    baseURL: process.env["PLAYWRIGHT_BASE_URL"] ?? "http://127.0.0.1:3100",
+    baseURL: lifecycleBaseUrl ?? "http://127.0.0.1:3100",
     trace: "retain-on-failure",
   },
-  webServer: {
-    cwd: ".",
-    url: "http://127.0.0.1:3100",
-    command: "./node_modules/.bin/next start -p 3100",
-    reuseExistingServer: false,
-    timeout: 120_000,
-  },
+  ...(lifecycleBaseUrl === undefined
+    ? {
+        webServer: {
+          cwd: ".",
+          url: "http://127.0.0.1:3100",
+          command: "./node_modules/.bin/next start -p 3100",
+          reuseExistingServer: false,
+          timeout: 120_000,
+        },
+      }
+    : {}),
   projects: [
     {
       name: "mobile",

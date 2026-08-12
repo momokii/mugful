@@ -8,6 +8,7 @@ describe("web build environment", () => {
     const baseline = {
       DATABASE_URL: "postgresql://secret",
       NODE_ENV: "production",
+      NEXT_DIST_DIR: "/tmp/mugful-lifecycle/.next",
       PATH: "/bin",
     };
 
@@ -21,6 +22,7 @@ describe("web build environment", () => {
     expect(childEnvironment).toEqual({
       API_INTERNAL_ORIGIN: "http://127.0.0.1:3001",
       NODE_ENV: "production",
+      NEXT_DIST_DIR: "/tmp/mugful-lifecycle/.next",
       PATH: "/bin",
     });
   });
@@ -35,7 +37,11 @@ describe("web build environment", () => {
 
     // When: the production build runner executes
     runBuild({
-      baseline: { DATABASE_URL: "postgresql://secret", PATH: "/bin" },
+      baseline: {
+        DATABASE_URL: "postgresql://secret",
+        NEXT_DIST_DIR: "/tmp/mugful-lifecycle/.next",
+        PATH: "/bin",
+      },
       loadEnvironment: () => ({
         combinedEnv: {
           API_INTERNAL_ORIGIN: "http://127.0.0.1:3001",
@@ -48,6 +54,7 @@ describe("web build environment", () => {
     // Then: the fake Next process cannot receive the secret
     expect(capturedOptions.env).toEqual({
       API_INTERNAL_ORIGIN: "http://127.0.0.1:3001",
+      NEXT_DIST_DIR: "/tmp/mugful-lifecycle/.next",
       PATH: "/bin",
     });
   });

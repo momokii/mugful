@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 
+const baseUrl = process.env["PLAYWRIGHT_BASE_URL"] ?? "http://127.0.0.1:3100";
 const routes = ["/", "/login", "/register"] as const;
 const colorSchemes = ["light", "dark"] as const;
 
@@ -80,7 +81,7 @@ test.describe("public and auth shell", () => {
   }) => {
     for (const colorScheme of colorSchemes) {
       const context = await browser.newContext({
-        baseURL: "http://127.0.0.1:3100",
+        baseURL: baseUrl,
         colorScheme,
       });
       const page = await context.newPage();
@@ -156,7 +157,7 @@ test.describe("public and auth shell", () => {
 
   test("dark theme keeps the shell readable", async ({ browser }, testInfo) => {
     const context = await browser.newContext({
-      baseURL: "http://127.0.0.1:3100",
+      baseURL: baseUrl,
       colorScheme: "dark",
       viewport: { width: 375, height: 812 },
     });

@@ -39,7 +39,9 @@ describe.skipIf(!databaseTestsEnabled)(
           displayName: "Ada",
           email: "ada@example.test",
           password: "correct horse battery staple",
+          privacyAccepted: true,
           privacyVersion: "privacy-v1",
+          termsAccepted: true,
           termsVersion: "terms-v1",
         },
       });
@@ -64,7 +66,9 @@ describe.skipIf(!databaseTestsEnabled)(
           displayName: "Ada",
           email: " Ada@Example.Test ",
           password: "correct horse battery staple",
+          privacyAccepted: true,
           privacyVersion: "privacy-v1",
+          termsAccepted: true,
           termsVersion: "terms-v1",
         },
       });
@@ -82,6 +86,46 @@ describe.skipIf(!databaseTestsEnabled)(
       ]);
     });
 
+    it("rolls back the account when consent persistence fails", async () => {
+      // Given: a database rule that rejects the Terms consent after account creation starts
+      const csrf = await csrfFor(context.app);
+      await context.pool.query(
+        "ALTER TABLE account_consents ADD CONSTRAINT reject_terms_consent CHECK (kind <> 'terms') NOT VALID",
+      );
+
+      // When: an otherwise valid registration is submitted
+      try {
+        const response = await context.app.inject({
+          method: "POST",
+          url: "/v1/auth/register",
+          headers: unsafeHeaders({
+            cookie: csrf.cookie,
+            csrfToken: csrf.token,
+          }),
+          payload: {
+            adultAttestation: true,
+            displayName: "Ada",
+            email: "ada@example.test",
+            password: "correct horse battery staple",
+            privacyAccepted: true,
+            privacyVersion: "privacy-v1",
+            termsAccepted: true,
+            termsVersion: "terms-v1",
+          },
+        });
+
+        // Then: the transaction leaves no partially created account
+        expect(response.statusCode).toBeGreaterThanOrEqual(500);
+        expect(
+          (await context.pool.query("SELECT id FROM accounts")).rows,
+        ).toEqual([]);
+      } finally {
+        await context.pool.query(
+          "ALTER TABLE account_consents DROP CONSTRAINT reject_terms_consent",
+        );
+      }
+    });
+
     it("rejects incomplete or non-adult registration before persisting an account", async () => {
       // Given: enabled registration with a valid CSRF exchange
       const csrf = await csrfFor(context.app);
@@ -96,12 +140,59 @@ describe.skipIf(!databaseTestsEnabled)(
           displayName: "Ada",
           email: "ada@example.test",
           password: "correct horse battery staple",
+          privacyAccepted: true,
           termsVersion: "terms-v1",
         },
       });
 
       // Then: it is rejected without a partial account
       expect(missingConsent.statusCode).toBe(400);
+      expect(
+        (await context.pool.query("SELECT id FROM accounts")).rows,
+      ).toEqual([]);
+
+      // When: the applicant leaves the Terms affirmation unchecked
+      const termsRejected = await context.app.inject({
+        method: "POST",
+        url: "/v1/auth/register",
+        headers: unsafeHeaders({ cookie: csrf.cookie, csrfToken: csrf.token }),
+        payload: {
+          adultAttestation: true,
+          displayName: "Ada",
+          email: "ada@example.test",
+          password: "correct horse battery staple",
+          privacyAccepted: true,
+          privacyVersion: "privacy-v1",
+          termsAccepted: false,
+          termsVersion: "terms-v1",
+        },
+      });
+
+      // Then: a bundled or omitted Terms affirmation cannot create an account
+      expect(termsRejected.statusCode).toBe(400);
+      expect(
+        (await context.pool.query("SELECT id FROM accounts")).rows,
+      ).toEqual([]);
+
+      // When: the applicant leaves the Privacy Notice affirmation unchecked
+      const privacyRejected = await context.app.inject({
+        method: "POST",
+        url: "/v1/auth/register",
+        headers: unsafeHeaders({ cookie: csrf.cookie, csrfToken: csrf.token }),
+        payload: {
+          adultAttestation: true,
+          displayName: "Ada",
+          email: "ada@example.test",
+          password: "correct horse battery staple",
+          privacyAccepted: false,
+          privacyVersion: "privacy-v1",
+          termsAccepted: true,
+          termsVersion: "terms-v1",
+        },
+      });
+
+      // Then: a bundled or omitted Privacy affirmation cannot create an account
+      expect(privacyRejected.statusCode).toBe(400);
       expect(
         (await context.pool.query("SELECT id FROM accounts")).rows,
       ).toEqual([]);
@@ -116,7 +207,9 @@ describe.skipIf(!databaseTestsEnabled)(
           displayName: "Ada",
           email: "ada@example.test",
           password: "correct horse battery staple",
+          privacyAccepted: true,
           privacyVersion: "privacy-v1",
+          termsAccepted: true,
           termsVersion: "terms-v1",
         },
       });
@@ -136,7 +229,9 @@ describe.skipIf(!databaseTestsEnabled)(
         displayName: "Ada",
         email: "ada@example.test",
         password: "correct horse battery staple",
+        privacyAccepted: true,
         privacyVersion: "privacy-v1",
+        termsAccepted: true,
         termsVersion: "terms-v1",
       };
       await context.app.inject({
@@ -167,7 +262,9 @@ describe.skipIf(!databaseTestsEnabled)(
         displayName: "Ada",
         email: "ada@example.test",
         password: "correct horse battery staple",
+        privacyAccepted: true,
         privacyVersion: "privacy-v1",
+        termsAccepted: true,
         termsVersion: "terms-v1",
       };
 

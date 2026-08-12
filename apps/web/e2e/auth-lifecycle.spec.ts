@@ -35,7 +35,22 @@ test("registration, verification, sessions, reset, and password change use isola
   await page.getByLabel("Your name").fill("Browser lifecycle");
   await page.getByLabel("Email address").fill(email);
   await page.getByLabel("Create a password").fill(password);
-  await page.getByLabel(/I confirm that I am at least 18/).check();
+  await expect(
+    page.getByLabel(/Saya menyatakan bahwa saya berusia minimal 18 tahun/i),
+  ).not.toBeChecked();
+  await expect(
+    page.getByLabel(/Saya menyetujui Syarat dan Ketentuan/i),
+  ).not.toBeChecked();
+  await expect(
+    page.getByLabel(/Saya telah membaca dan menyetujui Pemberitahuan Privasi/i),
+  ).not.toBeChecked();
+  await page
+    .getByLabel(/Saya menyatakan bahwa saya berusia minimal 18 tahun/i)
+    .check();
+  await page.getByLabel(/Saya menyetujui Syarat dan Ketentuan/i).check();
+  await page
+    .getByLabel(/Saya telah membaca dan menyetujui Pemberitahuan Privasi/i)
+    .check();
   await page.getByRole("button", { name: "Create account" }).click();
   await expect(page.getByText(/check your email/i)).toBeVisible();
 
@@ -241,13 +256,31 @@ test("registration, verification, sessions, reset, and password change use isola
     await page.getByLabel("Password").fill(password);
     await page.getByRole("button", { name: "Continue" }).click();
     await expect(page).toHaveURL(/\/settings\/security$/);
+    await page.goto("/privacy");
+    await expect(
+      page.getByRole("heading", { name: "Pusat Privasi" }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Persetujuan Anda" }),
+    ).toBeVisible();
+    await expect(page.getByText("privacy-v1")).toBeVisible();
+    await expect(page.getByText("terms-v1")).toBeVisible();
+    await expect(
+      page.getByText(/Verifikasi email: terverifikasi/i),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: /Kelola kata sandi dan sesi aktif/i }),
+    ).toBeVisible();
+    await page.goto("/settings/security");
     const securityStorageState = await page.context().storageState();
     await checkAuthPageMatrix({
       browser,
       open: async (securityPage) => {
         await securityPage.goto("/settings/security");
         await expect(securityPage).toHaveURL(/\/settings\/security$/);
-        await expect(securityPage.getByText("Active sessions")).toBeVisible();
+        await expect(
+          securityPage.getByRole("heading", { name: "Active sessions" }),
+        ).toBeVisible();
         return null;
       },
       storageState: securityStorageState,

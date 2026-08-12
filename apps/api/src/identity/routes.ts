@@ -14,7 +14,9 @@ const registrationSchema = z.object({
   displayName: z.string().trim().min(1).max(80),
   email: z.string().trim().email().max(320),
   password: z.string().min(12).max(256),
+  privacyAccepted: z.literal(true),
   privacyVersion: z.string().min(1).max(64),
+  termsAccepted: z.literal(true),
   termsVersion: z.string().min(1).max(64),
 });
 
@@ -232,6 +234,26 @@ export const registerIdentityRoutes = (
           email: session.email,
           expiresAt: session.expiresAt.toISOString(),
         },
+      });
+    },
+  );
+
+  app.get(
+    "/v1/auth/privacy",
+    { schema: identityOpenApiSchemas.privacySummary },
+    async (request, reply) => {
+      const session = await authenticate(request);
+      if (session === undefined)
+        return reply.code(401).send({ error: "unauthorized" });
+      const summary = await dependencies.identityService.privacySummary(
+        session.accountId,
+      );
+      return reply.send({
+        consents: summary.consents.map((consent) => ({
+          ...consent,
+          grantedAt: consent.grantedAt.toISOString(),
+        })),
+        emailVerified: summary.emailVerified,
       });
     },
   );

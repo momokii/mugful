@@ -9,7 +9,9 @@ type RegistrationInput = Readonly<{
   displayName: string;
   email: string;
   password: string;
+  privacyAccepted: true;
   privacyVersion: string;
+  termsAccepted: true;
   termsVersion: string;
 }>;
 

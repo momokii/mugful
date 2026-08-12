@@ -61,10 +61,22 @@ export type IdentityService = Readonly<{
       displayName: string;
       email: string;
       password: string;
+      privacyAccepted: true;
       privacyVersion: string;
+      termsAccepted: true;
       termsVersion: string;
     }>,
   ) => Promise<"accepted" | "rate-limited">;
+  privacySummary: (accountId: string) => Promise<
+    Readonly<{
+      consents: readonly Readonly<{
+        grantedAt: Date;
+        kind: "privacy" | "terms";
+        version: string;
+      }>[];
+      emailVerified: boolean;
+    }>
+  >;
   revokeSession: (
     input: Readonly<{
       accountId: string;
@@ -183,6 +195,27 @@ export const createIdentityService = (
     return { ...session, email: account.email };
   },
   register: async (input) => registerAccount(dependencies, input),
+  privacySummary: async (accountId) => {
+    const account = await dependencies.repository.query<
+      Readonly<{ email_verified_at: Date | null }>
+    >("SELECT email_verified_at FROM accounts WHERE id = $1", [accountId]);
+    const [row] = account.rows;
+    if (row === undefined) throw new Error("Authenticated account is missing");
+    const consents = await dependencies.repository.query<
+      Readonly<{ granted_at: Date; kind: "privacy" | "terms"; version: string }>
+    >(
+      "SELECT kind, version, granted_at FROM account_consents WHERE account_id = $1 AND kind IN ('privacy', 'terms') AND withdrawn_at IS NULL ORDER BY kind",
+      [accountId],
+    );
+    return {
+      consents: consents.rows.map((consent) => ({
+        grantedAt: consent.granted_at,
+        kind: consent.kind,
+        version: consent.version,
+      })),
+      emailVerified: row.email_verified_at !== null,
+    };
+  },
   revokeSession: async (input) => {
     if (input.sessionId === input.currentSessionId) return "forbidden";
     const result = await dependencies.repository.query(

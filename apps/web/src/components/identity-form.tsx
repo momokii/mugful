@@ -44,6 +44,8 @@ export function IdentityForm({ mode }: IdentityFormProperties) {
               displayName: String(values.get("displayName") ?? ""),
               email,
               password,
+              privacyAccepted: values.get("privacy") === "on",
+              termsAccepted: values.get("terms") === "on",
               ...versions,
             });
           case "login":
@@ -166,12 +168,7 @@ export function IdentityForm({ mode }: IdentityFormProperties) {
           autoComplete={mode === "login" ? "current-password" : "new-password"}
         />
       ) : null}
-      {mode === "register" ? (
-        <label className={styles.checkbox}>
-          <input name="adult" required type="checkbox" /> I confirm that I am at
-          least 18 years old and agree to the Terms and Privacy Notice.
-        </label>
-      ) : null}
+      {mode === "register" ? <ConsentAffirmations /> : null}
       <button className={styles.submit} disabled={pending} type="submit">
         {pending ? "Working" : action(mode)}
       </button>
@@ -191,6 +188,32 @@ export function IdentityForm({ mode }: IdentityFormProperties) {
         </p>
       ) : null}
     </form>
+  );
+}
+
+function ConsentAffirmations() {
+  return (
+    <fieldset className={styles.consent}>
+      <legend>Persetujuan pendaftaran</legend>
+      <label className={styles.checkbox}>
+        <input name="adult" required type="checkbox" /> Saya menyatakan bahwa
+        saya berusia minimal 18 tahun.
+      </label>
+      <label className={styles.checkbox}>
+        <input name="terms" required type="checkbox" /> Saya menyetujui Syarat
+        dan Ketentuan versi terms-v1.
+      </label>
+      <p className={styles.legalLink}>
+        <Link href="/legal/terms">Baca Syarat dan Ketentuan</Link>
+      </p>
+      <label className={styles.checkbox}>
+        <input name="privacy" required type="checkbox" /> Saya telah membaca dan
+        menyetujui Pemberitahuan Privasi versi privacy-v1.
+      </label>
+      <p className={styles.legalLink}>
+        <Link href="/legal/privacy">Baca Pemberitahuan Privasi</Link>
+      </p>
+    </fieldset>
   );
 }
 
