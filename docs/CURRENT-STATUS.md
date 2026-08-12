@@ -1,6 +1,6 @@
 # Current status
 
-**Last updated:** 2026-08-10
+**Last updated:** 2026-08-13
 **Phase:** 0b local runtime/database health boundary and Todo 4 accessible web shell complete; Todo 5 identity work in progress
 **Release target:** v1 invite-only beta
 **Product name:** Mugful
@@ -31,12 +31,13 @@
 - Todo 5B2 identity HTTP checkpoint is verified against an isolated Compose PostgreSQL database through Fastify injection: `/v1` CSRF issuance, default-closed/config-gated atomic registration with adult/terms/privacy consent, verified-account login, logout, current session, password change session rotation, session listing, and owned non-current session revocation. Unsafe routes require same-origin plus signed/bound CSRF; authentication throttling persists only HMAC-principal keys; raw passwords and session tokens are neither logged nor stored. Registration creates no session before future email verification.
 - Todo 5C email checkpoint is verified against isolated Compose PostgreSQL and Mailpit services: provider-neutral Nodemailer SMTP configuration, local-only loopback Mailpit, registration verification email, verification resend/confirm, and password forgot/reset HTTP commands. Messages contain only fragment token links. Token persistence is HMAC-only; replacement, expiry, atomic single use, absent-email generic output, SMTP failure recovery, session revocation after reset, and no token in API responses are covered through Fastify injection and Mailpit capture.
 - Todo 5D thin identity UI is implemented and browser-verified against a fresh isolated PostgreSQL/Mailpit lifecycle: CSRF-protected registration, verification resend/confirm, login/logout, forgot/reset, password change, active-session revoke, fragment-only token handling, and responsive accessible light/dark shell behavior. Todo 5 remains in progress because invitations, privacy, and product behavior are not implemented.
+- Todo 5E identity contract/security checkpoint is verified: Fastify generates a JSON-only `/openapi.json` document for every implemented identity endpoint and status response, with no Swagger UI route or secret/token/password examples. Isolated PostgreSQL/Mailpit Fastify-injection tests cover default-closed registration, generic enumeration-resistant responses, unverified login denial, signed CSRF binding and Origin checks, verification/reset replay and expiry, session rotation/revocation and cross-account restrictions, HMAC-principal limiting with `Retry-After`, SMTP generic failure/recovery, and secret-free API/OpenAPI outputs. Todo 5 remains in progress pending final checkpoint 5F.
 
 ## Not started
 
 - Next.js web application beyond the Todo 4 static shell.
 - Fastify API/realtime application.
-- Invitations, Privacy Center, and OpenAPI documentation.
+- Invitations and Privacy Center.
 - Identity persistence transaction orchestration for future account-and-consent creation.
 - Prompt catalog and Guess My Answer state machine.
 - Docker Compose configurations and deployment scripts.

@@ -92,6 +92,17 @@ set -a
 source "$environment_file"
 set +a
 (cd "$root_dir/apps/api" && ./node_modules/.bin/drizzle-kit migrate --config drizzle.config.ts)
+MUGFUL_RUN_DATABASE_TESTS=true \
+MUGFUL_TEST_DATABASE_URL="postgresql://mugful:lifecycle-only-password@127.0.0.1:${postgres_port}/mugful" \
+MUGFUL_TEST_MAILPIT_URL="http://127.0.0.1:${mailpit_ui_port}" \
+MUGFUL_TEST_SMTP_PORT="${mailpit_smtp_port}" \
+MUGFUL_TEST_STOPPED_SMTP_PORT="$(unused_port)" \
+npx --yes pnpm@11.20.0 --filter @mugful/api test -- \
+  src/openapi.integration.test.ts \
+  src/identity/http-auth.integration.test.ts \
+  src/identity/http-security.integration.test.ts \
+  src/identity/http-session.integration.test.ts \
+  src/identity/http-email.integration.test.ts
 (cd "$root_dir/apps/web" && API_INTERNAL_ORIGIN="http://127.0.0.1:${api_port}" NEXT_PUBLIC_REGISTRATION_ENABLED=true ./node_modules/.bin/next build)
 start_owned sh -c "cd '$root_dir/apps/api' && exec node dist/main.js >'$api_log' 2>&1"
 api_pid="$owned_pid"

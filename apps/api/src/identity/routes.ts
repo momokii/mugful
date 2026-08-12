@@ -3,6 +3,7 @@ import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 
 import { createCsrfProtection } from "./csrf.js";
+import { identityOpenApiSchemas } from "./openapi.js";
 import type { IdentityEmailService } from "./email-service.js";
 import { registerIdentityEmailRoutes } from "./email-routes.js";
 import { sessionTokenSchema } from "./session.js";
@@ -142,131 +143,165 @@ export const registerIdentityRoutes = (
     verifyUnsafeRequest,
   });
 
-  app.get("/v1/csrf", (_request, reply) => {
-    const issued = csrf.create();
-    setCsrfCookie(reply, dependencies, issued.cookieValue);
-    return reply.send({ csrfToken: issued.token });
-  });
+  app.get(
+    "/v1/csrf",
+    { schema: identityOpenApiSchemas.csrf },
+    (_request, reply) => {
+      const issued = csrf.create();
+      setCsrfCookie(reply, dependencies, issued.cookieValue);
+      return reply.send({ csrfToken: issued.token });
+    },
+  );
 
-  app.post("/v1/auth/register", async (request, reply) => {
-    if (!verifyUnsafeRequest(request)) return sendForbidden(reply);
-    if (!dependencies.registrationEnabled) return sendForbidden(reply);
-    const parsed = registrationSchema.safeParse(request.body);
-    if (!parsed.success)
-      return reply.code(400).send({ error: "invalid registration" });
-    const result = await dependencies.identityService.register(parsed.data);
-    if (result === "rate-limited")
-      return reply
-        .code(429)
-        .header("retry-after", "60")
-        .send({ error: "try again later" });
-    return reply.code(202).send({ status: "accepted" });
-  });
+  app.post(
+    "/v1/auth/register",
+    { schema: identityOpenApiSchemas.register },
+    async (request, reply) => {
+      if (!verifyUnsafeRequest(request)) return sendForbidden(reply);
+      if (!dependencies.registrationEnabled) return sendForbidden(reply);
+      const parsed = registrationSchema.safeParse(request.body);
+      if (!parsed.success)
+        return reply.code(400).send({ error: "invalid registration" });
+      const result = await dependencies.identityService.register(parsed.data);
+      if (result === "rate-limited")
+        return reply
+          .code(429)
+          .header("retry-after", "60")
+          .send({ error: "try again later" });
+      return reply.code(202).send({ status: "accepted" });
+    },
+  );
 
-  app.post("/v1/auth/login", async (request, reply) => {
-    if (!verifyUnsafeRequest(request)) return sendForbidden(reply);
-    const parsed = loginSchema.safeParse(request.body);
-    if (!parsed.success)
-      return reply.code(400).send({ error: "invalid credentials" });
-    const result = await dependencies.identityService.login({
-      ...parsed.data,
-      deviceLabel: deviceLabel(request),
-    });
-    if (result === "rate-limited")
-      return reply
-        .code(429)
-        .header("retry-after", "60")
-        .send({ error: "try again later" });
-    if (result === "invalid-credentials")
-      return reply.code(401).send({ error: "invalid credentials" });
-    setSessionCookie(reply, dependencies, result);
-    return reply.send({
-      session: {
-        email: result.email,
-        expiresAt: result.expiresAt.toISOString(),
-      },
-    });
-  });
+  app.post(
+    "/v1/auth/login",
+    { schema: identityOpenApiSchemas.login },
+    async (request, reply) => {
+      if (!verifyUnsafeRequest(request)) return sendForbidden(reply);
+      const parsed = loginSchema.safeParse(request.body);
+      if (!parsed.success)
+        return reply.code(400).send({ error: "invalid credentials" });
+      const result = await dependencies.identityService.login({
+        ...parsed.data,
+        deviceLabel: deviceLabel(request),
+      });
+      if (result === "rate-limited")
+        return reply
+          .code(429)
+          .header("retry-after", "60")
+          .send({ error: "try again later" });
+      if (result === "invalid-credentials")
+        return reply.code(401).send({ error: "invalid credentials" });
+      setSessionCookie(reply, dependencies, result);
+      return reply.send({
+        session: {
+          email: result.email,
+          expiresAt: result.expiresAt.toISOString(),
+        },
+      });
+    },
+  );
 
-  app.post("/v1/auth/logout", async (request, reply) => {
-    if (!verifyUnsafeRequest(request)) return sendForbidden(reply);
-    const token = parseCookies(request.headers.cookie)[
-      dependencies.sessionCookieName
-    ];
-    const parsedToken = sessionTokenSchema.safeParse(token);
-    if (parsedToken.success)
-      await dependencies.identityService.revokeSessionToken(parsedToken.data);
-    reply.header(
-      "set-cookie",
-      `${dependencies.sessionCookieName}=; ${cookieAttributes({ httpOnly: true, maxAge: 0, production: dependencies.productionCookies })}`,
-    );
-    return reply.code(204).send();
-  });
+  app.post(
+    "/v1/auth/logout",
+    { schema: identityOpenApiSchemas.logout },
+    async (request, reply) => {
+      if (!verifyUnsafeRequest(request)) return sendForbidden(reply);
+      const token = parseCookies(request.headers.cookie)[
+        dependencies.sessionCookieName
+      ];
+      const parsedToken = sessionTokenSchema.safeParse(token);
+      if (parsedToken.success)
+        await dependencies.identityService.revokeSessionToken(parsedToken.data);
+      reply.header(
+        "set-cookie",
+        `${dependencies.sessionCookieName}=; ${cookieAttributes({ httpOnly: true, maxAge: 0, production: dependencies.productionCookies })}`,
+      );
+      return reply.code(204).send();
+    },
+  );
 
-  app.get("/v1/auth/session", async (request, reply) => {
-    const session = await authenticate(request);
-    if (session === undefined)
-      return reply.code(401).send({ error: "unauthorized" });
-    return reply.send({
-      session: {
-        email: session.email,
-        expiresAt: session.expiresAt.toISOString(),
-      },
-    });
-  });
+  app.get(
+    "/v1/auth/session",
+    { schema: identityOpenApiSchemas.currentSession },
+    async (request, reply) => {
+      const session = await authenticate(request);
+      if (session === undefined)
+        return reply.code(401).send({ error: "unauthorized" });
+      return reply.send({
+        session: {
+          email: session.email,
+          expiresAt: session.expiresAt.toISOString(),
+        },
+      });
+    },
+  );
 
-  app.post("/v1/auth/password", async (request, reply) => {
-    if (!verifyUnsafeRequest(request)) return sendForbidden(reply);
-    const session = await authenticate(request);
-    if (session === undefined)
-      return reply.code(401).send({ error: "unauthorized" });
-    const parsed = passwordChangeSchema.safeParse(request.body);
-    if (!parsed.success)
-      return reply.code(400).send({ error: "invalid password" });
-    const result = await dependencies.identityService.changePassword({
-      ...parsed.data,
-      session,
-    });
-    if (result === "invalid-password")
-      return reply.code(401).send({ error: "invalid password" });
-    setSessionCookie(reply, dependencies, result);
-    return reply.send({
-      session: {
-        email: result.email,
-        expiresAt: result.expiresAt.toISOString(),
-      },
-    });
-  });
+  app.post(
+    "/v1/auth/password",
+    { schema: identityOpenApiSchemas.changePassword },
+    async (request, reply) => {
+      if (!verifyUnsafeRequest(request)) return sendForbidden(reply);
+      const session = await authenticate(request);
+      if (session === undefined)
+        return reply.code(401).send({ error: "unauthorized" });
+      const parsed = passwordChangeSchema.safeParse(request.body);
+      if (!parsed.success)
+        return reply.code(400).send({ error: "invalid password" });
+      const result = await dependencies.identityService.changePassword({
+        ...parsed.data,
+        session,
+      });
+      if (result === "invalid-password")
+        return reply.code(401).send({ error: "invalid password" });
+      setSessionCookie(reply, dependencies, result);
+      return reply.send({
+        session: {
+          email: result.email,
+          expiresAt: result.expiresAt.toISOString(),
+        },
+      });
+    },
+  );
 
-  app.get("/v1/auth/sessions", async (request, reply) => {
-    const session = await authenticate(request);
-    if (session === undefined)
-      return reply.code(401).send({ error: "unauthorized" });
-    const sessions = await dependencies.identityService.sessions(
-      session.accountId,
-    );
-    return reply.send({
-      sessions: sessions.map((item) => ({
-        ...item,
-        createdAt: item.createdAt.toISOString(),
-        current: item.id === session.sessionId,
-        lastSeenAt: item.lastSeenAt?.toISOString() ?? null,
-      })),
-    });
-  });
+  app.get(
+    "/v1/auth/sessions",
+    { schema: identityOpenApiSchemas.sessions },
+    async (request, reply) => {
+      const session = await authenticate(request);
+      if (session === undefined)
+        return reply.code(401).send({ error: "unauthorized" });
+      const sessions = await dependencies.identityService.sessions(
+        session.accountId,
+      );
+      return reply.send({
+        sessions: sessions.map((item) => ({
+          ...item,
+          createdAt: item.createdAt.toISOString(),
+          current: item.id === session.sessionId,
+          lastSeenAt: item.lastSeenAt?.toISOString() ?? null,
+        })),
+      });
+    },
+  );
 
-  app.delete("/v1/auth/sessions/:sessionId", async (request, reply) => {
-    if (!verifyUnsafeRequest(request)) return sendForbidden(reply);
-    const session = await authenticate(request);
-    if (session === undefined)
-      return reply.code(401).send({ error: "unauthorized" });
-    const params = sessionParamsSchema.safeParse(request.params);
-    if (!params.success) return sendForbidden(reply);
-    const result = await dependencies.identityService.revokeSession({
-      accountId: session.accountId,
-      currentSessionId: session.sessionId,
-      sessionId: params.data.sessionId,
-    });
-    return result === "revoked" ? reply.code(204).send() : sendForbidden(reply);
-  });
+  app.delete(
+    "/v1/auth/sessions/:sessionId",
+    { schema: identityOpenApiSchemas.revokeSession },
+    async (request, reply) => {
+      if (!verifyUnsafeRequest(request)) return sendForbidden(reply);
+      const session = await authenticate(request);
+      if (session === undefined)
+        return reply.code(401).send({ error: "unauthorized" });
+      const params = sessionParamsSchema.safeParse(request.params);
+      if (!params.success) return sendForbidden(reply);
+      const result = await dependencies.identityService.revokeSession({
+        accountId: session.accountId,
+        currentSessionId: session.sessionId,
+        sessionId: params.data.sessionId,
+      });
+      return result === "revoked"
+        ? reply.code(204).send()
+        : sendForbidden(reply);
+    },
+  );
 };
