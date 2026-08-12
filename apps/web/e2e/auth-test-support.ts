@@ -40,7 +40,7 @@ export const waitForMailpitMessages = async (
 export const mailpitToken = async (
   mailpit: string,
   path: string,
-): Promise<string> => {
+): Promise<string | undefined> => {
   const response = await fetch(`${mailpit}/api/v1/messages`);
   const list: unknown = await response.json();
   if (
@@ -71,5 +71,17 @@ export const mailpitToken = async (
         : "";
     if (text.includes(path)) return tokenFromMessage(text);
   }
-  throw new Error(`Mailpit did not include a ${path} message`);
+  return undefined;
+};
+
+export const waitForMailpitToken = async (
+  mailpit: string,
+  path: string,
+): Promise<string> => {
+  await expect.poll(() => mailpitToken(mailpit, path)).not.toBeUndefined();
+  const token = await mailpitToken(mailpit, path);
+  if (token === undefined) {
+    throw new Error(`Mailpit did not include a ${path} message`);
+  }
+  return token;
 };

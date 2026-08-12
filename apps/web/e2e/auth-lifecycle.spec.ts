@@ -4,11 +4,12 @@ import { readFile } from "node:fs/promises";
 
 import {
   baseUrl,
-  mailpitToken,
   mailpitUrl,
   required,
   waitForMailpitMessages,
+  waitForMailpitToken,
 } from "./auth-test-support";
+import { checkAuthPageMatrix } from "./auth-page-matrix";
 
 const apiOrigin = process.env["MUGFUL_TEST_API_ORIGIN"];
 const registrationClosed =
@@ -40,7 +41,18 @@ test("registration, verification, sessions, reset, and password change use isola
 
   const mailpit = required(mailpitUrl, "MUGFUL_TEST_MAILPIT_URL");
   await waitForMailpitMessages(mailpit, 1);
-  const verifyToken = await mailpitToken(mailpit, "/verify-email");
+  const verifyToken = await waitForMailpitToken(mailpit, "/verify-email");
+  await checkAuthPageMatrix({
+    browser,
+    open: async (tokenPage) => {
+      const response = await tokenPage.goto(
+        `/verify-email#token=${verifyToken}`,
+      );
+      await expect(tokenPage).toHaveURL(/\/verify-email$/);
+      return response;
+    },
+    tokenPage: true,
+  });
 
   const tokenRequests: string[] = [];
   page.on("request", (request) => tokenRequests.push(request.url()));
@@ -208,8 +220,18 @@ test("registration, verification, sessions, reset, and password change use isola
     await page.getByLabel("Email address").fill(email);
     await page.getByRole("button", { name: "Send reset link" }).click();
     await expect(page.getByText(/check your email/i)).toBeVisible();
-    await waitForMailpitMessages(mailpit, 2);
-    const resetToken = await mailpitToken(mailpit, "/reset-password");
+    const resetToken = await waitForMailpitToken(mailpit, "/reset-password");
+    await checkAuthPageMatrix({
+      browser,
+      open: async (tokenPage) => {
+        const response = await tokenPage.goto(
+          `/reset-password#token=${resetToken}`,
+        );
+        await expect(tokenPage).toHaveURL(/\/reset-password$/);
+        return response;
+      },
+      tokenPage: true,
+    });
     await page.goto(`/reset-password#token=${resetToken}`);
     await page.getByLabel("New password").fill(password);
     await page.getByRole("button", { name: "Reset password" }).click();
@@ -219,6 +241,18 @@ test("registration, verification, sessions, reset, and password change use isola
     await page.getByLabel("Password").fill(password);
     await page.getByRole("button", { name: "Continue" }).click();
     await expect(page).toHaveURL(/\/settings\/security$/);
+    const securityStorageState = await page.context().storageState();
+    await checkAuthPageMatrix({
+      browser,
+      open: async (securityPage) => {
+        await securityPage.goto("/settings/security");
+        await expect(securityPage).toHaveURL(/\/settings\/security$/);
+        await expect(securityPage.getByText("Active sessions")).toBeVisible();
+        return null;
+      },
+      storageState: securityStorageState,
+      tokenPage: false,
+    });
   } finally {
     await secondContext.close();
     await thirdContext.close();

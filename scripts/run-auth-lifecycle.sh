@@ -8,6 +8,7 @@ compose_file="$runtime_dir/compose.yaml"
 environment_file="$runtime_dir/runtime.env"
 api_log="$runtime_dir/api.log"
 web_log="$runtime_dir/web.log"
+cleanup_receipt_path="${MUGFUL_LIFECYCLE_RECEIPT_PATH:-/tmp/${run_id}.cleanup-receipt}"
 unused_port() { node -e 'require("node:net").createServer().listen(0,"127.0.0.1", function () { console.log(this.address().port); this.close(); })'; }
 secret() { node -e 'console.log(require("node:crypto").randomBytes(32).toString("hex"))'; }
 postgres_port="$(unused_port)"
@@ -16,15 +17,39 @@ mailpit_ui_port="$(unused_port)"
 api_port="$(unused_port)"
 web_port="$(unused_port)"
 
+owned_process_groups=()
+owned_pid=""
+
+start_owned() {
+  setsid "$@" &
+  owned_pid="$!"
+  owned_process_groups+=("$owned_pid")
+}
+
+stop_owned() {
+  local process_group="$1"
+  kill -TERM -- -"$process_group" 2>/dev/null || true
+  wait "$process_group" 2>/dev/null || true
+}
+
 cleanup() {
-  status=$?
-  if [[ -n "${web_pid:-}" ]]; then kill "$web_pid" 2>/dev/null || true; fi
-  if [[ -n "${api_pid:-}" ]]; then kill "$api_pid" 2>/dev/null || true; fi
+  local status=$?
+  local process_group
+  local remaining=""
+  for process_group in "${owned_process_groups[@]}"; do
+    stop_owned "$process_group"
+  done
+  for process_group in "${owned_process_groups[@]}"; do
+    remaining+="$(pgrep -g "$process_group" 2>/dev/null || true)"
+  done
+  printf 'owned_process_groups=%s\nremaining_processes=%s\n' "${owned_process_groups[*]}" "${remaining:-none}" > "$cleanup_receipt_path"
   docker compose --project-name "$run_id" --file "$compose_file" down --volumes --remove-orphans >/dev/null 2>&1 || true
   rm -rf "$runtime_dir"
+  printf 'cleanup receipt: %s\n' "$cleanup_receipt_path"
   exit "$status"
 }
-trap cleanup EXIT INT TERM
+trap cleanup EXIT
+trap 'exit 130' INT TERM
 
 cat > "$compose_file" <<EOF
 services:
@@ -68,9 +93,11 @@ source "$environment_file"
 set +a
 (cd "$root_dir/apps/api" && ./node_modules/.bin/drizzle-kit migrate --config drizzle.config.ts)
 (cd "$root_dir/apps/web" && API_INTERNAL_ORIGIN="http://127.0.0.1:${api_port}" NEXT_PUBLIC_REGISTRATION_ENABLED=true ./node_modules/.bin/next build)
-(cd "$root_dir/apps/api" && exec node dist/main.js >"$api_log" 2>&1) & api_pid=$!
+start_owned sh -c "cd '$root_dir/apps/api' && exec node dist/main.js >'$api_log' 2>&1"
+api_pid="$owned_pid"
 until curl --fail --silent "http://127.0.0.1:${api_port}/health/live" >/dev/null; do sleep 1; done
-(cd "$root_dir/apps/web" && exec ./node_modules/.bin/next start -p "$web_port" >"$web_log" 2>&1) & web_pid=$!
+start_owned sh -c "cd '$root_dir/apps/web' && exec ./node_modules/.bin/next start -p '$web_port' >'$web_log' 2>&1"
+web_pid="$owned_pid"
 until curl --fail --silent "http://127.0.0.1:${web_port}/login" >/dev/null; do sleep 1; done
 
 cd "$root_dir/apps/web"
@@ -81,10 +108,10 @@ PLAYWRIGHT_OUTPUT_DIR="$runtime_dir/playwright-output" \
 PLAYWRIGHT_REPORT_FILE="$runtime_dir/playwright-report.json" \
 ./node_modules/.bin/playwright test e2e/auth-lifecycle.spec.ts e2e/auth-token-coverage.spec.ts --workers=1
 ./node_modules/.bin/playwright test e2e/public-shell.spec.ts --workers=1
-kill "$web_pid"
-unset web_pid
+stop_owned "$web_pid"
 (cd "$root_dir/apps/web" && API_INTERNAL_ORIGIN="http://127.0.0.1:${api_port}" NEXT_PUBLIC_REGISTRATION_ENABLED=false ./node_modules/.bin/next build)
-(cd "$root_dir/apps/web" && exec ./node_modules/.bin/next start -p "$web_port" >"$web_log" 2>&1) & web_pid=$!
+start_owned sh -c "cd '$root_dir/apps/web' && exec ./node_modules/.bin/next start -p '$web_port' >'$web_log' 2>&1"
+web_pid="$owned_pid"
 until curl --fail --silent "http://127.0.0.1:${web_port}/register" >/dev/null; do sleep 1; done
 MUGFUL_TEST_REGISTRATION_CLOSED=true \
 PLAYWRIGHT_BASE_URL="http://127.0.0.1:${web_port}" \
