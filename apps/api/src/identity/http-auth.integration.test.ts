@@ -86,7 +86,7 @@ describe.skipIf(!databaseTestsEnabled)(
       ]);
     });
 
-    it("ignores caller-supplied legal versions and persists canonical versions", async () => {
+    it("rejects caller-supplied legal versions without persisting an account", async () => {
       // Given: enabled registration and a valid CSRF exchange
       const csrf = await csrfFor(context.app);
 
@@ -107,18 +107,11 @@ describe.skipIf(!databaseTestsEnabled)(
         },
       });
 
-      // Then: caller input cannot select the versions recorded for either legal notice
-      expect(response.statusCode).toBe(202);
+      // Then: obsolete caller-selected versions cannot create any account or consent
+      expect(response.statusCode).toBe(400);
       expect(
-        (
-          await context.pool.query<Readonly<{ kind: string; version: string }>>(
-            "SELECT kind, version FROM account_consents WHERE kind IN ('privacy', 'terms') ORDER BY kind",
-          )
-        ).rows,
-      ).toEqual([
-        { kind: "privacy", version: "privacy-v1" },
-        { kind: "terms", version: "terms-v1" },
-      ]);
+        (await context.pool.query("SELECT id FROM accounts")).rows,
+      ).toEqual([]);
     });
 
     it("rolls back the account when consent persistence fails", async () => {

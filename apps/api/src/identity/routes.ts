@@ -9,14 +9,16 @@ import { registerIdentityEmailRoutes } from "./email-routes.js";
 import { sessionTokenSchema } from "./session.js";
 import type { IdentityService } from "./service.js";
 
-const registrationSchema = z.object({
-  adultAttestation: z.literal(true),
-  displayName: z.string().trim().min(1).max(80),
-  email: z.string().trim().email().max(320),
-  password: z.string().min(12).max(256),
-  privacyAccepted: z.literal(true),
-  termsAccepted: z.literal(true),
-});
+const registrationSchema = z
+  .object({
+    adultAttestation: z.literal(true),
+    displayName: z.string().trim().min(1).max(80),
+    email: z.string().trim().email().max(320),
+    password: z.string().min(12).max(256),
+    privacyAccepted: z.literal(true),
+    termsAccepted: z.literal(true),
+  })
+  .strict();
 
 const loginSchema = z.object({
   email: z.string().trim().email().max(320),

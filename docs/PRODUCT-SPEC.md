@@ -142,7 +142,7 @@ The product should feel warm, playful, and mature. It should be lively through m
 - Treat the app operator as an Indonesian UU PDP Controller and external infrastructure/email providers as Processors where applicable.
 - Use Bahasa Indonesia as the primary privacy and consent language; English can be secondary.
 - Record consent versions and withdrawal events.
-- Provide a Privacy Center for export, correction, withdrawal, deletion, and processing restriction.
+- The v1 Privacy Center will provide export, correction, withdrawal, deletion, and processing restriction. The implemented Todo 5F foundation is read-only and excludes those operations until their later v1 slice.
 - Default retention is user-controlled with a 90-day default for recent activity; ending a space triggers immediate access revocation and a documented deletion grace period.
 - Use field-level application encryption for private content, with keys outside PostgreSQL and inaccessible through the superadmin UI.
 - Superadmins can manage operational metadata, prompts, feature flags, health, and audit data, but cannot read private couple content through the application.
