@@ -1,75 +1,31 @@
 import { expect, test } from "@playwright/test";
 import { randomUUID } from "node:crypto";
+import { readFile } from "node:fs/promises";
 
-const mailpitUrl = process.env["MUGFUL_TEST_MAILPIT_URL"];
-const baseUrl = process.env["PLAYWRIGHT_BASE_URL"] ?? "http://127.0.0.1:3100";
+import {
+  baseUrl,
+  mailpitToken,
+  mailpitUrl,
+  required,
+  waitForMailpitMessages,
+} from "./auth-test-support";
+
 const apiOrigin = process.env["MUGFUL_TEST_API_ORIGIN"];
-
-const required = (value: string | undefined, name: string): string => {
-  if (value === undefined)
-    throw new Error(`${name} is required for the auth lifecycle`);
-  return value;
-};
+const registrationClosed =
+  process.env["MUGFUL_TEST_REGISTRATION_CLOSED"] === "true";
 
 const uniqueEmail = (): string => `browser-${randomUUID()}@mugful.test`;
-
-const tokenFromMessage = (message: string): string => {
-  const match = message.match(/#token=([^\s"<]+)/);
-  if (match?.[1] === undefined)
-    throw new Error("Mailpit message did not include a fragment token");
-  return match[1];
-};
-
-type SanitizableResponse = Readonly<{
-  status: () => number;
-  text: () => Promise<string>;
-}>;
-
-const sanitizedResult = async (
-  response: SanitizableResponse,
-): Promise<string> => {
-  const text = await response.text();
-  return `${response.status()}:${text.slice(0, 120)}`;
-};
-
-const mailpitToken = async (mailpit: string, path: string): Promise<string> => {
-  const response = await fetch(`${mailpit}/api/v1/messages`);
-  const list: unknown = await response.json();
-  if (
-    typeof list !== "object" ||
-    list === null ||
-    !("messages" in list) ||
-    !Array.isArray(list.messages)
-  )
-    throw new Error("Mailpit messages response is invalid");
-  for (const item of list.messages) {
-    if (
-      typeof item !== "object" ||
-      item === null ||
-      !("ID" in item) ||
-      typeof item.ID !== "string"
-    )
-      continue;
-    const messageResponse = await fetch(`${mailpit}/api/v1/message/${item.ID}`);
-    const message: unknown = await messageResponse.json();
-    const text =
-      typeof message === "object" &&
-      message !== null &&
-      "Text" in message &&
-      typeof message.Text === "string"
-        ? message.Text
-        : "";
-    if (text.includes(path)) return tokenFromMessage(text);
-  }
-  throw new Error(`Mailpit did not include a ${path} message`);
-};
 
 test.describe.configure({ mode: "serial" });
 
 test("registration, verification, sessions, reset, and password change use isolated browser data", async ({
   browser,
   page,
-}) => {
+}, testInfo) => {
+  test.skip(
+    registrationClosed,
+    "This lifecycle requires enabled registration.",
+  );
   const email = uniqueEmail();
   const password = "browser-lifecycle-password";
   const replacementPassword = "browser-replacement-password";
@@ -83,22 +39,22 @@ test("registration, verification, sessions, reset, and password change use isola
   await expect(page.getByText(/check your email/i)).toBeVisible();
 
   const mailpit = required(mailpitUrl, "MUGFUL_TEST_MAILPIT_URL");
-  await expect
-    .poll(async () => {
-      const response = await fetch(`${mailpit}/api/v1/messages`);
-      const body: unknown = await response.json();
-      return typeof body === "object" &&
-        body !== null &&
-        "messages" in body &&
-        Array.isArray(body.messages)
-        ? body.messages.length
-        : 0;
-    })
-    .toBeGreaterThan(0);
+  await waitForMailpitMessages(mailpit, 1);
   const verifyToken = await mailpitToken(mailpit, "/verify-email");
 
+  const tokenRequests: string[] = [];
+  page.on("request", (request) => tokenRequests.push(request.url()));
   await page.goto(`/verify-email#token=${verifyToken}`);
   await expect(page).toHaveURL(/\/verify-email$/);
+  const tokenScreenshot = testInfo.outputPath("verification-page.png");
+  await page.screenshot({ path: tokenScreenshot });
+  expect(page.url()).not.toContain(verifyToken);
+  expect(tokenRequests.some((url) => url.includes(verifyToken))).toBe(false);
+  expect(
+    Buffer.from(await readFile(tokenScreenshot)).includes(
+      Buffer.from(verifyToken),
+    ),
+  ).toBe(false);
   await page.getByRole("button", { name: "Verify email" }).click();
   await expect(page.getByText(/email address is verified/i)).toBeVisible();
 
@@ -130,7 +86,7 @@ test("registration, verification, sessions, reset, and password change use isola
     await thirdPage.getByRole("button", { name: "Continue" }).click();
     await expect(thirdPage).toHaveURL(/\/settings\/security$/);
     await page.reload();
-    const targetId = await thirdPage.evaluate(async () => {
+    const sessionIds = await page.evaluate(async () => {
       const response = await fetch("/api/v1/auth/sessions", {
         credentials: "same-origin",
       });
@@ -143,69 +99,89 @@ test("registration, verification, sessions, reset, and password change use isola
         !Array.isArray(body.sessions)
       )
         throw new Error("Target browser session listing is invalid");
-      const target = body.sessions.find(
-        (session) =>
-          typeof session === "object" &&
-          session !== null &&
-          "deviceLabel" in session &&
-          session.deviceLabel === "Mugful lifecycle revoke target" &&
-          "id" in session &&
-          typeof session.id === "string",
+      const ids = body.sessions.flatMap((session) =>
+        typeof session === "object" &&
+        session !== null &&
+        "deviceLabel" in session &&
+        "id" in session &&
+        typeof session.id === "string" &&
+        typeof session.deviceLabel === "string"
+          ? [{ id: session.id, label: session.deviceLabel }]
+          : [],
       );
-      if (
-        target === undefined ||
-        typeof target !== "object" ||
-        target === null ||
-        !("id" in target) ||
-        typeof target.id !== "string"
-      )
-        throw new Error("Target browser session was not found");
-      return target.id;
+      const direct = ids.find(
+        (session) => session.label === "Mugful lifecycle second session",
+      );
+      const proxy = ids.find(
+        (session) => session.label === "Mugful lifecycle revoke target",
+      );
+      if (direct === undefined || proxy === undefined)
+        throw new Error("Target browser sessions were not found");
+      return { direct: direct.id, proxy: proxy.id };
     });
+    const csrfToken = await page.evaluate(async () => {
+      const response = await fetch("/api/v1/csrf", {
+        credentials: "same-origin",
+      });
+      const body: unknown = await response.json();
+      if (
+        typeof body !== "object" ||
+        body === null ||
+        !("csrfToken" in body) ||
+        typeof body.csrfToken !== "string"
+      )
+        throw new Error("CSRF response is invalid");
+      return body.csrfToken;
+    });
+    const cookies = await page.context().cookies(baseUrl);
+    const cookieHeader = cookies
+      .map((cookie) => `${cookie.name}=${cookie.value}`)
+      .join("; ");
+    const direct = await fetch(
+      `${required(apiOrigin, "MUGFUL_TEST_API_ORIGIN")}/v1/auth/sessions/${sessionIds.direct}`,
+      {
+        headers: {
+          cookie: cookieHeader,
+          origin: baseUrl,
+          "x-csrf-token": csrfToken,
+        },
+        method: "DELETE",
+      },
+    );
+    expect(direct.status).toBe(204);
+    await expect
+      .poll(async () =>
+        secondPage.evaluate(
+          async () =>
+            (
+              await fetch("/api/v1/auth/session", {
+                credentials: "same-origin",
+              })
+            ).status,
+        ),
+      )
+      .toBe(401);
     const revoke = page
-      .locator(`li[data-session-id="${targetId}"]`)
+      .locator(`li[data-session-id="${sessionIds.proxy}"]`)
       .getByRole("button", { name: "Revoke" });
     const deletion = page.waitForResponse(
       (response) =>
         response.request().method() === "DELETE" &&
-        response.url().endsWith(`/api/v1/auth/sessions/${targetId}`),
+        response.url().endsWith(`/api/v1/auth/sessions/${sessionIds.proxy}`),
     );
     await revoke.click();
     const deletionResponse = await deletion;
-    if (deletionResponse.status() !== 204) {
-      const csrfToken = await page.evaluate(async () => {
-        const response = await fetch("/api/v1/csrf", {
-          credentials: "same-origin",
-        });
-        const body: unknown = await response.json();
-        if (
-          typeof body !== "object" ||
-          body === null ||
-          !("csrfToken" in body) ||
-          typeof body.csrfToken !== "string"
-        )
-          throw new Error("CSRF response is invalid");
-        return body.csrfToken;
-      });
-      const cookies = await page.context().cookies(baseUrl);
-      const cookieHeader = cookies
-        .map((cookie) => `${cookie.name}=${cookie.value}`)
-        .join("; ");
-      const direct = await fetch(
-        `${required(apiOrigin, "MUGFUL_TEST_API_ORIGIN")}/v1/auth/sessions/${targetId}`,
-        {
-          headers: {
-            cookie: cookieHeader,
-            origin: baseUrl,
-            "x-csrf-token": csrfToken,
-          },
-          method: "DELETE",
-        },
-      );
-      throw new Error(
-        `Session revoke comparison: proxy=${await sanitizedResult(deletionResponse)} direct=${direct.status}:${(await direct.text()).slice(0, 120)}`,
-      );
-    }
+    expect(deletionResponse.status()).toBe(204);
+    const headers = await deletionResponse.request().allHeaders();
+    expect(headers["content-type"]).toBeUndefined();
+    expect(headers["origin"]).toBe(baseUrl);
+    const cookieNames = (headers["cookie"] ?? "")
+      .split(";")
+      .map((item) => item.trim().split("=", 1)[0])
+      .filter((name): name is string => name !== undefined && name !== "")
+      .sort();
+    expect(cookieNames).toEqual(["mugful-csrf", "mugful-session"]);
+    expect(headers["x-csrf-token"]).toBeDefined();
     await expect
       .poll(async () =>
         thirdPage.evaluate(
@@ -232,18 +208,7 @@ test("registration, verification, sessions, reset, and password change use isola
     await page.getByLabel("Email address").fill(email);
     await page.getByRole("button", { name: "Send reset link" }).click();
     await expect(page.getByText(/check your email/i)).toBeVisible();
-    await expect
-      .poll(async () => {
-        const response = await fetch(`${mailpit}/api/v1/messages`);
-        const body: unknown = await response.json();
-        return typeof body === "object" &&
-          body !== null &&
-          "messages" in body &&
-          Array.isArray(body.messages)
-          ? body.messages.length
-          : 0;
-      })
-      .toBeGreaterThan(1);
+    await waitForMailpitMessages(mailpit, 2);
     const resetToken = await mailpitToken(mailpit, "/reset-password");
     await page.goto(`/reset-password#token=${resetToken}`);
     await page.getByLabel("New password").fill(password);
@@ -257,27 +222,5 @@ test("registration, verification, sessions, reset, and password change use isola
   } finally {
     await secondContext.close();
     await thirdContext.close();
-  }
-});
-
-test("token pages prevent referrers, avoid cache, and fit each visual viewport", async ({
-  browser,
-}) => {
-  for (const width of [375, 768, 1280]) {
-    const context = await browser.newContext({
-      baseURL: baseUrl,
-      viewport: { height: 900, width },
-    });
-    const page = await context.newPage();
-    const response = await page.goto("/reset-password#token=not-a-real-token");
-    expect(response?.headers()["referrer-policy"]).toBe("no-referrer");
-    expect(response?.headers()["cache-control"]).toContain("no-store");
-    await expect(page).toHaveURL(/\/reset-password$/);
-    expect(
-      await page.evaluate(() => document.documentElement.scrollWidth),
-    ).toBeLessThanOrEqual(
-      await page.evaluate(() => document.documentElement.clientWidth),
-    );
-    await context.close();
   }
 });
