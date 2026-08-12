@@ -36,8 +36,8 @@
 
 ## Not started
 
-- Next.js web application beyond the Todo 4 static shell.
-- Fastify API/realtime application.
+- Couple and activity web behavior beyond the implemented Todo 4 shell and Todo 5 identity flows.
+- Couple, activity, and realtime Fastify behavior beyond the implemented Todo 3 runtime and Todo 5 identity API.
 - Invitations and privacy-request operations (export, correction, deletion, withdrawal, and restriction).
 - Prompt catalog and Guess My Answer state machine.
 - Docker Compose configurations and deployment scripts.
