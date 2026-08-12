@@ -67,10 +67,10 @@ set -a
 source "$environment_file"
 set +a
 (cd "$root_dir/apps/api" && ./node_modules/.bin/drizzle-kit migrate --config drizzle.config.ts)
-(cd "$root_dir/apps/web" && API_INTERNAL_ORIGIN="http://127.0.0.1:${api_port}" ./node_modules/.bin/next build)
-(cd "$root_dir/apps/api" && node dist/main.js >"$api_log" 2>&1) & api_pid=$!
+(cd "$root_dir/apps/web" && API_INTERNAL_ORIGIN="http://127.0.0.1:${api_port}" NEXT_PUBLIC_REGISTRATION_ENABLED=true ./node_modules/.bin/next build)
+(cd "$root_dir/apps/api" && exec node dist/main.js >"$api_log" 2>&1) & api_pid=$!
 until curl --fail --silent "http://127.0.0.1:${api_port}/health/live" >/dev/null; do sleep 1; done
-(cd "$root_dir/apps/web" && ./node_modules/.bin/next start -p "$web_port" >"$web_log" 2>&1) & web_pid=$!
+(cd "$root_dir/apps/web" && exec ./node_modules/.bin/next start -p "$web_port" >"$web_log" 2>&1) & web_pid=$!
 until curl --fail --silent "http://127.0.0.1:${web_port}/login" >/dev/null; do sleep 1; done
 
 cd "$root_dir/apps/web"
@@ -79,4 +79,15 @@ MUGFUL_TEST_API_ORIGIN="http://127.0.0.1:${api_port}" \
 PLAYWRIGHT_BASE_URL="http://127.0.0.1:${web_port}" \
 PLAYWRIGHT_OUTPUT_DIR="$runtime_dir/playwright-output" \
 PLAYWRIGHT_REPORT_FILE="$runtime_dir/playwright-report.json" \
-./node_modules/.bin/playwright test e2e/auth-lifecycle.spec.ts --workers=1
+./node_modules/.bin/playwright test e2e/auth-lifecycle.spec.ts e2e/auth-token-coverage.spec.ts --workers=1
+./node_modules/.bin/playwright test e2e/public-shell.spec.ts --workers=1
+kill "$web_pid"
+unset web_pid
+(cd "$root_dir/apps/web" && API_INTERNAL_ORIGIN="http://127.0.0.1:${api_port}" NEXT_PUBLIC_REGISTRATION_ENABLED=false ./node_modules/.bin/next build)
+(cd "$root_dir/apps/web" && exec ./node_modules/.bin/next start -p "$web_port" >"$web_log" 2>&1) & web_pid=$!
+until curl --fail --silent "http://127.0.0.1:${web_port}/register" >/dev/null; do sleep 1; done
+MUGFUL_TEST_REGISTRATION_CLOSED=true \
+PLAYWRIGHT_BASE_URL="http://127.0.0.1:${web_port}" \
+PLAYWRIGHT_OUTPUT_DIR="$runtime_dir/closed-output" \
+PLAYWRIGHT_REPORT_FILE="$runtime_dir/closed-report.json" \
+./node_modules/.bin/playwright test e2e/auth-lifecycle.spec.ts e2e/auth-token-coverage.spec.ts --workers=1
