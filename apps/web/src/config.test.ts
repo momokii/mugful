@@ -36,6 +36,25 @@ describe("web runtime configuration", () => {
     ]);
   });
 
+  it("prevents caching and referrer disclosure on fragment-invite redemption", async () => {
+    // Given: a configured web application
+    const config = createNextConfig({
+      API_INTERNAL_ORIGIN: "http://127.0.0.1:3001",
+    });
+
+    // When: route response headers are resolved
+    const headers = await config.headers?.();
+
+    // Then: the join route has the same token privacy headers as identity token routes
+    expect(headers).toContainEqual({
+      headers: [
+        { key: "Cache-Control", value: "no-store" },
+        { key: "Referrer-Policy", value: "no-referrer" },
+      ],
+      source: "/join",
+    });
+  });
+
   it("documents a root environment that supplies the server-only build origin", async () => {
     // Given: the environment file used by the documented root setup
     const environmentFile = await readFile(

@@ -44,6 +44,13 @@ export const createNextConfig = (environment: Environment): NextConfig => {
           ],
           source: "/reset-password",
         },
+        {
+          headers: [
+            { key: "Cache-Control", value: "no-store" },
+            { key: "Referrer-Policy", value: "no-referrer" },
+          ],
+          source: "/join",
+        },
       ];
     },
     async rewrites() {
