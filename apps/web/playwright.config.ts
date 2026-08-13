@@ -20,6 +20,13 @@ export default defineConfig({
   ],
   use: {
     baseURL: lifecycleBaseUrl ?? "http://127.0.0.1:3100",
+    ...(process.env["PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH"] === undefined
+      ? {}
+      : {
+          launchOptions: {
+            executablePath: process.env["PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH"],
+          },
+        }),
     trace: "retain-on-failure",
   },
   ...(lifecycleBaseUrl === undefined

@@ -2,7 +2,7 @@
 
 A private, playful web space for adults in long-distance relationships. The first release focuses on one shared activity: **Guess My Answer**.
 
-> **Status:** The local runtime foundation, Todo 4 accessible public/auth UI shell, and Todo 5 identity-consent foundation are implemented and accepted. Todo 6 couple onboarding is implemented through its API/UI checkpoint, but remains in progress pending Chromium browser verification.
+> **Status:** The local runtime foundation, Todo 4 accessible public/auth UI shell, Todo 5 identity-consent foundation, and Todo 6 couple onboarding are implemented and accepted.
 
 ## Product direction
 
@@ -24,7 +24,7 @@ v1 deliberately does **not** include native video, AI, behavioral analytics, or 
 
 ## Current repository state
 
-This repository contains local-only PostgreSQL 17 and Mailpit Compose services, Fastify liveness/readiness API, a minimal Next.js proxy, and explicit manual migrations. Todo 5 provides bounded accounts, email verification, secure sessions, reset, OpenAPI, and negative-path identity protections. Registration records separate adult self-attestation, Terms, and Privacy Notice affirmations as three atomic, versioned consent records. The Bahasa-first registration flow has no preselected consent. Authenticated users can read their Terms/Privacy consent versions and timestamps, email-verification status, and links to account-security/session controls through `/privacy`. It intentionally does not implement privacy export, correction, deletion, withdrawal, or restriction operations. Tokens are HMAC-persisted, short-lived, replaced on resend, atomically single-use, and sent only in fragment links. Registration remains closed by default; account creation does not create a session before email verification. Todo 6 adds verified-session couple-space creation, one active space per account, seven-day single-use fragment-only invite links, atomic acceptance, immediate membership/invite revocation on end, and a 30-day deletion grace timestamp. The API and UI checkpoint are implemented; Chromium browser verification remains required before Todo 6 is accepted.
+This repository contains local-only PostgreSQL 17 and Mailpit Compose services, Fastify liveness/readiness API, a minimal Next.js proxy, and explicit manual migrations. Todo 5 provides bounded accounts, email verification, secure sessions, reset, OpenAPI, and negative-path identity protections. Registration records separate adult self-attestation, Terms, and Privacy Notice affirmations as three atomic, versioned consent records. The Bahasa-first registration flow has no preselected consent. Authenticated users can read their Terms/Privacy consent versions and timestamps, email-verification status, and links to account-security/session controls through `/privacy`. It intentionally does not implement privacy export, correction, deletion, withdrawal, or restriction operations. Tokens are HMAC-persisted, short-lived, replaced on resend, atomically single-use, and sent only in fragment links. Registration remains closed by default; account creation does not create a session before email verification. Todo 6 adds verified-session couple-space creation, one active space per account, seven-day single-use fragment-only invite links, atomic acceptance, immediate membership/invite revocation on end, and a 30-day deletion grace timestamp. The API and UI flows, including responsive Brave Chromium coverage, are accepted.
 
 With Node 22 and pnpm 11.20.0 installed, a contributor can verify the tooling foundation with:
 
