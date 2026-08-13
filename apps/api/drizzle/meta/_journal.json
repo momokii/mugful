@@ -29,6 +29,13 @@
       "when": 1786291200003,
       "tag": "0003_rate_limit_hash_constraint",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1786291200004,
+      "tag": "0004_couple_onboarding",
+      "breakpoints": true
     }
   ]
 }
