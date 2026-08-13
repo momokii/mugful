@@ -2,6 +2,8 @@ import fastify from "fastify";
 import swagger from "@fastify/swagger";
 
 import { registerIdentityRoutes } from "./identity/routes.js";
+import { registerCoupleRoutes } from "./couples/routes.js";
+import type { CoupleService } from "./couples/service.js";
 import type { IdentityEmailService } from "./identity/email-service.js";
 import type { IdentityService } from "./identity/service.js";
 
@@ -17,6 +19,14 @@ export type AppDependencies = Readonly<{
     identityService: IdentityService;
     productionCookies: boolean;
     registrationEnabled: boolean;
+    sessionCookieName: string;
+    webOrigin: string;
+  }>;
+  couples?: Readonly<{
+    coupleService: CoupleService;
+    csrfSecret: string;
+    identityService: IdentityService;
+    productionCookies: boolean;
     sessionCookieName: string;
     webOrigin: string;
   }>;
@@ -57,6 +67,8 @@ export const createApp = (dependencies: AppDependencies) => {
   app.after(() => {
     if (dependencies.identity !== undefined)
       registerIdentityRoutes(app, dependencies.identity);
+    if (dependencies.couples !== undefined)
+      registerCoupleRoutes(app, dependencies.couples);
 
     app.get("/openapi.json", { schema: { hide: true } }, () => app.swagger());
   });

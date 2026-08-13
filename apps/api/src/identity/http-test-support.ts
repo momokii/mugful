@@ -8,6 +8,8 @@ import { rateLimitPrincipalPepperSchema } from "./rate-limit.js";
 import { sessionPepperSchema } from "./session.js";
 import { createIdentityService } from "./service.js";
 import { tokenPepperSchema } from "./token.js";
+import { createCoupleService } from "../couples/service.js";
+import { inviteTokenPepperSchema } from "../couples/invite-token.js";
 
 const databaseUrl = process.env["MUGFUL_TEST_DATABASE_URL"] ?? "";
 export const databaseTestsEnabled =
@@ -27,21 +29,33 @@ export const createIdentityHttpTestContext = (
     repository: createIdentityRepository(pool),
     tokenPepper: tokenPepperSchema.parse("t".repeat(32)),
   });
+  const identityService = createIdentityService({
+    emailService: identityEmailService,
+    rateLimitPrincipalPepper: rateLimitPrincipalPepperSchema.parse(
+      "r".repeat(32),
+    ),
+    repository: createIdentityRepository(pool),
+    sessionPepper: sessionPepperSchema.parse("s".repeat(32)),
+  });
   const app = createApp({
     databaseChecker: { check: async () => undefined },
     identity: {
       csrfSecret: "c".repeat(32),
       identityEmailService,
-      identityService: createIdentityService({
-        emailService: identityEmailService,
-        rateLimitPrincipalPepper: rateLimitPrincipalPepperSchema.parse(
-          "r".repeat(32),
-        ),
-        repository: createIdentityRepository(pool),
-        sessionPepper: sessionPepperSchema.parse("s".repeat(32)),
-      }),
+      identityService,
       productionCookies: false,
       registrationEnabled,
+      sessionCookieName: "mugful-session",
+      webOrigin: "https://mugful.test",
+    },
+    couples: {
+      coupleService: createCoupleService({
+        inviteTokenPepper: inviteTokenPepperSchema.parse("i".repeat(32)),
+        repository: createIdentityRepository(pool),
+      }),
+      csrfSecret: "c".repeat(32),
+      identityService,
+      productionCookies: false,
       sessionCookieName: "mugful-session",
       webOrigin: "https://mugful.test",
     },
@@ -80,5 +94,7 @@ export const unsafeHeaders = (
 });
 
 export const resetIdentityData = async (pool: Pool): Promise<void> => {
-  await pool.query("TRUNCATE accounts, rate_limit_buckets CASCADE");
+  await pool.query(
+    "TRUNCATE accounts, rate_limit_buckets, couple_spaces, couple_memberships, couple_invites CASCADE",
+  );
 };

@@ -24,6 +24,7 @@ const apiConfigSchema = z
     API_PORT: z.coerce.number().int().min(1).max(65_535).default(3001),
     CSRF_SECRET: secretSchema,
     DATABASE_URL: databaseUrlSchema,
+    INVITE_TOKEN_PEPPER: secretSchema,
     RATE_LIMIT_PRINCIPAL_PEPPER: secretSchema,
     REGISTRATION_DEFAULT_ENABLED: z
       .enum(["true", "false"])
@@ -54,6 +55,7 @@ export type ApiConfig = Readonly<{
   databaseUrl: string;
   host: string;
   identityTokenPepper: string;
+  inviteTokenPepper: string;
   port: number;
   rateLimitPrincipalPepper: string;
   registrationDefaultEnabled: boolean;
@@ -93,6 +95,7 @@ export const parseApiConfig = (environment: Environment): ApiConfig => {
     databaseUrl: result.data.DATABASE_URL,
     host: result.data.API_HOST,
     identityTokenPepper: result.data.IDENTITY_TOKEN_PEPPER,
+    inviteTokenPepper: result.data.INVITE_TOKEN_PEPPER,
     port: result.data.API_PORT,
     rateLimitPrincipalPepper: result.data.RATE_LIMIT_PRINCIPAL_PEPPER,
     registrationDefaultEnabled: result.data.REGISTRATION_DEFAULT_ENABLED,

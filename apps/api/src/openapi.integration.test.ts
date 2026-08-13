@@ -42,6 +42,9 @@ describe("OpenAPI identity contract", () => {
       "/v1/auth/verification/confirm": { post: ["204", "400", "403"] },
       "/v1/auth/password/forgot": { post: ["202", "400", "403", "429"] },
       "/v1/auth/password/reset": { post: ["204", "400", "403"] },
+      "/v1/couple-space": { post: ["201", "401", "403"] },
+      "/v1/couple-invites/accept": { post: ["204", "400", "401", "403"] },
+      "/v1/couple-space/end": { post: ["204", "401", "403"] },
     } as const;
     for (const [path, methods] of Object.entries(expectedResponses)) {
       const documentedPath = document.paths[path];

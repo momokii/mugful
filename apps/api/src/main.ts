@@ -11,6 +11,8 @@ import {
 } from "./identity/session.js";
 import { createIdentityService } from "./identity/service.js";
 import { tokenPepperSchema } from "./identity/token.js";
+import { inviteTokenPepperSchema } from "./couples/invite-token.js";
+import { createCoupleService } from "./couples/service.js";
 
 export const main = async (): Promise<void> => {
   const config = parseApiConfig(process.env);
@@ -29,21 +31,35 @@ export const main = async (): Promise<void> => {
     repository: database.identityRepository,
     tokenPepper: tokenPepperSchema.parse(config.identityTokenPepper),
   });
+  const identityService = createIdentityService({
+    emailService: identityEmailService,
+    rateLimitPrincipalPepper: rateLimitPrincipalPepperSchema.parse(
+      config.rateLimitPrincipalPepper,
+    ),
+    repository: database.identityRepository,
+    sessionPepper: sessionPepperSchema.parse(config.sessionTokenPepper),
+  });
   const app = createApp({
     databaseChecker: database.checker,
     identity: {
       csrfSecret: config.csrfSecret,
       identityEmailService,
-      identityService: createIdentityService({
-        emailService: identityEmailService,
-        rateLimitPrincipalPepper: rateLimitPrincipalPepperSchema.parse(
-          config.rateLimitPrincipalPepper,
-        ),
-        repository: database.identityRepository,
-        sessionPepper: sessionPepperSchema.parse(config.sessionTokenPepper),
-      }),
+      identityService,
       productionCookies,
       registrationEnabled: config.registrationDefaultEnabled,
+      sessionCookieName: sessionCookie.name,
+      webOrigin: config.webOrigin,
+    },
+    couples: {
+      coupleService: createCoupleService({
+        inviteTokenPepper: inviteTokenPepperSchema.parse(
+          config.inviteTokenPepper,
+        ),
+        repository: database.identityRepository,
+      }),
+      csrfSecret: config.csrfSecret,
+      identityService,
+      productionCookies,
       sessionCookieName: sessionCookie.name,
       webOrigin: config.webOrigin,
     },
