@@ -1,6 +1,6 @@
 # Development guide
 
-**Status:** 0b local runtime foundation, Todo 4 accessible web shell, and Todo 5A-5E identity checkpoints plus the 5F consent/privacy identity foundation are implemented. Todo 5 remains in progress pending independent final review; product behavior remains unimplemented.
+**Status:** 0b local runtime foundation, Todo 4 accessible web shell, Todo 5 identity foundation, and Todo 6 couple onboarding are implemented and accepted. Local development also supports an explicit fail-closed email-verification bypass; Todo 7 prompt administration is next.
 
 This document is the handoff point for a fresh agent or contributor who does not have the conversation history.
 
@@ -77,6 +77,8 @@ The API and web dev servers can also run as plain `pnpm` processes on the host i
 - Both Fastify and Next bind to `127.0.0.1` by default, so by default they are not reachable from other devices, including over a private mesh network (e.g. Tailscale).
 - To make the web app reachable from another device on your private network, start it with an explicit host bind, for example `next dev --hostname 0.0.0.0` (or the equivalent `start -H 0.0.0.0` flag for a production-built server). The API can stay bound to loopback since the web app proxies `/api/*` server-side.
 - Registration visibility on `/register` is controlled by two **independent** flags that must both be enabled to actually register a user during manual QA: the API's `REGISTRATION_DEFAULT_ENABLED` (gates the `/v1/auth/register` endpoint) and the web app's `NEXT_PUBLIC_REGISTRATION_ENABLED` (gates whether the web page renders the registration form at all instead of an invite-only notice). The `registration_policies` database table exists but is not currently wired into this check.
+- For local account creation without an SMTP/email-confirmation round trip, also set `NODE_ENV=development` and `LOCAL_AUTH_BYPASS_EMAIL_VERIFICATION=true`. This marks the account verified inside the registration transaction and skips verification-mail issuance; it does not weaken the adult, Terms, Privacy, CSRF, password, or rate-limit checks. The API rejects this bypass when `NODE_ENV=production`.
+- A safe local manual-QA combination is `REGISTRATION_DEFAULT_ENABLED=true`, `NEXT_PUBLIC_REGISTRATION_ENABLED=true`, and `LOCAL_AUTH_BYPASS_EMAIL_VERIFICATION=true`. You can then create an account and sign in immediately without configuring an external SMTP account; keep SMTP/Mailpit for testing the normal verification and password-recovery flows.
 - Never commit, log, or paste your private Tailscale (or any other private-network) IP address into this repository, its documentation, commit messages, or issues — it identifies a device on your private network. If you need to reference "the private-network address," describe it generically (e.g. "your Tailscale IP") and let the reader substitute their own.
 - If you don't already know the current private-network address or exposure setup for a given session, ask the user rather than assuming or reusing one from an earlier session.
 - Tear down manually started processes explicitly (`kill` the PID or `pnpm` process); nothing here is cleaned up automatically like the isolated lifecycle script.
