@@ -74,7 +74,9 @@ export function IdentityForm({ mode }: IdentityFormProperties) {
             ? "Signed in. Your session is ready."
             : mode === "verify"
               ? "Your email address is verified. You can sign in now."
-              : "Done. Check your email or continue with your account.",
+              : mode === "register"
+                ? "Account created. If email verification is required, check your email before signing in. Otherwise, you can sign in now."
+                : "Done. Check your email or continue with your account.",
         );
         if (mode === "login") window.location.assign("/settings/security");
       } else setMessage(identityMessage(response));
