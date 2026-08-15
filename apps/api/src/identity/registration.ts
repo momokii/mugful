@@ -16,6 +16,7 @@ type RegistrationInput = Readonly<{
 
 type RegistrationDependencies = Readonly<{
   emailService: IdentityEmailService;
+  localAuthBypassEmailVerification: boolean;
   rateLimitPrincipalPepper: RateLimitPrincipalPepper;
   repository: IdentityRepository;
 }>;
@@ -37,8 +38,13 @@ export const registerAccount = async (
   try {
     account = await dependencies.repository.transaction(async (transaction) => {
       const created = await transaction.query<Readonly<{ id: string }>>(
-        "INSERT INTO accounts (email, normalized_email, display_name, password_hash) VALUES ($1, $1, $2, $3) RETURNING id",
-        [email, input.displayName, passwordHash],
+        "INSERT INTO accounts (email, normalized_email, display_name, password_hash, email_verified_at) VALUES ($1, $1, $2, $3, CASE WHEN $4 THEN NOW() ELSE NULL END) RETURNING id",
+        [
+          email,
+          input.displayName,
+          passwordHash,
+          dependencies.localAuthBypassEmailVerification,
+        ],
       );
       const row = created.rows[0];
       if (row === undefined) throw new Error("Account creation failed");
@@ -62,7 +68,7 @@ export const registerAccount = async (
     )
       throw error;
   }
-  if (account !== undefined)
+  if (account !== undefined && !dependencies.localAuthBypassEmailVerification)
     await dependencies.emailService.issueVerificationForAccount(account);
   return "accepted";
 };

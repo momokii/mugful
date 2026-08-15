@@ -95,6 +95,7 @@ export type IdentityService = Readonly<{
 
 type ServiceDependencies = Readonly<{
   emailService: IdentityEmailService;
+  localAuthBypassEmailVerification: boolean;
   rateLimitPrincipalPepper: RateLimitPrincipalPepper;
   repository: IdentityRepository;
   sessionPepper: SessionPepper;
@@ -179,7 +180,8 @@ export const createIdentityService = (
     });
     if (
       account === undefined ||
-      account.email_verified_at === null ||
+      (!dependencies.localAuthBypassEmailVerification &&
+        account.email_verified_at === null) ||
       !validPassword
     )
       return "invalid-credentials";
