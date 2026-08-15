@@ -70,6 +70,17 @@ Do not describe planned product or deployment work as implemented.
 
 Compose health only proves PostgreSQL accepts TCP connections. Fastify liveness never queries PostgreSQL; readiness uses a read-only query and returns generic 503 on failure. Startup, development, Fastify construction, readiness, and Compose never import or run migration code.
 
+### Running web/API directly (no Docker) and exposing over Tailscale
+
+The API and web dev servers can also run as plain `pnpm` processes on the host instead of inside Docker (only PostgreSQL and Mailpit need Compose). This is useful for quick manual QA but is not the verified production path.
+
+- Both Fastify and Next bind to `127.0.0.1` by default, so by default they are not reachable from other devices, including over a private mesh network (e.g. Tailscale).
+- To make the web app reachable from another device on your private network, start it with an explicit host bind, for example `next dev --hostname 0.0.0.0` (or the equivalent `start -H 0.0.0.0` flag for a production-built server). The API can stay bound to loopback since the web app proxies `/api/*` server-side.
+- Registration visibility on `/register` is controlled by two **independent** flags that must both be enabled to actually register a user during manual QA: the API's `REGISTRATION_DEFAULT_ENABLED` (gates the `/v1/auth/register` endpoint) and the web app's `NEXT_PUBLIC_REGISTRATION_ENABLED` (gates whether the web page renders the registration form at all instead of an invite-only notice). The `registration_policies` database table exists but is not currently wired into this check.
+- Never commit, log, or paste your private Tailscale (or any other private-network) IP address into this repository, its documentation, commit messages, or issues — it identifies a device on your private network. If you need to reference "the private-network address," describe it generically (e.g. "your Tailscale IP") and let the reader substitute their own.
+- If you don't already know the current private-network address or exposure setup for a given session, ask the user rather than assuming or reusing one from an earlier session.
+- Tear down manually started processes explicitly (`kill` the PID or `pnpm` process); nothing here is cleaned up automatically like the isolated lifecycle script.
+
 Todo 5A migration verification also runs `MUGFUL_RUN_DATABASE_TESTS=true DATABASE_URL=<local URL> pnpm --filter @mugful/api test -- src/identity/schema.integration.test.ts` after the manual migration. The test is skipped unless explicitly enabled so ordinary unit runs do not require PostgreSQL.
 
 Todo 5B2 HTTP verification requires a manually migrated, isolated PostgreSQL database and runs `MUGFUL_RUN_DATABASE_TESTS=true MUGFUL_TEST_DATABASE_URL=<isolated URL> pnpm --filter @mugful/api test -- src/identity/http-auth.integration.test.ts src/identity/http-session.integration.test.ts`. The suite uses Fastify injection against the real database; application startup does not execute migrations.
