@@ -36,6 +36,7 @@ describe("parseApiConfig", () => {
       inviteTokenPepper: "i".repeat(32),
       rateLimitPrincipalPepper: "r".repeat(32),
       registrationDefaultEnabled: false,
+      localAuthBypassEmailVerification: false,
       sessionTokenPepper: "s".repeat(32),
       smtp: {
         from: "Mugful <noreply@mugful.test>",
@@ -85,6 +86,89 @@ describe("parseApiConfig", () => {
 
     // Then: registration remains closed until explicitly enabled
     expect(config.registrationDefaultEnabled).toBe(false);
+  });
+
+  it("defaults local email-verification bypass to disabled", () => {
+    // Given: valid configuration without a local bypass override
+    const environment = {
+      DATABASE_URL:
+        "postgresql://mugful:local-only-password@127.0.0.1:5432/mugful",
+      CSRF_SECRET: "c".repeat(32),
+      RATE_LIMIT_PRINCIPAL_PEPPER: "r".repeat(32),
+      SESSION_TOKEN_PEPPER: "s".repeat(32),
+      IDENTITY_TOKEN_PEPPER: "t".repeat(32),
+      INVITE_TOKEN_PEPPER: "i".repeat(32),
+      SMTP_FROM: "Mugful <noreply@mugful.test>",
+      SMTP_HOST: "mailpit",
+      SMTP_PORT: "1025",
+      SMTP_SECURE: "false",
+      WEB_ORIGIN: "https://mugful.example",
+    };
+
+    // When: configuration is parsed
+    const config = parseApiConfig(environment);
+
+    // Then: email verification bypass remains disabled
+    expect(config.localAuthBypassEmailVerification).toBe(false);
+  });
+
+  it.each(["development", "test"])(
+    "accepts local email-verification bypass in %s",
+    (nodeEnv) => {
+      // Given: a development/test environment with the local bypass enabled
+      const environment = {
+        NODE_ENV: nodeEnv,
+        LOCAL_AUTH_BYPASS_EMAIL_VERIFICATION: "true",
+        REGISTRATION_DEFAULT_ENABLED: "true",
+        DATABASE_URL:
+          "postgresql://mugful:local-only-password@127.0.0.1:5432/mugful",
+        CSRF_SECRET: "c".repeat(32),
+        RATE_LIMIT_PRINCIPAL_PEPPER: "r".repeat(32),
+        SESSION_TOKEN_PEPPER: "s".repeat(32),
+        IDENTITY_TOKEN_PEPPER: "t".repeat(32),
+        INVITE_TOKEN_PEPPER: "i".repeat(32),
+        SMTP_FROM: "Mugful <noreply@mugful.test>",
+        SMTP_HOST: "mailpit",
+        SMTP_PORT: "1025",
+        SMTP_SECURE: "false",
+        WEB_ORIGIN: "https://mugful.example",
+      };
+
+      // When: configuration is parsed
+      const config = parseApiConfig(environment);
+
+      // Then: only the local bypass is enabled and registration stays independent
+      expect(config.localAuthBypassEmailVerification).toBe(true);
+      expect(config.registrationDefaultEnabled).toBe(true);
+    },
+  );
+
+  it("rejects local email-verification bypass in production", () => {
+    // Given: a production environment with the local bypass enabled
+    const environment = {
+      NODE_ENV: "production",
+      LOCAL_AUTH_BYPASS_EMAIL_VERIFICATION: "true",
+      DATABASE_URL:
+        "postgresql://mugful:local-only-password@127.0.0.1:5432/mugful",
+      CSRF_SECRET: "c".repeat(32),
+      RATE_LIMIT_PRINCIPAL_PEPPER: "r".repeat(32),
+      SESSION_TOKEN_PEPPER: "s".repeat(32),
+      IDENTITY_TOKEN_PEPPER: "t".repeat(32),
+      INVITE_TOKEN_PEPPER: "i".repeat(32),
+      SMTP_FROM: "Mugful <noreply@mugful.test>",
+      SMTP_HOST: "mailpit",
+      SMTP_PORT: "1025",
+      SMTP_SECURE: "false",
+      WEB_ORIGIN: "https://mugful.example",
+    };
+
+    // When: configuration is parsed
+    const parse = (): void => {
+      parseApiConfig(environment);
+    };
+
+    // Then: startup fails without exposing configuration details
+    expect(parse).toThrow("Invalid API configuration");
   });
 
   it("rejects a web URL that is not an origin", () => {

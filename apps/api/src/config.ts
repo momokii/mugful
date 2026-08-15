@@ -25,6 +25,13 @@ const apiConfigSchema = z
     CSRF_SECRET: secretSchema,
     DATABASE_URL: databaseUrlSchema,
     INVITE_TOKEN_PEPPER: secretSchema,
+    LOCAL_AUTH_BYPASS_EMAIL_VERIFICATION: z
+      .enum(["true", "false"])
+      .default("false")
+      .transform((value) => value === "true"),
+    NODE_ENV: z
+      .enum(["development", "test", "production"])
+      .default("development"),
     RATE_LIMIT_PRINCIPAL_PEPPER: secretSchema,
     REGISTRATION_DEFAULT_ENABLED: z
       .enum(["true", "false"])
@@ -48,6 +55,14 @@ const apiConfigSchema = z
         code: z.ZodIssueCode.custom,
         message: "SMTP credentials must be configured together",
       });
+    if (
+      value.NODE_ENV === "production" &&
+      value.LOCAL_AUTH_BYPASS_EMAIL_VERIFICATION
+    )
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Local email-verification bypass is not allowed in production",
+      });
   });
 
 export type ApiConfig = Readonly<{
@@ -56,6 +71,7 @@ export type ApiConfig = Readonly<{
   host: string;
   identityTokenPepper: string;
   inviteTokenPepper: string;
+  localAuthBypassEmailVerification: boolean;
   port: number;
   rateLimitPrincipalPepper: string;
   registrationDefaultEnabled: boolean;
@@ -96,6 +112,8 @@ export const parseApiConfig = (environment: Environment): ApiConfig => {
     host: result.data.API_HOST,
     identityTokenPepper: result.data.IDENTITY_TOKEN_PEPPER,
     inviteTokenPepper: result.data.INVITE_TOKEN_PEPPER,
+    localAuthBypassEmailVerification:
+      result.data.LOCAL_AUTH_BYPASS_EMAIL_VERIFICATION,
     port: result.data.API_PORT,
     rateLimitPrincipalPepper: result.data.RATE_LIMIT_PRINCIPAL_PEPPER,
     registrationDefaultEnabled: result.data.REGISTRATION_DEFAULT_ENABLED,
