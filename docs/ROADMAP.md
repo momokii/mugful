@@ -4,7 +4,7 @@ This roadmap is intentionally outcome-based. A milestone is not complete because
 
 ## Current status
 
-**Phase:** Foundation and Todo 4 complete; Todo 5 identity implementation is in progress through 5E and implemented 5F blocker resolution, pending independent final review.
+**Phase:** Foundation, Todo 5 identity, and Todo 6 couple onboarding are accepted; Todo 7 prompt administration is next.
 
 Completed discovery artifacts:
 
@@ -56,7 +56,7 @@ Each slice must include its behavior tests, documentation updates, accessibility
 - 5E: negative-path matrix and JSON-only identity OpenAPI contract.
 - 5F: Zod 4 compliance, separable Bahasa consent capture, read-only Privacy Center identity foundation, lifecycle reliability, final acceptance, and independent final review.
 
-Checkpoints 5A, 5B1, 5B2, 5C, 5D, and 5E are complete. The 5F blocker resolution is implemented; Todo 5 is not complete until subsequent independent final review verifies 5F.
+Checkpoints 5A, 5B1, 5B2, 5C, 5D, 5E, and 5F are complete and accepted. Todo 6 couple onboarding is also complete; Todo 7 prompt administration is the next implementation slice.
 
 ## Phase 2 — v1 invite-only beta
 
