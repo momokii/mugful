@@ -33,6 +33,7 @@ export const main = async (): Promise<void> => {
   });
   const identityService = createIdentityService({
     emailService: identityEmailService,
+    localAuthBypassEmailVerification: config.localAuthBypassEmailVerification,
     rateLimitPrincipalPepper: rateLimitPrincipalPepperSchema.parse(
       config.rateLimitPrincipalPepper,
     ),

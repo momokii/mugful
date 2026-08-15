@@ -18,6 +18,7 @@ export const databaseTestsEnabled =
 export const createIdentityHttpTestContext = (
   registrationEnabled = false,
   mailer: IdentityMailer = { send: async () => undefined },
+  localAuthBypassEmailVerification = false,
 ) => {
   const pool = new Pool({ connectionString: databaseUrl });
   const identityEmailService = createIdentityEmailService({
@@ -31,6 +32,7 @@ export const createIdentityHttpTestContext = (
   });
   const identityService = createIdentityService({
     emailService: identityEmailService,
+    localAuthBypassEmailVerification,
     rateLimitPrincipalPepper: rateLimitPrincipalPepperSchema.parse(
       "r".repeat(32),
     ),
