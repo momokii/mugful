@@ -1,7 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { type FormEvent, useEffect, useState } from "react";
+import {
+  type ChangeEvent,
+  type FormEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import {
   identityMessage,
@@ -9,28 +15,55 @@ import {
   readFragmentToken,
 } from "../lib/identity-client";
 import styles from "./auth-shell.module.css";
+import {
+  IdentityFormFields,
+  type IdentityFormMode,
+} from "./identity-form-fields";
+import { IdentityField } from "./identity-field";
 
-type Mode = "forgot" | "login" | "password" | "register" | "reset" | "verify";
-
-type IdentityFormProperties = Readonly<{ mode: Mode }>;
-
-export function IdentityForm({ mode }: IdentityFormProperties) {
+export function IdentityForm({ mode }: Readonly<{ mode: IdentityFormMode }>) {
   const [message, setMessage] = useState<string | undefined>();
+  const [passwordMismatch, setPasswordMismatch] = useState(false);
   const [pending, setPending] = useState(false);
   const [token, setToken] = useState<string | undefined>();
+  const confirmationRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (mode === "reset" || mode === "verify") setToken(readFragmentToken());
   }, [mode]);
 
+  const handlePasswordChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (!passwordMismatch) return;
+    const password = event.currentTarget.form?.elements.namedItem("password");
+    const confirmation = event.currentTarget.form?.elements.namedItem(
+      "passwordConfirmation",
+    );
+    if (
+      password instanceof HTMLInputElement &&
+      confirmation instanceof HTMLInputElement &&
+      password.value === confirmation.value
+    )
+      setPasswordMismatch(false);
+  };
+
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const values = new FormData(event.currentTarget);
+    const password = String(values.get("password") ?? "");
+    if (
+      (mode === "register" || mode === "reset" || mode === "password") &&
+      password !== String(values.get("passwordConfirmation") ?? "")
+    ) {
+      setMessage(undefined);
+      setPasswordMismatch(true);
+      confirmationRef.current?.focus();
+      return;
+    }
+    setPasswordMismatch(false);
     setPending(true);
     setMessage(undefined);
-    const values = new FormData(event.currentTarget);
     try {
       const email = String(values.get("email") ?? "");
-      const password = String(values.get("password") ?? "");
       const response = await (() => {
         switch (mode) {
           case "register":
@@ -75,7 +108,7 @@ export function IdentityForm({ mode }: IdentityFormProperties) {
             : mode === "verify"
               ? "Your email address is verified. You can sign in now."
               : mode === "register"
-                ? "Account created. If email verification is required, check your email before signing in. Otherwise, you can sign in now."
+                ? "If email verification is required, check your email for a verification link. If you do not receive one, check your spam folder or try signing in if you already have an account."
                 : "Done. Check your email or continue with your account.",
         );
         if (mode === "login") window.location.assign("/settings/security");
@@ -93,9 +126,9 @@ export function IdentityForm({ mode }: IdentityFormProperties) {
 
   if (mode === "verify")
     return (
-      <form className={styles.form} onSubmit={submit}>
+      <form aria-busy={pending} className={styles.form} onSubmit={submit}>
         {token === undefined ? (
-          <Field
+          <IdentityField
             autoComplete="email"
             label="Email address"
             name="email"
@@ -115,7 +148,7 @@ export function IdentityForm({ mode }: IdentityFormProperties) {
               : "Verify email"}
         </button>
         {message === undefined ? null : (
-          <p aria-live="polite" className={styles.status}>
+          <p aria-atomic="true" aria-live="polite" className={styles.status}>
             {message}
           </p>
         )}
@@ -123,53 +156,18 @@ export function IdentityForm({ mode }: IdentityFormProperties) {
     );
 
   return (
-    <form className={styles.form} onSubmit={submit}>
-      {mode === "register" ? (
-        <Field
-          label="Your name"
-          name="displayName"
-          type="text"
-          autoComplete="name"
-        />
-      ) : null}
-      {mode === "login" || mode === "register" || mode === "forgot" ? (
-        <Field
-          label="Email address"
-          name="email"
-          type="email"
-          autoComplete="email"
-        />
-      ) : null}
-      {mode === "password" ? (
-        <Field
-          label="Current password"
-          name="currentPassword"
-          type="password"
-          autoComplete="current-password"
-        />
-      ) : null}
-      {mode !== "forgot" ? (
-        <Field
-          label={
-            mode === "password"
-              ? "New password"
-              : mode === "reset"
-                ? "New password"
-                : mode === "register"
-                  ? "Create a password"
-                  : "Password"
-          }
-          name="password"
-          type="password"
-          autoComplete={mode === "login" ? "current-password" : "new-password"}
-        />
-      ) : null}
-      {mode === "register" ? <ConsentAffirmations /> : null}
+    <form aria-busy={pending} className={styles.form} onSubmit={submit}>
+      <IdentityFormFields
+        confirmationRef={confirmationRef}
+        mode={mode}
+        onPasswordChange={handlePasswordChange}
+        passwordMismatch={passwordMismatch}
+      />
       <button className={styles.submit} disabled={pending} type="submit">
         {pending ? "Working" : action(mode)}
       </button>
       {message === undefined ? null : (
-        <p aria-live="polite" className={styles.status}>
+        <p aria-atomic="true" aria-live="polite" className={styles.status}>
           {message}
         </p>
       )}
@@ -187,56 +185,7 @@ export function IdentityForm({ mode }: IdentityFormProperties) {
   );
 }
 
-function ConsentAffirmations() {
-  return (
-    <fieldset className={styles.consent}>
-      <legend>Persetujuan pendaftaran</legend>
-      <label className={styles.checkbox}>
-        <input name="adult" required type="checkbox" /> Saya menyatakan bahwa
-        saya berusia minimal 18 tahun.
-      </label>
-      <label className={styles.checkbox}>
-        <input name="terms" required type="checkbox" /> Saya menyetujui Syarat
-        dan Ketentuan versi terms-v1.
-      </label>
-      <p className={styles.legalLink}>
-        <Link href="/legal/terms">Baca Syarat dan Ketentuan</Link>
-      </p>
-      <label className={styles.checkbox}>
-        <input name="privacy" required type="checkbox" /> Saya telah membaca dan
-        menyetujui Pemberitahuan Privasi versi privacy-v1.
-      </label>
-      <p className={styles.legalLink}>
-        <Link href="/legal/privacy">Baca Pemberitahuan Privasi</Link>
-      </p>
-    </fieldset>
-  );
-}
-
-function Field(
-  properties: Readonly<{
-    autoComplete: string;
-    label: string;
-    name: string;
-    type: string;
-  }>,
-) {
-  return (
-    <div className={styles.field}>
-      <label htmlFor={properties.name}>{properties.label}</label>
-      <input
-        autoComplete={properties.autoComplete}
-        id={properties.name}
-        minLength={properties.type === "password" ? 12 : undefined}
-        name={properties.name}
-        required
-        type={properties.type}
-      />
-    </div>
-  );
-}
-
-const action = (mode: Exclude<Mode, "verify">): string =>
+const action = (mode: Exclude<IdentityFormMode, "verify">): string =>
   ({
     forgot: "Send reset link",
     login: "Continue",

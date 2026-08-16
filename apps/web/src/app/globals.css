@@ -8,9 +8,11 @@
   --text-tertiary: #7c898b;
   --border-default: #d6dedd;
   --border-subtle: #e6ebe9;
+  --border-control: #6b797b;
   --accent-primary: #e85d4a;
   --accent-hover: #c94739;
   --status-success: #208a68;
+  --status-error: #c43d4c;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -39,9 +41,11 @@
     --text-tertiary: #778486;
     --border-default: #303b3f;
     --border-subtle: #252e32;
+    --border-control: #637478;
     --accent-primary: #ff806b;
     --accent-hover: #ff9a8a;
     --status-success: #43b98b;
+    --status-error: #f06e7a;
   }
 }
 
