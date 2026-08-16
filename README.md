@@ -74,4 +74,4 @@ The app is designed around Indonesian UU PDP principles and an application-level
 
 ## License
 
-Apache-2.0. Contributions are welcome once the implementation begins and must preserve the product’s privacy, security, accessibility, and documentation requirements.
+Apache-2.0. Contributions are welcome and must preserve the product’s privacy, security, accessibility, and documentation requirements.

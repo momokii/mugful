@@ -14,7 +14,7 @@ This repository is Mugful: a private web space for two adults in a long-distance
 
 ## Current status
 
-Product and architecture discovery is complete. Documentation exists; application implementation has not started. Do not describe the project as production-ready or claim that planned commands work until they are implemented and verified.
+Product and architecture discovery is complete. The local runtime foundation, accessible public/auth shell, Todo 5 identity foundation, and Todo 6 couple onboarding are implemented and verified. Do not describe the project as production-ready or claim that commands work unless they are implemented and verified.
 
 ## Non-negotiable product decisions
 

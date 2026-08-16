@@ -1,6 +1,6 @@
 # Contributing
 
-The project is currently in documentation and architecture phase. The application toolchain will be added before implementation begins; until then, the product and architecture documents are the source of truth.
+The project is in active implementation. The product, architecture, design, and current-status documents remain the source of truth for behavior and engineering boundaries.
 
 ## Before contributing
 

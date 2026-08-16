@@ -2,7 +2,7 @@
 
 ## Status
 
-This project is pre-implementation and not yet suitable for production personal data. Do not use this repository as a live service until the v1 stability gate is complete.
+Implementation is active, but the project is not yet suitable for production personal data. Do not use this repository as a live service until the v1 stability gate is complete.
 
 ## Reporting a vulnerability
 
