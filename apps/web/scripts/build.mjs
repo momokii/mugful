@@ -4,7 +4,11 @@ import { fileURLToPath } from "node:url";
 
 const workspaceRoot = fileURLToPath(new URL("../../..", import.meta.url));
 
-export const createChildEnvironment = (baseline, apiInternalOrigin) => {
+export const createChildEnvironment = (
+  baseline,
+  apiInternalOrigin,
+  registrationEnabled = baseline.NEXT_PUBLIC_REGISTRATION_ENABLED,
+) => {
   new URL(apiInternalOrigin);
 
   return Object.fromEntries(
@@ -13,6 +17,7 @@ export const createChildEnvironment = (baseline, apiInternalOrigin) => {
       NODE_ENV: baseline.NODE_ENV,
       API_INTERNAL_ORIGIN: apiInternalOrigin,
       NEXT_DIST_DIR: baseline.NEXT_DIST_DIR,
+      NEXT_PUBLIC_REGISTRATION_ENABLED: registrationEnabled,
     }).filter(([, value]) => value !== undefined),
   );
 };
@@ -22,6 +27,7 @@ export const runBuild = ({ baseline, loadEnvironment, spawn }) => {
   const childEnvironment = createChildEnvironment(
     baseline,
     combinedEnv.API_INTERNAL_ORIGIN,
+    combinedEnv.NEXT_PUBLIC_REGISTRATION_ENABLED,
   );
 
   return spawn("next", ["build"], {

@@ -9,6 +9,7 @@ describe("web build environment", () => {
       DATABASE_URL: "postgresql://secret",
       NODE_ENV: "production",
       NEXT_DIST_DIR: "/tmp/mugful-lifecycle/.next",
+      NEXT_PUBLIC_REGISTRATION_ENABLED: "true",
       PATH: "/bin",
     };
 
@@ -23,6 +24,7 @@ describe("web build environment", () => {
       API_INTERNAL_ORIGIN: "http://127.0.0.1:3001",
       NODE_ENV: "production",
       NEXT_DIST_DIR: "/tmp/mugful-lifecycle/.next",
+      NEXT_PUBLIC_REGISTRATION_ENABLED: "true",
       PATH: "/bin",
     });
   });
@@ -46,6 +48,7 @@ describe("web build environment", () => {
         combinedEnv: {
           API_INTERNAL_ORIGIN: "http://127.0.0.1:3001",
           DATABASE_URL: "postgresql://secret",
+          NEXT_PUBLIC_REGISTRATION_ENABLED: "true",
         },
       }),
       spawn,
@@ -55,6 +58,7 @@ describe("web build environment", () => {
     expect(capturedOptions.env).toEqual({
       API_INTERNAL_ORIGIN: "http://127.0.0.1:3001",
       NEXT_DIST_DIR: "/tmp/mugful-lifecycle/.next",
+      NEXT_PUBLIC_REGISTRATION_ENABLED: "true",
       PATH: "/bin",
     });
   });
