@@ -69,6 +69,8 @@ export const registerAccount = async (
       throw error;
   }
   if (account !== undefined && !dependencies.localAuthBypassEmailVerification)
-    await dependencies.emailService.issueVerificationForAccount(account);
+    void dependencies.emailService
+      .issueVerificationForAccount(account)
+      .catch(() => undefined);
   return "accepted";
 };
