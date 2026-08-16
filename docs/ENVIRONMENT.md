@@ -22,6 +22,7 @@ Zod validates API and server-side web configuration. Invalid values fail with ge
 | `CSRF_SECRET`                          | API identity policy      | Yes    | Required minimum 32-character secret                                         |
 | `RATE_LIMIT_PRINCIPAL_PEPPER`          | API identity policy      | Yes    | Required HMAC secret; never persist principals                               |
 | `IDENTITY_TOKEN_PEPPER`                | API identity tokens      | Yes    | Required HMAC secret; only token hashes persist                              |
+| `INVITE_TOKEN_PEPPER`                  | API couple invites       | Yes    | Required HMAC secret; only invite-token hashes persist                       |
 | `SMTP_HOST`                            | API SMTP mailer          | No     | Required SMTP hostname; Mailpit is `127.0.0.1` locally                       |
 | `SMTP_PORT`                            | API SMTP mailer          | No     | Required SMTP port; Mailpit defaults to `1025`                               |
 | `SMTP_SECURE`                          | API SMTP mailer          | No     | Required `true` for implicit TLS or `false` for STARTTLS/plain local Mailpit |
@@ -51,7 +52,7 @@ Zod validates API and server-side web configuration. Invalid values fail with ge
 - `REGISTRATION_DEFAULT_ENABLED` controls whether the API accepts public registration; `NEXT_PUBLIC_REGISTRATION_ENABLED` controls only whether the web page renders the form. Both must be true for local public registration.
 - Local email-verification bypass marks registrations verified and skips verification mail. Set `NODE_ENV=development` and `LOCAL_AUTH_BYPASS_EMAIL_VERIFICATION=true` for local account creation without SMTP confirmation; it is rejected when `NODE_ENV=production`.
 - Secrets are never placed in Docker images, committed configuration, logs, screenshots, tests, or documentation examples.
-- Rotation procedures must be documented for database credentials, session/encryption keys, SMTP credentials, Docker Hub tokens, and future provider keys.
+- Rotation procedures must be documented for database credentials, session/invite/token peppers, encryption keys, SMTP credentials, Docker Hub tokens, and future provider keys.
 
 ## Required validation
 
