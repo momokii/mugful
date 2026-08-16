@@ -1,6 +1,6 @@
 # Mugful — Product Specification
 
-**Status:** Confirmed direction; implementation not started
+**Status:** Confirmed direction; bounded identity and couple-onboarding implementation underway
 **Audience:** Adults in long-distance romantic relationships
 **Release target:** v1 invite-only beta, with public registration feature-flagged off by default
 **License target:** Apache-2.0
@@ -133,6 +133,7 @@ The product should feel warm, playful, and mature. It should be lively through m
 - Store only hashed session tokens; use secure HTTP-only cookies, rotation, expiry, CSRF protection, and per-device revocation.
 - Use Argon2id or another approved memory-hard password hashing strategy.
 - Require email verification and secure password reset flows.
+- Registration, password reset, and authenticated password-change forms require a matching confirmation password before sending the existing single-password API payload; mismatches focus the confirmation field, clear when corrected, and remain associated with the field for assistive technology. Password inputs provide show/hide controls, autofill-compatible semantics, and 12-character guidance. Registration success explains the verification-link flow without claiming account creation, while responses remain generic for duplicate normalized emails to prevent account enumeration; forced first-login password changes are not part of the current identity scope.
 - Use single-use, short-lived, cryptographically random invite and reset tokens stored only as hashes.
 - Require passkey MFA with TOTP recovery for superadmins.
 - Enforce couple membership and content authorization in backend modules and database access patterns.
