@@ -1,0 +1,36 @@
+.passwordControl {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.passwordControl input {
+  min-width: 0;
+}
+
+.passwordToggle {
+  min-height: 44px;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--border-control);
+  border-radius: var(--radius-control);
+  background: var(--surface-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition:
+    background-color var(--motion-micro),
+    border-color var(--motion-micro),
+    color var(--motion-micro);
+}
+
+.passwordToggle:hover {
+  border-color: var(--text-secondary);
+  background: var(--surface-secondary);
+  color: var(--text-primary);
+}
+
+.passwordToggle:active {
+  background: var(--border-subtle);
+}
