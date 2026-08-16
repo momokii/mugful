@@ -81,6 +81,7 @@ API_INTERNAL_ORIGIN=http://127.0.0.1:${api_port}
 CSRF_SECRET=$(secret)
 DATABASE_URL=postgresql://mugful:lifecycle-only-password@127.0.0.1:${postgres_port}/mugful
 IDENTITY_TOKEN_PEPPER=$(secret)
+INVITE_TOKEN_PEPPER=$(secret)
 RATE_LIMIT_PRINCIPAL_PEPPER=$(secret)
 REGISTRATION_DEFAULT_ENABLED=true
 SESSION_TOKEN_PEPPER=$(secret)
@@ -114,11 +115,17 @@ npx --yes pnpm@11.20.0 --filter @mugful/api test -- \
   src/identity/http-security.integration.test.ts \
   src/identity/http-session.integration.test.ts \
   src/identity/http-email.integration.test.ts
-(cd "$root_dir/apps/web" && API_INTERNAL_ORIGIN="http://127.0.0.1:${api_port}" NEXT_DIST_DIR="$web_dist_dir" NEXT_PUBLIC_REGISTRATION_ENABLED=true ./node_modules/.bin/next build)
+(cd "$root_dir/apps/web" && env -i \
+  "PATH=$PATH" \
+  NODE_ENV=production \
+  API_INTERNAL_ORIGIN="http://127.0.0.1:${api_port}" \
+  NEXT_DIST_DIR="$web_dist_dir" \
+  NEXT_PUBLIC_REGISTRATION_ENABLED=true \
+  ./node_modules/.bin/next build)
 start_owned sh -c "cd '$root_dir/apps/api' && exec node dist/main.js >'$api_log' 2>&1"
 api_pid="$owned_pid"
 until curl --fail --silent "http://127.0.0.1:${api_port}/health/live" >/dev/null; do sleep 1; done
-start_owned sh -c "cd '$root_dir/apps/web' && exec env NEXT_DIST_DIR='$web_dist_dir' ./node_modules/.bin/next start -p '$web_port' >'$web_log' 2>&1"
+start_owned env -i "PATH=$PATH" NODE_ENV=production API_INTERNAL_ORIGIN="http://127.0.0.1:${api_port}" NEXT_DIST_DIR="$web_dist_dir" NEXT_PUBLIC_REGISTRATION_ENABLED=true sh -c "cd '$root_dir/apps/web' && exec ./node_modules/.bin/next start -p '$web_port' >'$web_log' 2>&1"
 web_pid="$owned_pid"
 until curl --fail --silent "http://127.0.0.1:${web_port}/login" >/dev/null; do sleep 1; done
 
@@ -135,8 +142,14 @@ PLAYWRIGHT_OUTPUT_DIR="$runtime_dir/public-shell-output" \
 PLAYWRIGHT_REPORT_FILE="$runtime_dir/public-shell-report.json" \
 ./node_modules/.bin/playwright test e2e/public-shell.spec.ts --workers=1
 stop_owned "$web_pid"
-(cd "$root_dir/apps/web" && API_INTERNAL_ORIGIN="http://127.0.0.1:${api_port}" NEXT_DIST_DIR="$web_dist_dir" NEXT_PUBLIC_REGISTRATION_ENABLED=false ./node_modules/.bin/next build)
-start_owned sh -c "cd '$root_dir/apps/web' && exec env NEXT_DIST_DIR='$web_dist_dir' ./node_modules/.bin/next start -p '$web_port' >'$web_log' 2>&1"
+(cd "$root_dir/apps/web" && env -i \
+  "PATH=$PATH" \
+  NODE_ENV=production \
+  API_INTERNAL_ORIGIN="http://127.0.0.1:${api_port}" \
+  NEXT_DIST_DIR="$web_dist_dir" \
+  NEXT_PUBLIC_REGISTRATION_ENABLED=false \
+  ./node_modules/.bin/next build)
+start_owned env -i "PATH=$PATH" NODE_ENV=production API_INTERNAL_ORIGIN="http://127.0.0.1:${api_port}" NEXT_DIST_DIR="$web_dist_dir" NEXT_PUBLIC_REGISTRATION_ENABLED=false sh -c "cd '$root_dir/apps/web' && exec ./node_modules/.bin/next start -p '$web_port' >'$web_log' 2>&1"
 web_pid="$owned_pid"
 until curl --fail --silent "http://127.0.0.1:${web_port}/register" >/dev/null; do sleep 1; done
 MUGFUL_TEST_REGISTRATION_CLOSED=true \
