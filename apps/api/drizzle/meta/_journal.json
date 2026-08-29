@@ -43,6 +43,13 @@
       "when": 1786291200005,
       "tag": "0005_prompt_catalog",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1786291200006,
+      "tag": "0006_superadmin_authorization",
+      "breakpoints": true
     }
   ]
 }
