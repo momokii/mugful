@@ -67,7 +67,15 @@ Checkpoints 5A, 5B1, 5B2, 5C, 5D, 5E, and 5F are complete and accepted. Todo 6 c
 - 7B3b: superadmin HTTP surface — MFA-gated prompt administration routes, WebAuthn ceremony endpoints, session/grant/CSRF/MFA guards, and negative-path coverage.
 - 7C: operational prompt tooling UI — the `/superadmin` console with passkey MFA ceremony, catalog CRUD, and the documented token system.
 
-Checkpoints 7A through 7C are implemented and verified. Todo 8 Guess My Answer is next.
+Todo 8 Guess My Answer is split into checkpoints:
+
+- 8A: round persistence — rounds, per-participant answers, reactions, one-pending-per-space invariant, the documented state machine as pure transitions, and real PostgreSQL verification.
+- 8B: round service — prompt suggestion with category/recent-avoidance, transactional start/submit/reveal/cancel/react, tested against real PostgreSQL.
+- 8C: round HTTP surface — couple-membership authorization, CSRF, negative-path coverage.
+- 8D: activity UI — choose → answer → waiting → reveal → react flow on the shared home.
+- 8E: realtime notifications — Socket.IO presence and post-commit round events.
+
+Checkpoints 7A through 7C and Todo 8A are implemented and verified. Todo 8B is next.
 
 ## Phase 2 — v1 invite-only beta
 
