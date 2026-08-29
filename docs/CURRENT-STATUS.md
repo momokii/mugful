@@ -1,7 +1,7 @@
 # Current status
 
 **Last updated:** 2026-08-29
-**Phase:** Todo 7 prompt administration (7A–7C) implemented and verified; Todo 8 Guess My Answer in progress (8A persistence, 8B round service, and 8C HTTP surface done, 8D activity UI next)
+**Phase:** Todo 7 prompt administration (7A–7C) implemented and verified; Todo 8 Guess My Answer in progress (8A–8D done: persistence, service, HTTP surface, and activity UI; 8E realtime next)
 **Release target:** v1 invite-only beta
 **Product name:** Mugful
 **Public repository:** https://github.com/momokii/mugful
@@ -46,19 +46,20 @@
 - Todo 7C prompt tooling UI is implemented and verified: the `/superadmin` page (outside the public navigation) renders the operational console through the shared auth shell with the documented tokens, covering checking, sign-in-required, non-superadmin, unavailable, passkey-MFA, and verified states. `@simplewebauthn/browser` drives the authentication ceremony against the 7B3b endpoints, the verified console lists the active catalog and creates, re-version, and retire prompts with confirmation and typed inline notices (`aria-live`), every request uses credentials plus the CSRF token flow through an extended identity client, and all modules stay under the 250-line ceiling. Web unit tests cover the client layer (11 web tests total), and typecheck, lint, formatting, and the production build (16 routes including `/superadmin`) pass. Browser coverage of the hardware-bound passkey ceremony itself is deferred to the stability pass; the console states render without it.
 - Todo 8A Guess My Answer persistence is implemented and verified: additive `0009_guess_my_answer.sql` adds `rounds` (couple-space, immutable prompt-version reference, documented status enum, cancellation/reveal timestamp pairing constraints, and a partial unique index enforcing one pending round per space), `round_answers` (one canonical trimmed answer per participant, submitted once), and `round_reactions` (one per participant, never gating completion). The `round-state` module encodes the architecture state machine (`active → waiting-for-partner → ready-to-reveal → completed`, cancellation only from the two pending pre-reveal states, `revealed → completed`) as pure transition functions with focused unit tests. The migration applied to a fresh real PostgreSQL database, and a transactional probe proved the one-pending-per-space invariant rejects a second pending round, reveal persists as `completed` with both timestamps, and cancellation timestamp consistency is enforced.
 - Todo 8B Guess My Answer round service is implemented and verified: `createGuessMyAnswerService` provides prompt suggestion (random active version with category filtering, automatic exclusion of the couple's ten most recent rounds, and explicit excludes, returning a typed exhausted state), transactional round start gated on couple membership with retired/unknown prompt rejection and one-pending enforcement, single-submission answer flow that walks `active → waiting-for-partner → ready-to-reveal` under row locks, reveal permitted only at `ready-to-reveal` and completing atomically with a case-insensitive match computation, cancellation only from the two pending states, post-completion reactions with upsert, and member-scoped views that hide the partner's answer until completion while exposing the partner-submitted flag. Seven real-PostgreSQL integration tests cover suggestion exhaustion, start gating, the submission walk with partner visibility, reveal matching, cancellation slot release, reaction windows, and unknown/foreign round guards.
+- Todo 8D Guess My Answer activity UI is implemented and verified: the shared home at `/home` renders the activity console through the shared auth shell with the documented tokens, covering checking, sign-in-required, no-space, unavailable, suggestion (random with category filter and skip re-rolls that accumulate exclusions), answer submission (trimmed 1000-character limit with lock-in), waiting (locked answer visible, partner-submitted flag without content, two-step cancellation), reveal readiness, and completed rounds with your/partner answers, case-insensitive match badge, and preset reaction buttons. All requests flow through the typed `rounds-client` with credentials, the CSRF token flow, and zod-validated responses mapped to human-readable `aria-live` notices; every module stays under the 250-line ceiling. Web unit tests cover the client helpers (14 web tests total), and typecheck, lint, formatting, and the production build (17 routes including `/home`) pass. Interactive browser verification of the full two-partner flow rides the lifecycle suite in the stability pass.
 
 ## Not started
 
 - Couple activity web behavior beyond the implemented Todo 4/5 shell, Todo 6 onboarding, and identity flows.
 - Couple activity and realtime Fastify behavior beyond the implemented Todo 3 runtime, Todo 5 identity API, and Todo 6 onboarding API.
 - Privacy-request operations (export, correction, deletion, withdrawal, and restriction).
-- The Guess My Answer activity UI and realtime notifications (Todo 8D–8E).
+- Realtime round notifications (Todo 8E).
 - Production Docker Compose configurations and deployment scripts.
 - CI workflows and Docker Hub publication.
 
 ## Next recommended step
 
-Start Todo 8D activity UI after reviewing the Todo 8C HTTP evidence. Do not add privacy-request operations, video, AI, analytics, Redis, or a second activity while building v1. Complete the independent security and stability gate before production use.
+Start Todo 8E realtime notifications after reviewing the Todo 8D UI evidence. Do not add privacy-request operations, video, AI, analytics, Redis, or a second activity while building v1. Complete the independent security and stability gate before production use.
 
 ## Command status
 
