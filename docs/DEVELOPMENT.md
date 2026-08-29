@@ -1,6 +1,6 @@
 # Development guide
 
-**Status:** 0b local runtime foundation, Todo 4 accessible web shell, Todo 5 identity foundation, and Todo 6 couple onboarding are implemented and accepted. Local development also supports an explicit fail-closed email-verification bypass; Todo 7 prompt administration is next.
+**Status:** 0b local runtime foundation, Todo 4 accessible web shell, Todo 5 identity foundation, and Todo 6 couple onboarding are implemented and accepted. Local development also supports an explicit fail-closed email-verification bypass. Todo 7A–7B2c prompt catalog and superadmin authorization are implemented and verified; Todo 7B3 superadmin prompt HTTP surface is next.
 
 This document is the handoff point for a fresh agent or contributor who does not have the conversation history.
 

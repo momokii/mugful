@@ -56,7 +56,17 @@ Each slice must include its behavior tests, documentation updates, accessibility
 - 5E: negative-path matrix and JSON-only identity OpenAPI contract.
 - 5F: Zod 4 compliance, separable Bahasa consent capture, read-only Privacy Center identity foundation, lifecycle reliability, final acceptance, and independent final review.
 
-Checkpoints 5A, 5B1, 5B2, 5C, 5D, 5E, and 5F are complete and accepted. Todo 6 couple onboarding is also complete; Todo 7 prompt administration is the next implementation slice.
+Checkpoints 5A, 5B1, 5B2, 5C, 5D, 5E, and 5F are complete and accepted. Todo 6 couple onboarding is also complete. Todo 7 prompt administration is the current implementation slice, split into checkpoints:
+
+- 7A: prompt catalog persistence — versioned immutable prompt versions with one active version per prompt, audit events, reviewed migration, schema module unit coverage, and real PostgreSQL verification.
+- 7B1: prompt catalog service — transactional create/update/retire/list with audit events, tested against real PostgreSQL.
+- 7B2a: superadmin authorization persistence — grant/revocation, passkey credential, and TOTP recovery storage with audit events, schema module, and real PostgreSQL verification.
+- 7B2b: superadmin MFA service — RFC 6238 TOTP verification with replay protection and the transactional grant/passkey/TOTP lifecycle, tested against real PostgreSQL.
+- 7B2c: WebAuthn ceremonies — challenge-scoped registration and authentication orchestration with single-use challenge storage, counter-advance tracking, and failure auditing.
+- 7B3: superadmin prompt administration HTTP surface with OpenAPI and negative-path coverage.
+- 7C: operational prompt tooling UI.
+
+Checkpoints 7A, 7B1, 7B2a, 7B2b, and 7B2c are implemented and verified. Todo 7B3 is next.
 
 ## Phase 2 — v1 invite-only beta
 
