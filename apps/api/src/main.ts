@@ -17,6 +17,7 @@ import { createPromptCatalogService } from "./prompts/service.js";
 import { createSuperadminMfaService } from "./superadmin/mfa.js";
 import { createSuperadminService } from "./superadmin/service.js";
 import { createSuperadminWebauthnService } from "./superadmin/webauthn.js";
+import { createGuessMyAnswerService } from "./activities/guess-my-answer/service.js";
 
 export const main = async (): Promise<void> => {
   const config = parseApiConfig(process.env);
@@ -57,6 +58,9 @@ export const main = async (): Promise<void> => {
     rpName: "Mugful",
     superadminService,
   });
+  const roundService = createGuessMyAnswerService({
+    repository: database.identityRepository,
+  });
   const app = createApp({
     databaseChecker: database.checker,
     identity: {
@@ -92,6 +96,14 @@ export const main = async (): Promise<void> => {
       }),
       sessionCookieName: sessionCookie.name,
       superadminService,
+      webOrigin: config.webOrigin,
+    },
+    activities: {
+      csrfSecret: config.csrfSecret,
+      identityService,
+      productionCookies,
+      roundService,
+      sessionCookieName: sessionCookie.name,
       webOrigin: config.webOrigin,
     },
   });

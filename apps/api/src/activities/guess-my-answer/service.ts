@@ -71,6 +71,7 @@ export type RoundView = Readonly<{
 }>;
 
 export type GuessMyAnswerService = Readonly<{
+  activeSpaceId: (actorAccountId: string) => Promise<string | undefined>;
   cancelRound: (
     input: Readonly<{
       actorAccountId: string;
@@ -239,6 +240,17 @@ export const createGuessMyAnswerService = (
   };
 
   return {
+    activeSpaceId: async (rawActorAccountId) => {
+      const actorAccountId = idSchema.parse(rawActorAccountId);
+      const result = await dependencies.repository.query<
+        Readonly<{ id: string }>
+      >(
+        "SELECT couple_space_id AS id FROM couple_memberships WHERE account_id = $1 AND revoked_at IS NULL LIMIT 1",
+        [actorAccountId],
+      );
+      return result.rows[0]?.id;
+    },
+
     suggestPrompt: async (input) => {
       const spaceId = idSchema.parse(input.spaceId);
       const actorAccountId = idSchema.parse(input.actorAccountId);

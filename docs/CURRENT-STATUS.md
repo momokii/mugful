@@ -1,7 +1,7 @@
 # Current status
 
 **Last updated:** 2026-08-29
-**Phase:** Todo 7 prompt administration (7A–7C) implemented and verified; Todo 8 Guess My Answer in progress (8A persistence and 8B round service done, 8C HTTP surface next)
+**Phase:** Todo 7 prompt administration (7A–7C) implemented and verified; Todo 8 Guess My Answer in progress (8A persistence, 8B round service, and 8C HTTP surface done, 8D activity UI next)
 **Release target:** v1 invite-only beta
 **Product name:** Mugful
 **Public repository:** https://github.com/momokii/mugful
@@ -52,13 +52,13 @@
 - Couple activity web behavior beyond the implemented Todo 4/5 shell, Todo 6 onboarding, and identity flows.
 - Couple activity and realtime Fastify behavior beyond the implemented Todo 3 runtime, Todo 5 identity API, and Todo 6 onboarding API.
 - Privacy-request operations (export, correction, deletion, withdrawal, and restriction).
-- The Guess My Answer HTTP commands, activity UI, and realtime notifications (Todo 8C–8E).
+- The Guess My Answer activity UI and realtime notifications (Todo 8D–8E).
 - Production Docker Compose configurations and deployment scripts.
 - CI workflows and Docker Hub publication.
 
 ## Next recommended step
 
-Start Todo 8C round HTTP surface after reviewing the Todo 8B service evidence. Do not add privacy-request operations, video, AI, analytics, Redis, or a second activity while building v1. Complete the independent security and stability gate before production use.
+Start Todo 8D activity UI after reviewing the Todo 8C HTTP evidence. Do not add privacy-request operations, video, AI, analytics, Redis, or a second activity while building v1. Complete the independent security and stability gate before production use.
 
 ## Command status
 

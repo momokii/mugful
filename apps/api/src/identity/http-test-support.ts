@@ -14,6 +14,7 @@ import { createPromptCatalogService } from "../prompts/service.js";
 import { createSuperadminMfaService } from "../superadmin/mfa.js";
 import { createSuperadminService } from "../superadmin/service.js";
 import { createSuperadminWebauthnService } from "../superadmin/webauthn.js";
+import { createGuessMyAnswerService } from "../activities/guess-my-answer/service.js";
 
 const databaseUrl = process.env["MUGFUL_TEST_DATABASE_URL"] ?? "";
 export const databaseTestsEnabled =
@@ -88,6 +89,16 @@ export const createIdentityHttpTestContext = (
       }),
       sessionCookieName: "mugful-session",
       superadminService,
+      webOrigin: "https://mugful.test",
+    },
+    activities: {
+      csrfSecret: "c".repeat(32),
+      identityService,
+      productionCookies: false,
+      roundService: createGuessMyAnswerService({
+        repository: createIdentityRepository(pool),
+      }),
+      sessionCookieName: "mugful-session",
       webOrigin: "https://mugful.test",
     },
   });

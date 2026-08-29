@@ -74,7 +74,7 @@ Todo 8 Guess My Answer is split into checkpoints:
 - 8C: round HTTP surface — couple-membership authorization, CSRF, negative-path coverage.- 8D: activity UI — choose → answer → waiting → reveal → react flow on the shared home.
 - 8E: realtime notifications — Socket.IO presence and post-commit round events.
 
-Checkpoints 7A through 7C, Todo 8A, and Todo 8B are implemented and verified. Todo 8C is next.
+Checkpoints 7A through 7C, Todo 8A, 8B, and 8C are implemented and verified. Todo 8D is next.
 
 ## Phase 2 — v1 invite-only beta
 

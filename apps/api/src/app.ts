@@ -11,6 +11,8 @@ import type { SuperadminService } from "./superadmin/service.js";
 import type { SuperadminWebauthnService } from "./superadmin/webauthn.js";
 import type { PromptCatalogService } from "./prompts/service.js";
 import { registerSuperadminRoutes } from "./superadmin/routes.js";
+import type { GuessMyAnswerService } from "./activities/guess-my-answer/service.js";
+import { registerGuessMyAnswerRoutes } from "./activities/guess-my-answer/routes.js";
 
 export type DatabaseChecker = Readonly<{
   check: () => Promise<void>;
@@ -44,6 +46,14 @@ export type AppDependencies = Readonly<{
     promptService: PromptCatalogService;
     sessionCookieName: string;
     superadminService: SuperadminService;
+    webOrigin: string;
+  }>;
+  activities?: Readonly<{
+    csrfSecret: string;
+    identityService: IdentityService;
+    productionCookies: boolean;
+    roundService: GuessMyAnswerService;
+    sessionCookieName: string;
     webOrigin: string;
   }>;
 }>;
@@ -87,6 +97,8 @@ export const createApp = (dependencies: AppDependencies) => {
       registerCoupleRoutes(app, dependencies.couples);
     if (dependencies.superadmin !== undefined)
       registerSuperadminRoutes(app, dependencies.superadmin);
+    if (dependencies.activities !== undefined)
+      registerGuessMyAnswerRoutes(app, dependencies.activities);
 
     app.get("/openapi.json", { schema: { hide: true } }, () => app.swagger());
   });
