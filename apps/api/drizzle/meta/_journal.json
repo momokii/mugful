@@ -36,6 +36,13 @@
       "when": 1786291200004,
       "tag": "0004_couple_onboarding",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1786291200005,
+      "tag": "0005_prompt_catalog",
+      "breakpoints": true
     }
   ]
 }
