@@ -13,6 +13,10 @@ import { createIdentityService } from "./identity/service.js";
 import { tokenPepperSchema } from "./identity/token.js";
 import { inviteTokenPepperSchema } from "./couples/invite-token.js";
 import { createCoupleService } from "./couples/service.js";
+import { createPromptCatalogService } from "./prompts/service.js";
+import { createSuperadminMfaService } from "./superadmin/mfa.js";
+import { createSuperadminService } from "./superadmin/service.js";
+import { createSuperadminWebauthnService } from "./superadmin/webauthn.js";
 
 export const main = async (): Promise<void> => {
   const config = parseApiConfig(process.env);
@@ -40,6 +44,19 @@ export const main = async (): Promise<void> => {
     repository: database.identityRepository,
     sessionPepper: sessionPepperSchema.parse(config.sessionTokenPepper),
   });
+  const superadminService = createSuperadminService({
+    repository: database.identityRepository,
+  });
+  const superadminMfaService = createSuperadminMfaService({
+    repository: database.identityRepository,
+  });
+  const superadminCeremony = createSuperadminWebauthnService({
+    origin: config.webOrigin,
+    repository: database.identityRepository,
+    rpID: new URL(config.webOrigin).hostname,
+    rpName: "Mugful",
+    superadminService,
+  });
   const app = createApp({
     databaseChecker: database.checker,
     identity: {
@@ -62,6 +79,19 @@ export const main = async (): Promise<void> => {
       identityService,
       productionCookies,
       sessionCookieName: sessionCookie.name,
+      webOrigin: config.webOrigin,
+    },
+    superadmin: {
+      ceremony: superadminCeremony,
+      csrfSecret: config.csrfSecret,
+      identityService,
+      mfaService: superadminMfaService,
+      productionCookies,
+      promptService: createPromptCatalogService({
+        repository: database.identityRepository,
+      }),
+      sessionCookieName: sessionCookie.name,
+      superadminService,
       webOrigin: config.webOrigin,
     },
   });

@@ -23,14 +23,18 @@ const clientDataSchema = z.object({
 const challengeFromResponse = (
   response: RegistrationResponseJSON | AuthenticationResponseJSON,
 ): string | undefined => {
-  const parsed = clientDataSchema.safeParse(
-    JSON.parse(
-      Buffer.from(response.response.clientDataJSON, "base64url").toString(
-        "utf8",
+  try {
+    const parsed = clientDataSchema.safeParse(
+      JSON.parse(
+        Buffer.from(response.response.clientDataJSON, "base64url").toString(
+          "utf8",
+        ),
       ),
-    ),
-  );
-  return parsed.success ? parsed.data.challenge : undefined;
+    );
+    return parsed.success ? parsed.data.challenge : undefined;
+  } catch {
+    return undefined;
+  }
 };
 
 type ChallengeRow = Readonly<{ challenge: string }>;

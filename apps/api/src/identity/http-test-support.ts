@@ -10,6 +10,10 @@ import { createIdentityService } from "./service.js";
 import { tokenPepperSchema } from "./token.js";
 import { createCoupleService } from "../couples/service.js";
 import { inviteTokenPepperSchema } from "../couples/invite-token.js";
+import { createPromptCatalogService } from "../prompts/service.js";
+import { createSuperadminMfaService } from "../superadmin/mfa.js";
+import { createSuperadminService } from "../superadmin/service.js";
+import { createSuperadminWebauthnService } from "../superadmin/webauthn.js";
 
 const databaseUrl = process.env["MUGFUL_TEST_DATABASE_URL"] ?? "";
 export const databaseTestsEnabled =
@@ -39,6 +43,10 @@ export const createIdentityHttpTestContext = (
     repository: createIdentityRepository(pool),
     sessionPepper: sessionPepperSchema.parse("s".repeat(32)),
   });
+  const superadminRepository = createIdentityRepository(pool);
+  const superadminService = createSuperadminService({
+    repository: superadminRepository,
+  });
   const app = createApp({
     databaseChecker: { check: async () => undefined },
     identity: {
@@ -59,6 +67,27 @@ export const createIdentityHttpTestContext = (
       identityService,
       productionCookies: false,
       sessionCookieName: "mugful-session",
+      webOrigin: "https://mugful.test",
+    },
+    superadmin: {
+      ceremony: createSuperadminWebauthnService({
+        origin: "https://mugful.test",
+        repository: superadminRepository,
+        rpID: "mugful.test",
+        rpName: "Mugful",
+        superadminService,
+      }),
+      csrfSecret: "c".repeat(32),
+      identityService,
+      mfaService: createSuperadminMfaService({
+        repository: superadminRepository,
+      }),
+      productionCookies: false,
+      promptService: createPromptCatalogService({
+        repository: superadminRepository,
+      }),
+      sessionCookieName: "mugful-session",
+      superadminService,
       webOrigin: "https://mugful.test",
     },
   });

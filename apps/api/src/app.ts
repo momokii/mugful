@@ -6,6 +6,11 @@ import { registerCoupleRoutes } from "./couples/routes.js";
 import type { CoupleService } from "./couples/service.js";
 import type { IdentityEmailService } from "./identity/email-service.js";
 import type { IdentityService } from "./identity/service.js";
+import type { SuperadminMfaService } from "./superadmin/mfa.js";
+import type { SuperadminService } from "./superadmin/service.js";
+import type { SuperadminWebauthnService } from "./superadmin/webauthn.js";
+import type { PromptCatalogService } from "./prompts/service.js";
+import { registerSuperadminRoutes } from "./superadmin/routes.js";
 
 export type DatabaseChecker = Readonly<{
   check: () => Promise<void>;
@@ -28,6 +33,17 @@ export type AppDependencies = Readonly<{
     identityService: IdentityService;
     productionCookies: boolean;
     sessionCookieName: string;
+    webOrigin: string;
+  }>;
+  superadmin?: Readonly<{
+    ceremony: SuperadminWebauthnService;
+    csrfSecret: string;
+    identityService: IdentityService;
+    mfaService: SuperadminMfaService;
+    productionCookies: boolean;
+    promptService: PromptCatalogService;
+    sessionCookieName: string;
+    superadminService: SuperadminService;
     webOrigin: string;
   }>;
 }>;
@@ -69,6 +85,8 @@ export const createApp = (dependencies: AppDependencies) => {
       registerIdentityRoutes(app, dependencies.identity);
     if (dependencies.couples !== undefined)
       registerCoupleRoutes(app, dependencies.couples);
+    if (dependencies.superadmin !== undefined)
+      registerSuperadminRoutes(app, dependencies.superadmin);
 
     app.get("/openapi.json", { schema: { hide: true } }, () => app.swagger());
   });
