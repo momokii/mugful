@@ -63,10 +63,11 @@ Checkpoints 5A, 5B1, 5B2, 5C, 5D, 5E, and 5F are complete and accepted. Todo 6 c
 - 7B2a: superadmin authorization persistence — grant/revocation, passkey credential, and TOTP recovery storage with audit events, schema module, and real PostgreSQL verification.
 - 7B2b: superadmin MFA service — RFC 6238 TOTP verification with replay protection and the transactional grant/passkey/TOTP lifecycle, tested against real PostgreSQL.
 - 7B2c: WebAuthn ceremonies — challenge-scoped registration and authentication orchestration with single-use challenge storage, counter-advance tracking, and failure auditing.
-- 7B3: superadmin prompt administration HTTP surface with OpenAPI and negative-path coverage.
-- 7C: operational prompt tooling UI.
+- 7B3a: superadmin MFA session verification persistence — expiring, revocable, session-scoped verification records with real PostgreSQL verification.
+- 7B3b: superadmin HTTP surface — MFA-gated prompt administration routes, WebAuthn ceremony endpoints, session/grant/CSRF/MFA guards, and negative-path coverage.
+- 7C: operational prompt tooling UI — the `/superadmin` console with passkey MFA ceremony, catalog CRUD, and the documented token system.
 
-Checkpoints 7A, 7B1, 7B2a, 7B2b, and 7B2c are implemented and verified. Todo 7B3 is next.
+Checkpoints 7A through 7C are implemented and verified. Todo 8 Guess My Answer is next.
 
 ## Phase 2 — v1 invite-only beta
 
