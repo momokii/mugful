@@ -57,6 +57,13 @@
       "when": 1786291200007,
       "tag": "0007_superadmin_webauthn_challenges",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1786291200008,
+      "tag": "0008_superadmin_mfa_verifications",
+      "breakpoints": true
     }
   ]
 }
