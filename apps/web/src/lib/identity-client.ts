@@ -19,7 +19,7 @@ const messageFor = (status: number): string => {
 const request = async (path: string, init: RequestInit): Promise<ApiResult> => {
   const response = await fetch(`${api}${path}`, {
     ...init,
-    credentials: "same-origin",
+    credentials: "include",
     headers: {
       ...(init.body === undefined
         ? {}
@@ -40,7 +40,7 @@ const request = async (path: string, init: RequestInit): Promise<ApiResult> => {
 };
 
 const csrf = async (): Promise<string> => {
-  const response = await fetch(`${api}/csrf`, { credentials: "same-origin" });
+  const response = await fetch(`${api}/csrf`, { credentials: "include" });
   if (!response.ok) throw new Error("Unable to prepare a secure request.");
   const body: unknown = await response.json();
   if (
@@ -53,9 +53,12 @@ const csrf = async (): Promise<string> => {
   return body.csrfToken;
 };
 
+export const fetchJson = async (path: string): Promise<ApiResult> =>
+  request(path, {});
+
 export const mutateIdentity = async (
   path: string,
-  method: "POST" | "DELETE",
+  method: "POST" | "PUT" | "DELETE",
   body?: unknown,
 ): Promise<ApiResult> => {
   const token = await csrf();
