@@ -56,7 +56,7 @@ Each slice must include its behavior tests, documentation updates, accessibility
 - 5E: negative-path matrix and JSON-only identity OpenAPI contract.
 - 5F: Zod 4 compliance, separable Bahasa consent capture, read-only Privacy Center identity foundation, lifecycle reliability, final acceptance, and independent final review.
 
-Checkpoints 5A, 5B1, 5B2, 5C, 5D, 5E, and 5F are complete and accepted. Todo 6 couple onboarding is also complete. Todo 7 prompt administration is the current implementation slice, split into checkpoints:
+Checkpoints 5A, 5B1, 5B2, 5C, 5D, 5E, and 5F are complete and accepted. Todo 6 couple onboarding is also complete. Todo 7 prompt administration and Todo 8 Guess My Answer are complete and verified. Todo 9 deployment and operations is the current implementation slice:
 
 - 7A: prompt catalog persistence — versioned immutable prompt versions with one active version per prompt, audit events, reviewed migration, schema module unit coverage, and real PostgreSQL verification.
 - 7B1: prompt catalog service — transactional create/update/retire/list with audit events, tested against real PostgreSQL.
@@ -75,7 +75,7 @@ Todo 8 Guess My Answer is split into checkpoints:
 - 8D: activity UI — the `/home` console covering suggestion, answer lock-in, waiting, reveal, matches, and reactions.
 - 8E: realtime notifications — Socket.IO gateway with session-cookie handshake authorization, one room per couple space, post-commit event emission carrying event type and round id only, and client-side silent refresh.
 
-Todo 7 and Todo 8 are implemented and verified. Todo 9 (deployment and operations) is next.
+Todo 9 covers production Dockerfiles with pinned bases and healthchecks, a production Compose file with Traefik labels and persistent volumes, a deployment script that validates its environment, backs up, migrates, starts, checks health and retains the previous release, and encrypted backup/restore scripts with retention. Todo 9 is implemented and verified; the v1 stability gate is next.
 
 ## Phase 2 — v1 invite-only beta
 

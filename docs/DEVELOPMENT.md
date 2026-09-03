@@ -1,6 +1,6 @@
 # Development guide
 
-**Status:** 0b local runtime foundation, Todo 4 accessible web shell, Todo 5 identity foundation, and Todo 6 couple onboarding are implemented and accepted. Local development also supports an explicit fail-closed email-verification bypass. Todo 7 prompt administration (7A–7C, including the `/superadmin` tooling console) and Todo 8 Guess My Answer (8A–8E, including the `/home` activity console and realtime notifications) are implemented and verified; Todo 9 deployment and operations is next.
+**Status:** 0b local runtime foundation, Todo 4 accessible web shell, Todo 5 identity foundation, Todo 6 couple onboarding, Todo 7 prompt administration (7A–7C), Todo 8 Guess My Answer (8A–8E), and Todo 9 deployment and operations are implemented and verified. The v1 stability gate is next.
 
 This document is the handoff point for a fresh agent or contributor who does not have the conversation history.
 
@@ -43,8 +43,7 @@ Before running the build, create the ignored environment file with `cp .env.exam
 
 The following remain planned, not available yet:
 
-- Guess My Answer product behavior beyond the verified identity shell;
-- CI workflows, Docker builds, and deployment scripts.
+- CI workflows and Docker Hub publication.
 
 Do not describe planned product or deployment work as implemented.
 

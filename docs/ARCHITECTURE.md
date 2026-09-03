@@ -1,6 +1,6 @@
 # Architecture
 
-**Status:** Confirmed target architecture; local runtime and Todo 5F identity-consent foundation implemented and accepted
+**Status:** Confirmed target architecture; local runtime, Todo 5 identity, Todo 6 onboarding, Todo 7 prompt administration, Todo 8 Guess My Answer, and Todo 9 deployment and operations implemented and verified
 **Scope:** v1 LDR couples beta
 
 ## Architecture summary

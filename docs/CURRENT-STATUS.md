@@ -1,7 +1,7 @@
 # Current status
 
-**Last updated:** 2026-08-29
-**Phase:** Todo 7 prompt administration (7A–7C) and Todo 8 Guess My Answer (8A–8E) implemented and verified; Todo 9 deployment and operations is next
+**Last updated:** 2026-09-03
+**Phase:** Todo 7 prompt administration (7A–7C), Todo 8 Guess My Answer (8A–8E), and Todo 9 deployment and operations implemented and verified; v1 stability gate is next
 **Release target:** v1 invite-only beta
 **Product name:** Mugful
 **Public repository:** https://github.com/momokii/mugful
@@ -48,18 +48,16 @@
 - Todo 8B Guess My Answer round service is implemented and verified: `createGuessMyAnswerService` provides prompt suggestion (random active version with category filtering, automatic exclusion of the couple's ten most recent rounds, and explicit excludes, returning a typed exhausted state), transactional round start gated on couple membership with retired/unknown prompt rejection and one-pending enforcement, single-submission answer flow that walks `active → waiting-for-partner → ready-to-reveal` under row locks, reveal permitted only at `ready-to-reveal` and completing atomically with a case-insensitive match computation, cancellation only from the two pending states, post-completion reactions with upsert, and member-scoped views that hide the partner's answer until completion while exposing the partner-submitted flag. Seven real-PostgreSQL integration tests cover suggestion exhaustion, start gating, the submission walk with partner visibility, reveal matching, cancellation slot release, reaction windows, and unknown/foreign round guards.
 - Todo 8D Guess My Answer activity UI is implemented and verified: the shared home at `/home` renders the activity console through the shared auth shell with the documented tokens, covering checking, sign-in-required, no-space, unavailable, suggestion (random with category filter and skip re-rolls that accumulate exclusions), answer submission (trimmed 1000-character limit with lock-in), waiting (locked answer visible, partner-submitted flag without content, two-step cancellation), reveal readiness, and completed rounds with your/partner answers, case-insensitive match badge, and preset reaction buttons. All requests flow through the typed `rounds-client` with credentials, the CSRF token flow, and zod-validated responses mapped to human-readable `aria-live` notices; every module stays under the 250-line ceiling. Web unit tests cover the client helpers (14 web tests total), and typecheck, lint, formatting, and the production build (17 routes including `/home`) pass. Interactive browser verification of the full two-partner flow rides the lifecycle suite in the stability pass.
 - Todo 8E realtime notifications are implemented and verified: the Socket.IO server attaches to the Fastify HTTP server at path `/api/socket.io` (polling-compatible through the Next `/api` proxy and production path routing), handshake authorization reuses the opaque session cookie plus couple-space membership to join a single `space:<id>` room per connection, and the five round mutations emit post-commit events carrying only the event type and round id — never answer content. The `/home` console subscribes once its space state is ready, reloads its round list on every event, and disconnects on unmount. Two Socket.IO integration tests against a live server and real PostgreSQL cover event delivery through HTTP mutations and refusal of anonymous and spaceless sockets.
+- Todo 9 deployment and operations is implemented and verified: multi-stage production Dockerfiles for API and web with pinned `node:22-alpine` bases and healthchecks, a production Compose file with Traefik labels, persistent volumes and Docker Hub pinned image tags, a deployment script that validates its environment, selects an exact release, creates a backup, runs compatible migrations, starts the stack, checks health and retains the previous release for rollback (destructive migrations require explicit confirmation), and encrypted backup/restore scripts with retention. The local Tailscale deployment on `100.124.184.116:3002` is verified with `/api/health/live` and `/api/health/ready`.
 
 ## Not started
 
-- Couple activity web behavior beyond the implemented Todo 4/5 shell, Todo 6 onboarding, and identity flows.
-- Couple activity and realtime Fastify behavior beyond the implemented Todo 3 runtime, Todo 5 identity API, and Todo 6 onboarding API.
 - Privacy-request operations (export, correction, deletion, withdrawal, and restriction).
-- Production Docker Compose configurations and deployment scripts.
 - CI workflows and Docker Hub publication.
 
 ## Next recommended step
 
-Start Todo 9 deployment and operations after reviewing the Todo 8 evidence. Do not add privacy-request operations, video, AI, analytics, Redis, or a second activity while building v1. Complete the independent security and stability gate before production use.
+Begin the v1 stability gate after reviewing the Todo 9 deployment evidence. Do not add privacy-request operations, video, AI, analytics, Redis, or a second activity while building v1. Complete the independent security and stability gate before production use.
 
 ## Command status
 
