@@ -18,6 +18,13 @@ import { createSuperadminMfaService } from "./superadmin/mfa.js";
 import { createSuperadminService } from "./superadmin/service.js";
 import { createSuperadminWebauthnService } from "./superadmin/webauthn.js";
 import { createGuessMyAnswerService } from "./activities/guess-my-answer/service.js";
+import type { GuessMyAnswerService } from "./activities/guess-my-answer/service.js";
+import { Server as SocketIOServer } from "socket.io";
+import {
+  wireRealtimeGateway,
+  type RoundEventBus,
+} from "./activities/guess-my-answer/realtime.js";
+import type { IdentityService } from "./identity/service.js";
 
 export const main = async (): Promise<void> => {
   const config = parseApiConfig(process.env);
@@ -61,6 +68,23 @@ export const main = async (): Promise<void> => {
   const roundService = createGuessMyAnswerService({
     repository: database.identityRepository,
   });
+  const activitiesDependencies: {
+    csrfSecret: string;
+    events: RoundEventBus | undefined;
+    identityService: IdentityService;
+    productionCookies: boolean;
+    roundService: GuessMyAnswerService;
+    sessionCookieName: string;
+    webOrigin: string;
+  } = {
+    csrfSecret: config.csrfSecret,
+    events: undefined,
+    identityService,
+    productionCookies,
+    roundService,
+    sessionCookieName: sessionCookie.name,
+    webOrigin: config.webOrigin,
+  };
   const app = createApp({
     databaseChecker: database.checker,
     identity: {
@@ -98,21 +122,26 @@ export const main = async (): Promise<void> => {
       superadminService,
       webOrigin: config.webOrigin,
     },
-    activities: {
-      csrfSecret: config.csrfSecret,
-      identityService,
-      productionCookies,
-      roundService,
-      sessionCookieName: sessionCookie.name,
-      webOrigin: config.webOrigin,
-    },
+    activities: activitiesDependencies,
+  });
+
+  await app.ready();
+  const io = new SocketIOServer(app.server, {
+    cors: { credentials: true, origin: config.webOrigin },
+    path: "/api/socket.io",
+  });
+  activitiesDependencies.events = wireRealtimeGateway(io, {
+    identityService,
+    roundService,
+    sessionCookieName: sessionCookie.name,
   });
 
   app.addHook("onClose", async () => {
+    io.close();
     await database.close();
   });
 
-  await app.listen({ host: config.host, port: config.port });
+  await app.server.listen({ host: config.host, port: config.port });
 };
 
 void main().catch(() => {

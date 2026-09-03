@@ -1,6 +1,6 @@
 # Development guide
 
-**Status:** 0b local runtime foundation, Todo 4 accessible web shell, Todo 5 identity foundation, and Todo 6 couple onboarding are implemented and accepted. Local development also supports an explicit fail-closed email-verification bypass. Todo 7 prompt administration (7A–7C, including the `/superadmin` tooling console) is implemented and verified; Todo 8 Guess My Answer is in progress with 8A–8D verified (including the `/home` activity console) and 8E realtime notifications next.
+**Status:** 0b local runtime foundation, Todo 4 accessible web shell, Todo 5 identity foundation, and Todo 6 couple onboarding are implemented and accepted. Local development also supports an explicit fail-closed email-verification bypass. Todo 7 prompt administration (7A–7C, including the `/superadmin` tooling console) and Todo 8 Guess My Answer (8A–8E, including the `/home` activity console and realtime notifications) are implemented and verified; Todo 9 deployment and operations is next.
 
 This document is the handoff point for a fresh agent or contributor who does not have the conversation history.
 

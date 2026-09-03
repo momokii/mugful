@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { io } from "socket.io-client";
 
 import {
   fetchOwnAccountId,
@@ -35,9 +36,28 @@ export function GuessMyAnswer() {
     await refresh();
   }, [refresh]);
 
+  const loadRounds = useCallback(async () => {
+    try {
+      setState(await fetchRoundsState());
+    } catch {
+      setState({ kind: "unavailable" });
+    }
+  }, []);
+
   useEffect(() => {
     void refresh();
   }, [refresh, reloadKey]);
+
+  useEffect(() => {
+    if (state.kind !== "ready") return;
+    const socket = io({ path: "/api/socket.io", withCredentials: true });
+    socket.on("round-updated", () => {
+      void loadRounds();
+    });
+    return () => {
+      socket.disconnect();
+    };
+  }, [state.kind, loadRounds]);
 
   if (state.kind === "checking")
     return (

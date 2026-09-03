@@ -13,6 +13,7 @@ import type { PromptCatalogService } from "./prompts/service.js";
 import { registerSuperadminRoutes } from "./superadmin/routes.js";
 import type { GuessMyAnswerService } from "./activities/guess-my-answer/service.js";
 import { registerGuessMyAnswerRoutes } from "./activities/guess-my-answer/routes.js";
+import type { RoundEventBus } from "./activities/guess-my-answer/realtime.js";
 
 export type DatabaseChecker = Readonly<{
   check: () => Promise<void>;
@@ -50,6 +51,7 @@ export type AppDependencies = Readonly<{
   }>;
   activities?: Readonly<{
     csrfSecret: string;
+    events?: RoundEventBus | undefined;
     identityService: IdentityService;
     productionCookies: boolean;
     roundService: GuessMyAnswerService;

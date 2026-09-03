@@ -71,10 +71,11 @@ Todo 8 Guess My Answer is split into checkpoints:
 
 - 8A: round persistence — rounds, per-participant answers, reactions, one-pending-per-space invariant, the documented state machine as pure transitions, and real PostgreSQL verification.
 - 8B: round service — prompt suggestion with category/recent-avoidance, transactional start/submit/reveal/cancel/react, tested against real PostgreSQL.
-- 8C: round HTTP surface — couple-membership authorization, CSRF, negative-path coverage.- 8D: activity UI — choose → answer → waiting → reveal → react flow on the shared home.
-- 8E: realtime notifications — Socket.IO presence and post-commit round events.
+- 8C: round HTTP surface — couple-membership authorization, CSRF, negative-path coverage.
+- 8D: activity UI — the `/home` console covering suggestion, answer lock-in, waiting, reveal, matches, and reactions.
+- 8E: realtime notifications — Socket.IO gateway with session-cookie handshake authorization, one room per couple space, post-commit event emission carrying event type and round id only, and client-side silent refresh.
 
-Checkpoints 7A through 7C and Todo 8A, 8B, 8C, and 8D are implemented and verified. Todo 8E is next.
+Todo 7 and Todo 8 are implemented and verified. Todo 9 (deployment and operations) is next.
 
 ## Phase 2 — v1 invite-only beta
 

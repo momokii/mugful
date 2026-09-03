@@ -5,9 +5,11 @@ import { createCsrfProtection } from "../../identity/csrf.js";
 import { sessionTokenSchema } from "../../identity/session.js";
 import type { IdentityService } from "../../identity/service.js";
 import type { GuessMyAnswerService } from "./service.js";
+import type { RoundEventBus } from "./realtime.js";
 
 type GuessMyAnswerRouteDependencies = Readonly<{
   csrfSecret: string;
+  events?: RoundEventBus | undefined;
   identityService: IdentityService;
   productionCookies: boolean;
   roundService: GuessMyAnswerService;
@@ -180,6 +182,11 @@ export const registerGuessMyAnswerRoutes = (
         return sendError(reply, 400, "invalid prompt");
       if (started === "pending-exists")
         return sendError(reply, 409, "a pending round already exists");
+      dependencies.events?.roundUpdated(
+        space.spaceId,
+        started.roundId,
+        "round-started",
+      );
       return reply.code(201).send(started);
     },
   );
@@ -241,6 +248,11 @@ export const registerGuessMyAnswerRoutes = (
           return sendError(reply, 409, "answer already submitted");
         if (submitted === "round-closed")
           return sendError(reply, 409, "round no longer accepts answers");
+        dependencies.events?.roundUpdated(
+          space.spaceId,
+          roundId,
+          "answer-submitted",
+        );
         return reply.send(submitted);
       } catch {
         return sendError(reply, 400, "invalid request");
@@ -266,6 +278,11 @@ export const registerGuessMyAnswerRoutes = (
         return roundOutcomeError(reply, revealed);
       if (revealed === "not-ready")
         return sendError(reply, 409, "round is not ready to reveal");
+      dependencies.events?.roundUpdated(
+        space.spaceId,
+        roundId,
+        "round-revealed",
+      );
       return reply.send(revealed.view);
     },
   );
@@ -288,6 +305,11 @@ export const registerGuessMyAnswerRoutes = (
         return roundOutcomeError(reply, cancelled);
       if (cancelled === "not-cancellable")
         return sendError(reply, 409, "round can no longer be cancelled");
+      dependencies.events?.roundUpdated(
+        space.spaceId,
+        roundId,
+        "round-cancelled",
+      );
       return reply.send({ status: cancelled });
     },
   );
@@ -317,6 +339,11 @@ export const registerGuessMyAnswerRoutes = (
           return roundOutcomeError(reply, reacted);
         if (reacted === "not-open")
           return sendError(reply, 409, "reactions open after the reveal");
+        dependencies.events?.roundUpdated(
+          space.spaceId,
+          roundId,
+          "reaction-added",
+        );
         return reply.send({ status: reacted });
       } catch {
         return sendError(reply, 400, "invalid request");

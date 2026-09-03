@@ -11,10 +11,11 @@ import { tokenPepperSchema } from "./token.js";
 import { createCoupleService } from "../couples/service.js";
 import { inviteTokenPepperSchema } from "../couples/invite-token.js";
 import { createPromptCatalogService } from "../prompts/service.js";
+import { createGuessMyAnswerService } from "../activities/guess-my-answer/service.js";
+import type { RoundEventBus } from "../activities/guess-my-answer/realtime.js";
 import { createSuperadminMfaService } from "../superadmin/mfa.js";
 import { createSuperadminService } from "../superadmin/service.js";
 import { createSuperadminWebauthnService } from "../superadmin/webauthn.js";
-import { createGuessMyAnswerService } from "../activities/guess-my-answer/service.js";
 
 const databaseUrl = process.env["MUGFUL_TEST_DATABASE_URL"] ?? "";
 export const databaseTestsEnabled =
@@ -48,6 +49,25 @@ export const createIdentityHttpTestContext = (
   const superadminService = createSuperadminService({
     repository: superadminRepository,
   });
+  const activitiesDependencies: {
+    csrfSecret: string;
+    events: RoundEventBus | undefined;
+    identityService: typeof identityService;
+    productionCookies: boolean;
+    roundService: ReturnType<typeof createGuessMyAnswerService>;
+    sessionCookieName: string;
+    webOrigin: string;
+  } = {
+    csrfSecret: "c".repeat(32),
+    events: undefined,
+    identityService,
+    productionCookies: false,
+    roundService: createGuessMyAnswerService({
+      repository: createIdentityRepository(pool),
+    }),
+    sessionCookieName: "mugful-session",
+    webOrigin: "https://mugful.test",
+  };
   const app = createApp({
     databaseChecker: { check: async () => undefined },
     identity: {
@@ -91,19 +111,10 @@ export const createIdentityHttpTestContext = (
       superadminService,
       webOrigin: "https://mugful.test",
     },
-    activities: {
-      csrfSecret: "c".repeat(32),
-      identityService,
-      productionCookies: false,
-      roundService: createGuessMyAnswerService({
-        repository: createIdentityRepository(pool),
-      }),
-      sessionCookieName: "mugful-session",
-      webOrigin: "https://mugful.test",
-    },
+    activities: activitiesDependencies,
   });
 
-  return { app, pool };
+  return { activitiesDependencies, app, identityService, pool };
 };
 
 export const cookieFromResponse = (
