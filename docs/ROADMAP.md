@@ -4,7 +4,7 @@ This roadmap is intentionally outcome-based. A milestone is not complete because
 
 ## Current status
 
-**Phase:** Foundation through Todo 9 deployment and operations are implemented and verified; v1.1 Together Room 11A–11C are implemented and verified, 11D TURN/STUN and final verification is next.
+**Phase:** Foundation through Todo 9 deployment and operations and v1.1 Together Room 11A–11D are implemented and verified; final cross-device verification is next.
 
 Completed discovery artifacts:
 
@@ -75,7 +75,7 @@ Todo 8 Guess My Answer is split into checkpoints:
 - 8D: activity UI — the `/home` console covering suggestion, answer lock-in, waiting, reveal, matches, and reactions.
 - 8E: realtime notifications — Socket.IO gateway with session-cookie handshake authorization, one room per couple space, post-commit event emission carrying event type and round id only, and client-side silent refresh.
 
-Todo 9 covers production Dockerfiles with pinned bases and healthchecks, a production Compose file with Traefik labels and persistent volumes, a deployment script that validates its environment, backs up, migrates, starts, checks health and retains the previous release, and encrypted backup/restore scripts with retention. Todo 9 is implemented and verified; the v1 stability gate is next.
+Todo 9 covers production Dockerfiles with pinned bases and healthchecks, a production Compose file with Traefik labels and persistent volumes, a deployment script that validates its environment, backs up, migrates, starts, checks health and retains the previous release, and encrypted backup/restore scripts with retention. v1.1 Together Room 11A–11D are implemented and verified (signaling, state machine, media UI, TURN); final cross-device verification is next before the v1.1 stability gate.
 
 ## Phase 2 — v1 invite-only beta
 
