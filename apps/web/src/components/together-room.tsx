@@ -1,9 +1,17 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { io, type Socket } from "socket.io-client";
+import { useCallback, useRef, useState } from "react";
+import type { Socket } from "socket.io-client";
+
+import {
+  createCameraToggler,
+  createPeerConnection,
+  getMedia,
+  nextMuteState,
+} from "../lib/together-room-media";
 
 import styles from "./guess-my-answer.module.css";
+import { useTogetherRoomSignaling } from "./use-together-room-signaling";
 
 type CallViewState =
   | "idle"
@@ -13,8 +21,6 @@ type CallViewState =
   | "connected"
   | "ended"
   | "failed";
-
-const ICE_SERVERS: RTCIceServer[] = [{ urls: "stun:stun.l.google.com:19302" }];
 
 export function TogetherRoom() {
   const [consent, setConsent] = useState(false);
@@ -38,74 +44,46 @@ export function TogetherRoom() {
     if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
   }, []);
 
-  const createPeer = useCallback(() => {
-    const peer = new RTCPeerConnection({ iceServers: ICE_SERVERS });
-    peer.onicecandidate = (event) => {
-      if (event.candidate) {
-        socketRef.current?.emit("call:ice-candidate", {
-          candidate: event.candidate,
-        });
-      }
-    };
-    peer.ontrack = (event) => {
-      const [stream] = event.streams;
-      if (remoteVideoRef.current && stream)
-        remoteVideoRef.current.srcObject = stream;
-      if (remoteAudioRef.current && stream)
-        remoteAudioRef.current.srcObject = stream;
-    };
-    peer.onconnectionstatechange = () => {
-      if (peer.connectionState === "connected") setState("connected");
-      if (peer.connectionState === "failed") setState("failed");
-    };
-    return peer;
-  }, []);
+  const createPeer = useCallback(
+    () =>
+      createPeerConnection(
+        (candidate) =>
+          socketRef.current?.emit("call:ice-candidate", { candidate }),
+        (stream) => {
+          if (remoteVideoRef.current) remoteVideoRef.current.srcObject = stream;
+          if (remoteAudioRef.current) remoteAudioRef.current.srcObject = stream;
+        },
+        (state) => {
+          if (state === "connected") setState("connected");
+          if (state === "failed") setState("failed");
+        },
+      ),
+    [],
+  );
 
-  useEffect(() => {
-    const socket = io({ path: "/api/socket.io", withCredentials: true });
-    socketRef.current = socket;
-    socket.on("call:offer", async ({ sdp }: { sdp: string }) => {
+  useTogetherRoomSignaling(
+    socketRef,
+    (sdp) => {
       setState("incoming-ringing");
-      (socket as unknown as { _pendingOffer?: string })._pendingOffer = sdp;
-    });
-    socket.on("call:answer", async ({ sdp }: { sdp: string }) => {
+      (
+        socketRef.current as unknown as { _pendingOffer?: string }
+      )._pendingOffer = sdp;
+    },
+    async (sdp) => {
       const peer = pcRef.current;
       if (!peer) return;
       await peer.setRemoteDescription({ sdp, type: "answer" });
       setState("connecting");
-    });
-    socket.on(
-      "call:ice-candidate",
-      async ({ candidate }: { candidate: RTCIceCandidateInit }) => {
-        try {
-          await pcRef.current?.addIceCandidate(candidate);
-        } catch {
-          setNotice("ICE candidate failed. One restart will be tried.");
-        }
-      },
-    );
-    socket.on("call:hangup", () => {
+    },
+    async (candidate) => {
+      await pcRef.current?.addIceCandidate(candidate);
+    },
+    () => {
       cleanup();
       setState("ended");
-    });
-    socket.on("connect_error", () =>
-      setNotice("Realtime unavailable. Calls need an active space."),
-    );
-    return () => {
-      socket.disconnect();
-    };
-  }, [cleanup, createPeer]);
-
-  const getMedia = async (withVideo: boolean): Promise<MediaStream> => {
-    try {
-      return await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: withVideo,
-      });
-    } catch {
-      return navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-    }
-  };
+    },
+    (message) => setNotice(message),
+  );
 
   const startCall = async () => {
     if (!consent) {
@@ -155,46 +133,17 @@ export function TogetherRoom() {
     setState("ended");
   };
 
-  const toggleMute = () => {
-    const next = !muted;
-    localStreamRef.current?.getAudioTracks().forEach((track) => {
-      track.enabled = !next;
-    });
-    setMuted(next);
-  };
+  const toggleMute = () =>
+    setMuted(nextMuteState(localStreamRef.current, muted));
 
-  const toggleCamera = async () => {
-    const next = !cameraOff;
-    if (next) {
-      localStreamRef.current?.getVideoTracks().forEach((track) => {
-        track.enabled = false;
-      });
-      setCameraOff(true);
-      return;
-    }
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      const videoTrack = stream.getVideoTracks()[0];
-      if (videoTrack && pcRef.current && localStreamRef.current) {
-        const sender = pcRef.current
-          .getSenders()
-          .find((sender) => sender.track?.kind === "video");
-        if (sender) await sender.replaceTrack(videoTrack);
-        localStreamRef.current
-          .getVideoTracks()
-          .forEach((track) => track.stop());
-        localStreamRef.current.removeTrack(
-          localStreamRef.current.getVideoTracks()[0]!,
-        );
-        localStreamRef.current.addTrack(videoTrack);
-        if (localVideoRef.current)
-          localVideoRef.current.srcObject = localStreamRef.current;
-      }
-      setCameraOff(false);
-    } catch {
-      setNotice("Camera unavailable. Staying audio-only.");
-    }
-  };
+  const toggleCamera = createCameraToggler(
+    localStreamRef,
+    pcRef,
+    localVideoRef,
+    () => cameraOff,
+    setCameraOff,
+    setNotice,
+  );
 
   return (
     <section className={styles.card} aria-labelledby="together-room-title">
