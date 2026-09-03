@@ -125,7 +125,6 @@ export const main = async (): Promise<void> => {
     activities: activitiesDependencies,
   });
 
-  await app.ready();
   const io = new SocketIOServer(app.server, {
     cors: { credentials: true, origin: config.webOrigin },
     path: "/api/socket.io",
@@ -141,6 +140,7 @@ export const main = async (): Promise<void> => {
     await database.close();
   });
 
+  await app.ready();
   await app.server.listen({ host: config.host, port: config.port });
 };
 
