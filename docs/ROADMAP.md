@@ -4,7 +4,7 @@ This roadmap is intentionally outcome-based. A milestone is not complete because
 
 ## Current status
 
-**Phase:** Foundation, Todo 5 identity, and Todo 6 couple onboarding are accepted; Todo 7 prompt administration is next.
+**Phase:** Foundation through Todo 9 deployment and operations are implemented and verified; v1.1 Together Room 11A–11C are implemented and verified, 11D TURN/STUN and final verification is next.
 
 Completed discovery artifacts:
 

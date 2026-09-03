@@ -1,6 +1,6 @@
 # Development guide
 
-**Status:** 0b local runtime foundation, Todo 4 accessible web shell, Todo 5 identity foundation, Todo 6 couple onboarding, Todo 7 prompt administration (7A–7C), Todo 8 Guess My Answer (8A–8E), and Todo 9 deployment and operations are implemented and verified. The v1 stability gate is next.
+**Status:** 0b local runtime foundation, Todo 4 accessible web shell, Todo 5 identity foundation, Todo 6 couple onboarding, Todo 7 prompt administration (7A–7C), Todo 8 Guess My Answer (8A–8E), and Todo 9 deployment and operations are implemented and verified. 11D TURN/STUN and final verification is next.
 
 This document is the handoff point for a fresh agent or contributor who does not have the conversation history.
 
