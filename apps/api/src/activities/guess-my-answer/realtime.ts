@@ -63,6 +63,53 @@ export const wireRealtimeGateway = (
     next();
   });
 
+  io.on("connection", (socket) => {
+    socket.on("call:offer", (payload: unknown) => {
+      if (
+        typeof payload !== "object" ||
+        payload === null ||
+        typeof (payload as { sdp?: unknown }).sdp !== "string"
+      )
+        return;
+      socket
+        .to(roundRoomName(socket.data.spaceId as string))
+        .emit("call:offer", {
+          from: socket.data.accountId as string,
+          sdp: (payload as { sdp: string }).sdp,
+        });
+    });
+    socket.on("call:answer", (payload: unknown) => {
+      if (
+        typeof payload !== "object" ||
+        payload === null ||
+        typeof (payload as { sdp?: unknown }).sdp !== "string"
+      )
+        return;
+      socket
+        .to(roundRoomName(socket.data.spaceId as string))
+        .emit("call:answer", {
+          from: socket.data.accountId as string,
+          sdp: (payload as { sdp: string }).sdp,
+        });
+    });
+    socket.on("call:ice-candidate", (payload: unknown) => {
+      if (typeof payload !== "object" || payload === null) return;
+      const candidate = (payload as { candidate?: unknown }).candidate;
+      if (typeof candidate !== "object" || candidate === null) return;
+      socket
+        .to(roundRoomName(socket.data.spaceId as string))
+        .emit("call:ice-candidate", {
+          candidate,
+          from: socket.data.accountId as string,
+        });
+    });
+    socket.on("call:hangup", () => {
+      socket
+        .to(roundRoomName(socket.data.spaceId as string))
+        .emit("call:hangup", { from: socket.data.accountId as string });
+    });
+  });
+
   return {
     roundUpdated: (spaceId, roundId, type) => {
       io.to(roundRoomName(spaceId)).emit("round-updated", { roundId, type });
