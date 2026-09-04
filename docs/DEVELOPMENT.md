@@ -1,6 +1,6 @@
 # Development guide
 
-**Status:** 0b local runtime foundation, Todo 4 accessible web shell, Todo 5 identity foundation, Todo 6 couple onboarding, Todo 7 prompt administration (7A–7C), Todo 8 Guess My Answer (8A–8E), and Todo 9 deployment and operations are implemented and verified. final verification and two-network/iOS Safari cross-device testing is next.
+**Status:** 0b local runtime foundation, Todo 4 accessible web shell, Todo 5 identity foundation, Todo 6 couple onboarding, Todo 7 prompt administration (7A–7C), Todo 8 Guess My Answer (8A–8E), Todo 9 deployment and operations, v1.1 Together Room 11A–11D, and privacy-request operations are implemented and verified. The v1 stability gate is next.
 
 This document is the handoff point for a fresh agent or contributor who does not have the conversation history.
 

@@ -4,7 +4,7 @@ This roadmap is intentionally outcome-based. A milestone is not complete because
 
 ## Current status
 
-**Phase:** Foundation through Todo 9 deployment and operations and v1.1 Together Room 11A–11D are implemented and verified; v1 stability gate final verification is next.
+**Phase:** Foundation through Todo 9 deployment and operations, v1.1 Together Room 11A–11D, and privacy-request operations are implemented and verified; v1 stability gate is next.
 
 Completed discovery artifacts:
 
@@ -74,6 +74,8 @@ Todo 8 Guess My Answer is split into checkpoints:
 - 8C: round HTTP surface — couple-membership authorization, CSRF, negative-path coverage.
 - 8D: activity UI — the `/home` console covering suggestion, answer lock-in, waiting, reveal, matches, and reactions.
 - 8E: realtime notifications — Socket.IO gateway with session-cookie handshake authorization, one room per couple space, post-commit event emission carrying event type and round id only, and client-side silent refresh.
+
+Privacy-request operations cover export, correction, 30-day deletion, withdrawal, and idempotent restriction/lift with audit, tested against real PostgreSQL and exposed through the Bahasa-first Privacy Center.
 
 Todo 9 covers production Dockerfiles with pinned bases and healthchecks, a production Compose file with Traefik labels and persistent volumes, a deployment script that validates its environment, backs up, migrates, starts, checks health and retains the previous release, and encrypted backup/restore scripts with retention. v1.1 Together Room 11A–11D are implemented and verified (signaling, state machine, media UI, TURN); final cross-device verification is next before the v1.1 stability gate.
 
