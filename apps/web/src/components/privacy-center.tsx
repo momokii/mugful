@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { PrivacyOperations } from "./privacy-operations";
 import styles from "./auth-shell.module.css";
 
 type Consent = Readonly<{
@@ -130,6 +131,7 @@ export function PrivacyCenter() {
           </Link>
         </p>
       </section>
+      <PrivacyOperations />
       <section
         className={styles.security}
         aria-labelledby="legal-notices-title"
@@ -138,10 +140,6 @@ export function PrivacyCenter() {
         <p className={styles.footerLink}>
           <Link href="/legal/terms">Syarat dan Ketentuan</Link> ·{" "}
           <Link href="/legal/privacy">Pemberitahuan Privasi</Link>
-        </p>
-        <p className={styles.hint}>
-          Permintaan akses, koreksi, penghapusan, penarikan persetujuan, dan
-          pembatasan pemrosesan belum tersedia di versi ini.
         </p>
       </section>
     </>
