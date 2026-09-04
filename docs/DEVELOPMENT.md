@@ -41,11 +41,7 @@ Before running the build, create the ignored environment file with `cp .env.exam
 - `scripts/run-auth-lifecycle.sh`, which creates an isolated PostgreSQL/Mailpit lifecycle and runs API/OpenAPI plus real-Chromium enabled/default-closed flows, including the authenticated Privacy Center, at 375px, 768px, and 1280px;
 - `pnpm dev`, which compiles and prints labels from the two shell entry points.
 
-The following remain planned, not available yet:
-
-- CI workflows and Docker Hub publication.
-
-Do not describe planned product or deployment work as implemented.
+All planned product slices (including Guess My Answer and Together Room) and deployment automation (Dockerfiles, production Compose, deployment and backup scripts) are now implemented and verified; only privacy-request operations remain as a future v1 slice.
 
 ## Locked stack
 

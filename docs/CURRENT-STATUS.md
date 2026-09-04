@@ -1,7 +1,7 @@
 # Current status
 
 **Last updated:** 2026-09-03
-**Phase:** Todo 7 prompt administration (7A–7C), Todo 8 Guess My Answer (8A–8E), Todo 9 deployment and operations, and v1.1 Together Room 11A–11D are implemented and verified; final cross-device verification is next
+**Phase:** Todo 7 prompt administration (7A–7C), Todo 8 Guess My Answer (8A–8E), Todo 9 deployment and operations, and v1.1 Together Room 11A–11D are implemented and verified; v1 invite-only beta is next
 **Release target:** v1 invite-only beta
 **Product name:** Mugful
 **Public repository:** https://github.com/momokii/mugful
@@ -54,11 +54,10 @@
 ## Not started
 
 - Privacy-request operations (export, correction, deletion, withdrawal, and restriction).
-- CI workflows and Docker Hub publication.
 
 ## Next recommended step
 
-Begin final cross-device verification (two different networks, iOS Safari) for the Together Room after reviewing the 11D evidence. Do not add privacy-request operations, video, AI, analytics, Redis, or a second activity while building v1. Complete the independent security and stability gate before production use.
+Complete the v1 stability gate final checks (full test suite, security review, backup/restore verification, a11y visual QA) after reviewing the Together Room evidence. Do not add privacy-request operations, additional video features, AI, analytics, Redis, or a second activity while building v1.
 
 ## Command status
 

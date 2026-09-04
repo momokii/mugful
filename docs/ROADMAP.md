@@ -4,7 +4,7 @@ This roadmap is intentionally outcome-based. A milestone is not complete because
 
 ## Current status
 
-**Phase:** Foundation through Todo 9 deployment and operations and v1.1 Together Room 11A–11D are implemented and verified; final cross-device verification is next.
+**Phase:** Foundation through Todo 9 deployment and operations and v1.1 Together Room 11A–11D are implemented and verified; v1 stability gate final verification is next.
 
 Completed discovery artifacts:
 
