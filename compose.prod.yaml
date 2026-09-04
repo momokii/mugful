@@ -26,7 +26,7 @@ services:
       - internal
 
   api:
-    image: ${DOCKER_REGISTRY:-docker.io}/${DOCKER_USER:?Set DOCKER_USER}/mugful-api:${IMAGE_TAG:?Set IMAGE_TAG}
+    image: ${DOCKER_REGISTRY:-docker.io}/${DOCKER_USER:-momokii}/mugful-api:${IMAGE_TAG:-latest}
     restart: unless-stopped
     env_file:
       - .env
@@ -34,9 +34,13 @@ services:
       NODE_ENV: production
       API_HOST: 0.0.0.0
       API_PORT: 3001
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      LOCAL_AUTH_BYPASS_EMAIL_VERIFICATION: "false"
     depends_on:
       postgres:
         condition: service_healthy
+    ports:
+      - "127.0.0.1:3001:3001"
     expose:
       - "3001"
     healthcheck:
@@ -54,7 +58,7 @@ services:
       - web
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.mugful-api.rule=Host(`${TRAEFIK_HOST:?Set TRAEFIK_HOST}`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.mugful-api.rule=Host(`${TRAEFIK_HOST:-mugful.local}`) && PathPrefix(`/api`)"
       - "traefik.http.routers.mugful-api.entrypoints=websecure"
       - "traefik.http.routers.mugful-api.tls.certresolver=myresolver"
       - "traefik.http.services.mugful-api.loadbalancer.server.port=3001"
@@ -65,7 +69,7 @@ services:
         max-file: "3"
 
   web:
-    image: ${DOCKER_REGISTRY:-docker.io}/${DOCKER_USER:?Set DOCKER_USER}/mugful-web:${IMAGE_TAG:?Set IMAGE_TAG}
+    image: ${DOCKER_REGISTRY:-docker.io}/${DOCKER_USER:-momokii}/mugful-web:${IMAGE_TAG:-latest}
     restart: unless-stopped
     env_file:
       - .env
@@ -75,6 +79,8 @@ services:
     depends_on:
       api:
         condition: service_healthy
+    ports:
+      - "127.0.0.1:3002:3000"
     expose:
       - "3000"
     healthcheck:
@@ -91,7 +97,7 @@ services:
       - web
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.mugful-web.rule=Host(`${TRAEFIK_HOST}`)"
+      - "traefik.http.routers.mugful-web.rule=Host(`${TRAEFIK_HOST:-mugful.local}`)"
       - "traefik.http.routers.mugful-web.entrypoints=websecure"
       - "traefik.http.routers.mugful-web.tls.certresolver=myresolver"
       - "traefik.http.services.mugful-web.loadbalancer.server.port=3000"
