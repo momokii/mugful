@@ -1,7 +1,7 @@
 # Current status
 
 **Last updated:** 2026-09-03
-**Phase:** Todo 7 prompt administration (7A–7C), Todo 8 Guess My Answer (8A–8E), Todo 9 deployment and operations, v1.1 Together Room 11A–11D, and privacy-request operations are implemented and verified; v1 stability gate is next
+**Phase:** Todo 7 prompt administration (7A–7C), Todo 8 Guess My Answer (8A–8E), Todo 9 deployment and operations, v1.1 Together Room 11A–11D, and privacy-request operations are implemented and verified; v1 is ready for invite-only beta
 **Release target:** v1 invite-only beta
 **Product name:** Mugful
 **Public repository:** https://github.com/momokii/mugful
@@ -54,11 +54,11 @@
 
 ## Not started
 
-- All v1 product slices are implemented; only the v1 stability gate remains.
+- No v1 product slices remain. Future milestones (True E2EE, additional activities, AI) are gated behind design, DPIA, and legal review per ROADMAP.
 
 ## Next recommended step
 
-Complete the v1 stability gate final checks (full test suite, security review, backup/restore verification, a11y visual QA) after reviewing the Together Room evidence. Do not add privacy-request operations, additional video features, AI, analytics, Redis, or a second activity while building v1.
+Invite a small set of real couples per ROADMAP Phase 2 (invite-only beta) with registration disabled by default. Observe first-round completion, return rate, async flow, mobile reconnect, prompt quality, and operational burden. Do not add True E2EE, additional activities, or AI until the v1.1 stability gate passes and the explicit design and legal prerequisites are met.
 
 ## Command status
 

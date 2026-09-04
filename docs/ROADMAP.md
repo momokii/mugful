@@ -4,7 +4,7 @@ This roadmap is intentionally outcome-based. A milestone is not complete because
 
 ## Current status
 
-**Phase:** Foundation through Todo 9 deployment and operations, v1.1 Together Room 11A–11D, and privacy-request operations are implemented and verified; v1 stability gate is next.
+**Phase:** Foundation through v1.1 Together Room and privacy-request operations are implemented and verified; v1 is ready for invite-only beta.
 
 Completed discovery artifacts:
 
