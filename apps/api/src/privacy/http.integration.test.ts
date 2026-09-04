@@ -88,7 +88,7 @@ describe.skipIf(!databaseTestsEnabled)("privacy HTTP surface", () => {
     expect(missingCsrf.statusCode).toBe(403);
   });
 
-  it("exports, corrects, deletes, withdraws, and restricts through HTTP", async () => {
+  it("exports, corrects, deletes, withdraws, and restricts through HTTP with persistence", async () => {
     // Given: an account with consents and a session
     const accountId = await createAccount();
     const cookie = await createSessionCookie(accountId);
@@ -113,6 +113,11 @@ describe.skipIf(!databaseTestsEnabled)("privacy HTTP surface", () => {
     });
     expect(corrected.statusCode).toBe(200);
     expect(corrected.json()).toEqual({ status: "corrected" });
+    const correctedRow = await pool.query<{ display_name: string }>(
+      "SELECT display_name FROM accounts WHERE id = $1",
+      [accountId],
+    );
+    expect(correctedRow.rows[0]?.display_name).toBe("Corrected Name");
 
     // When: deletion is requested twice
     const deleted = await app.inject({
@@ -121,6 +126,13 @@ describe.skipIf(!databaseTestsEnabled)("privacy HTTP surface", () => {
       url: "/v1/privacy/deletion",
       payload: {},
     });
+    const deletedRow = await pool.query<{
+      deletion_grace_ends_at: Date;
+      deletion_requested_at: Date;
+    }>(
+      "SELECT deletion_requested_at, deletion_grace_ends_at FROM accounts WHERE id = $1",
+      [accountId],
+    );
     const deletedAgain = await app.inject({
       method: "POST",
       headers: await headersFor(cookie),
@@ -128,6 +140,11 @@ describe.skipIf(!databaseTestsEnabled)("privacy HTTP surface", () => {
       payload: {},
     });
     expect(deleted.json()).toEqual({ status: "deleted" });
+    expect(deletedRow.rows[0]?.deletion_requested_at).toBeInstanceOf(Date);
+    expect(
+      (deletedRow.rows[0]?.deletion_grace_ends_at.getTime() ?? 0) -
+        (deletedRow.rows[0]?.deletion_requested_at.getTime() ?? 0),
+    ).toBeGreaterThan(29 * 24 * 60 * 60 * 1000);
     expect(deletedAgain.json()).toEqual({ status: "already-requested" });
 
     // When: consent is withdrawn twice
@@ -137,6 +154,10 @@ describe.skipIf(!databaseTestsEnabled)("privacy HTTP surface", () => {
       url: "/v1/privacy/withdrawal",
       payload: {},
     });
+    const withdrawnRow = await pool.query<{ withdrawn_at: Date | null }>(
+      "SELECT withdrawn_at FROM account_consents WHERE account_id = $1 AND kind = 'privacy'",
+      [accountId],
+    );
     const withdrawnAgain = await app.inject({
       method: "POST",
       headers: await headersFor(cookie),
@@ -144,6 +165,7 @@ describe.skipIf(!databaseTestsEnabled)("privacy HTTP surface", () => {
       payload: {},
     });
     expect(withdrawn.json()).toEqual({ status: "withdrawn" });
+    expect(withdrawnRow.rows[0]?.withdrawn_at).toBeInstanceOf(Date);
     expect(withdrawnAgain.json()).toEqual({ status: "already-withdrawn" });
 
     // When: processing is restricted and lifted
@@ -153,6 +175,10 @@ describe.skipIf(!databaseTestsEnabled)("privacy HTTP surface", () => {
       url: "/v1/privacy/restriction",
       payload: { reason: "Need review" },
     });
+    const restrictedRow = await pool.query<{ reason: string | null }>(
+      "SELECT reason FROM account_processing_restrictions WHERE account_id = $1",
+      [accountId],
+    );
     const restrictedAgain = await app.inject({
       method: "POST",
       headers: await headersFor(cookie),
@@ -165,8 +191,67 @@ describe.skipIf(!databaseTestsEnabled)("privacy HTTP surface", () => {
       url: "/v1/privacy/restriction/lift",
       payload: {},
     });
+    const liftedRow = await pool.query<{ lifted_at: Date | null }>(
+      "SELECT lifted_at FROM account_processing_restrictions WHERE account_id = $1",
+      [accountId],
+    );
     expect(restricted.json()).toEqual({ status: "restricted" });
+    expect(restrictedRow.rows[0]?.reason).toBe("Need review");
     expect(restrictedAgain.json()).toEqual({ status: "already-restricted" });
     expect(lifted.json()).toEqual({ status: "lifted" });
+    expect(liftedRow.rows[0]?.lifted_at).toBeInstanceOf(Date);
+  });
+
+  it("rejects malformed correction, enforces idempotency on lift, and isolates accounts", async () => {
+    // Given: two accounts, one with a prior restriction
+    const accountId = await createAccount();
+    const otherId = await createAccount();
+    const cookie = await createSessionCookie(accountId);
+    const otherCookie = await createSessionCookie(otherId);
+    await app.inject({
+      method: "POST",
+      headers: await headersFor(cookie),
+      url: "/v1/privacy/restriction",
+      payload: { reason: "Initial" },
+    });
+    await app.inject({
+      method: "POST",
+      headers: await headersFor(cookie),
+      url: "/v1/privacy/restriction/lift",
+      payload: {},
+    });
+
+    // When: malformed correction, second lift, and cross-account export are attempted
+    const malformed = await app.inject({
+      method: "POST",
+      headers: await headersFor(cookie),
+      url: "/v1/privacy/correction",
+      payload: { displayName: "   " },
+    });
+    const secondLift = await app.inject({
+      method: "POST",
+      headers: await headersFor(cookie),
+      url: "/v1/privacy/restriction/lift",
+      payload: {},
+    });
+    const otherExport = await app.inject({
+      method: "GET",
+      headers: await headersFor(otherCookie),
+      url: "/v1/privacy/export",
+    });
+
+    // Then: malformed input is 400, second lift is not-restricted, and accounts stay isolated
+    expect(malformed.statusCode).toBe(400);
+    expect(secondLift.json()).toEqual({ status: "not-restricted" });
+    expect(otherExport.statusCode).toBe(200);
+    expect(
+      otherExport.json<{ account: { displayName: string } }>().account
+        .displayName,
+    ).toBe("Privacy");
+    const unchanged = await pool.query<{ display_name: string }>(
+      "SELECT display_name FROM accounts WHERE id = $1",
+      [accountId],
+    );
+    expect(unchanged.rows[0]?.display_name).toBe("Privacy");
   });
 });

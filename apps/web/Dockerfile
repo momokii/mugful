@@ -17,6 +17,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/packages ./packages
 COPY --from=deps /app/apps ./apps
 COPY . .
+RUN mkdir -p apps/web/public
 RUN pnpm --filter @mugful/contracts build
 RUN pnpm --filter @mugful/web build
 

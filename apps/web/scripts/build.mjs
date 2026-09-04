@@ -24,10 +24,17 @@ export const createChildEnvironment = (
 
 export const runBuild = ({ baseline, loadEnvironment, spawn }) => {
   const { combinedEnv } = loadEnvironment(workspaceRoot);
+  const apiOrigin =
+    combinedEnv.API_INTERNAL_ORIGIN ??
+    baseline.API_INTERNAL_ORIGIN ??
+    "http://api:3001";
+  const registrationFlag =
+    combinedEnv.NEXT_PUBLIC_REGISTRATION_ENABLED ??
+    baseline.NEXT_PUBLIC_REGISTRATION_ENABLED;
   const childEnvironment = createChildEnvironment(
     baseline,
-    combinedEnv.API_INTERNAL_ORIGIN,
-    combinedEnv.NEXT_PUBLIC_REGISTRATION_ENABLED,
+    apiOrigin,
+    registrationFlag,
   );
 
   return spawn("next", ["build"], {
