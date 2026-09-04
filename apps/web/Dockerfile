@@ -32,7 +32,7 @@ COPY --from=builder /app/apps/web/.next ./.next
 COPY --from=builder /app/apps/web/next.config.ts ./next.config.ts
 COPY --from=builder /app/apps/web/public ./public
 COPY --from=builder /app/packages ./packages
-RUN chown -R appuser:appgroup /app && chown -R appuser:appgroup /pnpm
+RUN chown -R appuser:appgroup /app
 USER appuser
 EXPOSE 3000
 HEALTHCHECK --interval=10s --timeout=3s --retries=5 --start-period=10s CMD wget -qO- http://127.0.0.1:3000/api/health/live | grep -q '"status":"live"' || exit 1
