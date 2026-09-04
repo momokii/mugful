@@ -20,7 +20,7 @@ COPY . .
 RUN mkdir -p apps/web/public
 RUN pnpm --filter @mugful/contracts build
 RUN pnpm --filter @mugful/web build
-RUN pnpm --filter @mugful/web deploy --prod /app/deploy --legacy
+RUN pnpm --filter @mugful/web deploy /app/deploy --legacy
 
 FROM base AS runner
 ENV NODE_ENV=production
