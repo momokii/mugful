@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:17.10-bookworm
+        env:
+          POSTGRES_DB: mugful
+          POSTGRES_USER: mugful
+          POSTGRES_PASSWORD: ci-only-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -h 127.0.0.1 -U mugful -d mugful"
+          --health-interval=5s
+          --health-timeout=3s
+          --health-retries=10
+      mailpit:
+        image: axllent/mailpit:v1.28.2
+        ports:
+          - 1025:1025
+          - 8025:8025
+    env:
+      DATABASE_URL: postgresql://mugful:ci-only-password@127.0.0.1:5432/mugful
+      MUGFUL_TEST_DATABASE_URL: postgresql://mugful:ci-only-password@127.0.0.1:5432/mugful
+      MUGFUL_RUN_DATABASE_TESTS: "true"
+      MUGFUL_TEST_MAILPIT_URL: http://127.0.0.1:8025
+      MUGFUL_TEST_SMTP_PORT: "1025"
+      API_INTERNAL_ORIGIN: http://127.0.0.1:3001
+      NEXT_PUBLIC_REGISTRATION_ENABLED: "false"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.20.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Format check
+        run: pnpm format:check
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      - name: Docker build (api)
+        run: docker build -f apps/api/Dockerfile -t mugful-api:ci .
+
+      - name: Docker build (web)
+        run: docker build -f apps/web/Dockerfile -t mugful-web:ci .
+
+      - name: Compose config (prod)
+        run: DOCKER_USER=test IMAGE_TAG=test TRAEFIK_HOST=example.test docker compose -f compose.yaml -f compose.prod.yaml config >/dev/null
+
+      - name: Secret scan (no committed secrets)
+        run: |
+          ! grep -R --exclude-dir=node_modules --exclude-dir=.git -E "BEGIN (RSA|EC) PRIVATE KEY|sk_live|ghp_" . || (echo "Potential secret found" && exit 1)
+          echo "No obvious secrets found"
