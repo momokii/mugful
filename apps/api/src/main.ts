@@ -19,6 +19,7 @@ import { createSuperadminService } from "./superadmin/service.js";
 import { createSuperadminWebauthnService } from "./superadmin/webauthn.js";
 import { createGuessMyAnswerService } from "./activities/guess-my-answer/service.js";
 import type { GuessMyAnswerService } from "./activities/guess-my-answer/service.js";
+import { createPrivacyService } from "./privacy/service.js";
 import { Server as SocketIOServer } from "socket.io";
 import {
   wireRealtimeGateway,
@@ -66,6 +67,9 @@ export const main = async (): Promise<void> => {
     superadminService,
   });
   const roundService = createGuessMyAnswerService({
+    repository: database.identityRepository,
+  });
+  const privacyService = createPrivacyService({
     repository: database.identityRepository,
   });
   const activitiesDependencies: {
@@ -123,6 +127,14 @@ export const main = async (): Promise<void> => {
       webOrigin: config.webOrigin,
     },
     activities: activitiesDependencies,
+    privacy: {
+      csrfSecret: config.csrfSecret,
+      identityService,
+      privacyService,
+      productionCookies,
+      sessionCookieName: sessionCookie.name,
+      webOrigin: config.webOrigin,
+    },
   });
 
   const io = new SocketIOServer(app.server, {

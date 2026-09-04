@@ -14,6 +14,8 @@ import { registerSuperadminRoutes } from "./superadmin/routes.js";
 import type { GuessMyAnswerService } from "./activities/guess-my-answer/service.js";
 import { registerGuessMyAnswerRoutes } from "./activities/guess-my-answer/routes.js";
 import type { RoundEventBus } from "./activities/guess-my-answer/realtime.js";
+import type { PrivacyService } from "./privacy/service.js";
+import { registerPrivacyRoutes } from "./privacy/routes.js";
 
 export type DatabaseChecker = Readonly<{
   check: () => Promise<void>;
@@ -55,6 +57,14 @@ export type AppDependencies = Readonly<{
     identityService: IdentityService;
     productionCookies: boolean;
     roundService: GuessMyAnswerService;
+    sessionCookieName: string;
+    webOrigin: string;
+  }>;
+  privacy?: Readonly<{
+    csrfSecret: string;
+    identityService: IdentityService;
+    privacyService: PrivacyService;
+    productionCookies: boolean;
     sessionCookieName: string;
     webOrigin: string;
   }>;
@@ -101,6 +111,8 @@ export const createApp = (dependencies: AppDependencies) => {
       registerSuperadminRoutes(app, dependencies.superadmin);
     if (dependencies.activities !== undefined)
       registerGuessMyAnswerRoutes(app, dependencies.activities);
+    if (dependencies.privacy !== undefined)
+      registerPrivacyRoutes(app, dependencies.privacy);
 
     app.get("/openapi.json", { schema: { hide: true } }, () => app.swagger());
   });

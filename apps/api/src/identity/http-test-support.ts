@@ -13,6 +13,7 @@ import { inviteTokenPepperSchema } from "../couples/invite-token.js";
 import { createPromptCatalogService } from "../prompts/service.js";
 import { createGuessMyAnswerService } from "../activities/guess-my-answer/service.js";
 import type { RoundEventBus } from "../activities/guess-my-answer/realtime.js";
+import { createPrivacyService } from "../privacy/service.js";
 import { createSuperadminMfaService } from "../superadmin/mfa.js";
 import { createSuperadminService } from "../superadmin/service.js";
 import { createSuperadminWebauthnService } from "../superadmin/webauthn.js";
@@ -112,6 +113,16 @@ export const createIdentityHttpTestContext = (
       webOrigin: "https://mugful.test",
     },
     activities: activitiesDependencies,
+    privacy: {
+      csrfSecret: "c".repeat(32),
+      identityService,
+      privacyService: createPrivacyService({
+        repository: createIdentityRepository(pool),
+      }),
+      productionCookies: false,
+      sessionCookieName: "mugful-session",
+      webOrigin: "https://mugful.test",
+    },
   });
 
   return { activitiesDependencies, app, identityService, pool };
