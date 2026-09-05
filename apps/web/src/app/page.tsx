@@ -1,9 +1,26 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 import { SiteHeader } from "../components/site-header";
 import styles from "./page.module.css";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const cookieStore = await cookies();
+  const cookieHeader = cookieStore.toString();
+  if (cookieHeader.length > 0) {
+    try {
+      const apiOrigin =
+        process.env["API_INTERNAL_ORIGIN"] ?? "http://127.0.0.1:3001";
+      const response = await fetch(`${apiOrigin}/v1/auth/session`, {
+        cache: "no-store",
+        headers: { cookie: cookieHeader },
+      });
+      if (response.ok) redirect("/home");
+    } catch {
+      void 0;
+    }
+  }
   return (
     <div className={styles.page}>
       <SiteHeader />

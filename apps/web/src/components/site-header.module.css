@@ -49,7 +49,9 @@
 }
 
 .signInLink,
-.headerAction {
+.headerAction,
+.navLink,
+.superadminLink {
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;
@@ -61,6 +63,21 @@
 }
 
 .signInLink:hover {
+  color: var(--text-primary);
+}
+
+.navLink {
+  color: var(--text-secondary);
+}
+
+.navLink:hover {
+  color: var(--text-primary);
+}
+
+.superadminLink {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--surface-secondary);
   color: var(--text-primary);
 }
 
@@ -77,6 +94,118 @@
 .headerAction:hover {
   background: var(--accent-hover);
   color: var(--surface-elevated);
+}
+
+.userMenu {
+  position: relative;
+}
+
+.avatarButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-control);
+  background: var(--surface-elevated);
+  cursor: pointer;
+}
+
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--accent-hover);
+  color: var(--surface-elevated);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.userEmail {
+  max-width: 180px;
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rolePill,
+.rolePillAdmin {
+  padding: 2px var(--space-2);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.rolePill {
+  background: var(--surface-secondary);
+  color: var(--text-secondary);
+}
+
+.rolePillAdmin {
+  background: var(--text-primary);
+  color: var(--surface-elevated);
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  z-index: 20;
+  min-width: 220px;
+  padding: var(--space-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-control);
+  background: var(--surface-elevated);
+  box-shadow: var(--shadow-soft);
+}
+
+.dropdownHeader {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: var(--space-2);
+}
+
+.dropdownEmail {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.dropdownRole {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.dropdownItem,
+.dropdownItemLogout {
+  display: block;
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.dropdownItem:hover,
+.dropdownItemLogout:hover {
+  background: var(--surface-secondary);
+}
+
+.dropdownItemLogout:disabled {
+  opacity: 0.6;
 }
 
 @media (max-width: 640px) {

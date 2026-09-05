@@ -17,11 +17,17 @@ const sessionSchema = z.object({ email: z.string(), expiresAt: z.string() });
 
 const sessionResponseSchema = z.object({ session: sessionSchema }).loose();
 
+const superadminStatusSchema = z
+  .object({ superadmin: z.boolean(), mfaVerified: z.boolean() })
+  .loose();
+
 export type Session = Readonly<{ email: string; expiresAt: string }>;
+
+export type SessionRole = "member" | "admin";
 
 export type SessionStatus =
   | Readonly<{ kind: "loading" }>
-  | Readonly<{ kind: "authenticated"; session: Session }>
+  | Readonly<{ kind: "authenticated"; session: Session; role: SessionRole }>
   | Readonly<{ kind: "unauthenticated" }>;
 
 export const parseSessionResponse = (body: unknown): Session | undefined => {
@@ -35,6 +41,13 @@ const fetchSession = async (): Promise<Session | undefined> => {
   const response = await fetchJson("/auth/session");
   if (response.status !== 200) return undefined;
   return parseSessionResponse(response.body);
+};
+
+const fetchRole = async (): Promise<SessionRole> => {
+  const response = await fetchJson("/superadmin/status");
+  if (response.status !== 200) return "member";
+  const parsed = superadminStatusSchema.safeParse(response.body);
+  return parsed.success && parsed.data.superadmin ? "admin" : "member";
 };
 
 type SessionContextValue = Readonly<{
@@ -54,11 +67,12 @@ export function SessionProvider({
   const refresh = useCallback(async () => {
     try {
       const session = await fetchSession();
-      setStatus(
-        session === undefined
-          ? { kind: "unauthenticated" }
-          : { kind: "authenticated", session },
-      );
+      if (session === undefined) {
+        setStatus({ kind: "unauthenticated" });
+        return;
+      }
+      const role = await fetchRole();
+      setStatus({ kind: "authenticated", session, role });
     } catch {
       setStatus({ kind: "unauthenticated" });
     }

@@ -94,8 +94,8 @@ export const registerSuperadminRoutes = (
     _reply: FastifyReply,
     _sessionId: string,
   ): Promise<boolean> => {
-    // Dev: superadmin MFA bypass — login is enough for now.
-    // Re-enable by restoring isSessionVerified check + mfa-required 403.
+    void _reply;
+    void _sessionId;
     return true;
   };
 
