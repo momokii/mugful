@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+
 import { AuthShell } from "../../components/auth-shell";
 import { IdentityForm } from "../../components/identity-form";
 
@@ -6,7 +9,21 @@ export const metadata: Metadata = {
   title: "Create your space",
 };
 
-export default function RegisterPage() {
+export default async function RegisterPage() {
+  const cookieHeader = (await cookies()).toString();
+  if (cookieHeader.length > 0) {
+    try {
+      const apiOrigin =
+        process.env["API_INTERNAL_ORIGIN"] ?? "http://127.0.0.1:3001";
+      const response = await fetch(`${apiOrigin}/v1/auth/session`, {
+        cache: "no-store",
+        headers: { cookie: cookieHeader },
+      });
+      if (response.ok) redirect("/home");
+    } catch {
+      void 0;
+    }
+  }
   const registrationEnabled =
     process.env["NEXT_PUBLIC_REGISTRATION_ENABLED"] === "true";
 
