@@ -47,6 +47,12 @@ const apiConfigSchema = z
       .enum(["true", "false"])
       .transform((value) => value === "true"),
     SMTP_USER: z.string().min(1).optional(),
+    SUPERADMIN_BOOTSTRAP_EMAIL: z
+      .string()
+      .email()
+      .max(320)
+      .default("admin@mugful.test"),
+    SUPERADMIN_BOOTSTRAP_PASSWORD: z.string().min(12).max(256).default("MugfulAdmin123!"),
     WEB_ORIGIN: webOriginSchema,
   })
   .superRefine((value, context) => {
@@ -84,6 +90,8 @@ export type ApiConfig = Readonly<{
     secure: boolean;
     username: string | undefined;
   }>;
+  superadminBootstrapEmail: string;
+  superadminBootstrapPassword: string;
   webOrigin: string;
 }>;
 
@@ -126,6 +134,8 @@ export const parseApiConfig = (environment: Environment): ApiConfig => {
       secure: result.data.SMTP_SECURE,
       username: result.data.SMTP_USER,
     },
+    superadminBootstrapEmail: result.data.SUPERADMIN_BOOTSTRAP_EMAIL,
+    superadminBootstrapPassword: result.data.SUPERADMIN_BOOTSTRAP_PASSWORD,
     webOrigin: result.data.WEB_ORIGIN.replace(/\/$/, ""),
   };
 };
