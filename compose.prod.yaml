@@ -40,7 +40,7 @@ services:
       postgres:
         condition: service_healthy
     ports:
-      - "127.0.0.1:3001:3001"
+      - "0.0.0.0:3001:3001"
     expose:
       - "3001"
     healthcheck:
@@ -80,7 +80,7 @@ services:
       api:
         condition: service_healthy
     ports:
-      - "127.0.0.1:3002:3000"
+      - "0.0.0.0:3002:3000"
     expose:
       - "3000"
     healthcheck:
