@@ -78,6 +78,10 @@ The API and web dev servers can also run as plain `pnpm` processes on the host i
 - If you don't already know the current private-network address or exposure setup for a given session, ask the user rather than assuming or reusing one from an earlier session.
 - Tear down manually started processes explicitly (`kill` the PID or `pnpm` process); nothing here is cleaned up automatically like the isolated lifecycle script.
 
+### Running the production Compose stack
+
+`compose.prod.yaml` runs both the API and web images with `NODE_ENV=production`; their Dockerfiles start `node dist/main.js` and `next start` respectively. Before starting it, set `WEB_ORIGIN` to the exact browser origin, including scheme, host, and port. The cookie policy follows that scheme: HTTPS receives `__Host-*` secure cookies, while trusted Tailscale/LAN HTTP receives plain non-`Secure` cookies so browser sessions work without TLS. Verify the rendered configuration with `docker compose -f compose.prod.yaml config`, start it with `docker compose -f compose.prod.yaml up -d`, and check `docker compose -f compose.prod.yaml ps` before using the stack.
+
 Todo 5A migration verification also runs `MUGFUL_RUN_DATABASE_TESTS=true DATABASE_URL=<local URL> pnpm --filter @mugful/api test -- src/identity/schema.integration.test.ts` after the manual migration. The test is skipped unless explicitly enabled so ordinary unit runs do not require PostgreSQL.
 
 Todo 5B2 HTTP verification requires a manually migrated, isolated PostgreSQL database and runs `MUGFUL_RUN_DATABASE_TESTS=true MUGFUL_TEST_DATABASE_URL=<isolated URL> pnpm --filter @mugful/api test -- src/identity/http-auth.integration.test.ts src/identity/http-session.integration.test.ts`. The suite uses Fastify injection against the real database; application startup does not execute migrations.

@@ -43,6 +43,12 @@ Zod validates API and server-side web configuration. Invalid values fail with ge
 | Observability     | Health endpoint and uptime configuration                          | Usually no              |
 | Future providers  | AI or TURN settings only when their roadmap milestone is approved | Yes                     |
 
+## Browser origin and cookie policy
+
+- `WEB_ORIGIN` must exactly equal the origin in the browser address bar, including scheme, host, and port. Cookie-authenticated mutations require that exact `Origin` header as part of CSRF protection.
+- Cookie names and the `Secure` attribute derive from the `WEB_ORIGIN` scheme, not from `NODE_ENV`. An `https:` origin uses `__Host-mugful-session` and `__Host-mugful-csrf` with `Secure`; an `http:` origin uses the plain `mugful-session` and `mugful-csrf` names without `Secure`.
+- Plain HTTP is intended only for trusted Tailscale or LAN access. Use HTTPS for Internet-facing deployments.
+
 ## Secret handling
 
 - Local development uses an ignored environment file populated from safe placeholders.
