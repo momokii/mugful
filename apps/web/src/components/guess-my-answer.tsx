@@ -8,6 +8,7 @@ import {
   fetchOwnAccountId,
   fetchRoundsState,
   findPendingRound,
+  isPendingRound,
   unavailableMessage,
   type RoundsState,
 } from "../lib/rounds-client";
