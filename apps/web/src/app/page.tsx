@@ -19,7 +19,10 @@ export default async function HomePage() {
         headers: { cookie: cookieHeader },
       });
       if (response.ok) redirect("/home");
-    } catch {
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : String(error);
+      if (message.includes("NEXT_REDIRECT")) throw error;
       void 0;
     }
   }
