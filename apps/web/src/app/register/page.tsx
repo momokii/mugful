@@ -9,6 +9,8 @@ export const metadata: Metadata = {
   title: "Create your space",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function RegisterPage() {
   const cookieHeader = (await cookies()).toString();
   if (cookieHeader.length > 0) {

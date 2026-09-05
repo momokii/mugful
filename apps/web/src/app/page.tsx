@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { SiteHeader } from "../components/site-header";
 import styles from "./page.module.css";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const cookieStore = await cookies();
   const cookieHeader = cookieStore.toString();
