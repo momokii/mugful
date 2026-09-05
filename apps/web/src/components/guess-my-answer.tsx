@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { io } from "socket.io-client";
 
 import {
+  deleteRound,
   fetchOwnAccountId,
   fetchRoundsState,
   findPendingRound,
@@ -104,6 +105,7 @@ export function GuessMyAnswer() {
       </div>
     );
 
+  const pendings = state.rounds.filter(isPendingRound);
   const pending = findPendingRound(state.rounds);
   const archived = state.rounds.filter(
     (round) => round.status === "completed" || round.status === "cancelled",
@@ -122,24 +124,31 @@ export function GuessMyAnswer() {
 
   return (
     <div className={styles.console}>
-      {pending === undefined ? (
-        <GuessMyAnswerStart onStarted={reload} />
-      ) : (
-        <>
-          <section aria-labelledby="active-round-title" className={styles.history}>
-            <h2 id="active-round-title">Active round</h2>
-            <div className={styles.completedCard} style={{ borderStyle: "solid", borderColor: "var(--accent-primary)" }}>
+      <GuessMyAnswerStart onStarted={reload} />
+      {pendings.length > 0 && (
+        <section aria-labelledby="active-round-title" className={styles.history}>
+          <h2 id="active-round-title">
+            Active {pendings.length === 1 ? "round" : `rounds (${pendings.length})`}
+          </h2>
+          {pendings.map((round) => (
+            <div
+              key={round.roundId}
+              className={styles.completedCard}
+              style={{ borderStyle: "solid", borderColor: "var(--accent-primary)", marginBottom: "var(--space-3)" }}
+            >
               <p className={styles.promptMeta}>
-                {pending.category} · {formatRelative(pending.createdAt)} · started by {pending.ownAnswer !== undefined ? "you" : "partner"} · with your partner
+                {round.category} · {formatRelative(round.createdAt)} · started by{" "}
+                {round.createdByAccountId === accountId ? "you" : round.partnerEmail ?? "partner"} · with{" "}
+                {round.partnerEmail ?? "your partner"}
               </p>
               <p className={styles.promptText} style={{ fontSize: "15px" }}>
-                {pending.promptText}
+                {round.promptText}
               </p>
-              <p className={styles.hint}>Status: {pending.status.replace(/-/g, " ")}</p>
+              <p className={styles.hint}>Status: {round.status.replace(/-/g, " ")}</p>
             </div>
-          </section>
-          <GuessMyAnswerPending onReload={reload} round={pending} />
-        </>
+          ))}
+          {pending && <GuessMyAnswerPending onReload={reload} round={pending} />}
+        </section>
       )}
       <section
         aria-labelledby="round-history-title"
@@ -166,27 +175,76 @@ export function GuessMyAnswer() {
                 }
               >
                 {round.status === "completed" ? (
-                  <GuessMyAnswerCompleted
-                    accountId={accountId}
-                    onReload={reload}
-                    round={round}
-                  />
+                  <>
+                    <GuessMyAnswerCompleted
+                      accountId={accountId}
+                      onReload={reload}
+                      round={round}
+                    />
+                    <button
+                      className={styles.secondary}
+                      style={{ marginTop: "var(--space-2)" }}
+                      onClick={async () => {
+                        if (!confirm("Delete this history for both of you?")) return;
+                        const result = await deleteRound(round.roundId);
+                        if (result.ok) await reload();
+                        else alert(result.message);
+                      }}
+                      type="button"
+                    >
+                      Delete history
+                    </button>
+                  </>
                 ) : isPendingRound(round) ? (
                   <>
                     <p className={styles.promptText} style={{ fontSize: "15px" }}>
                       {round.promptText}
                     </p>
                     <p className={styles.promptMeta}>
-                      {round.category} · {formatRelative(round.createdAt)} · {round.status.replace(/-/g, " ")} · with partner
+                      {round.category} · {formatRelative(round.createdAt)} · {round.status.replace(/-/g, " ")} · with{" "}
+                      {round.partnerEmail ?? "your partner"} · started by{" "}
+                      {round.createdByAccountId === accountId
+                        ? "you"
+                        : round.partnerEmail ?? "partner"}
                     </p>
+                    <button
+                      className={styles.secondary}
+                      style={{ marginTop: "var(--space-2)" }}
+                      onClick={async () => {
+                        if (!confirm("Delete this round for both of you?")) return;
+                        const result = await deleteRound(round.roundId);
+                        if (result.ok) await reload();
+                        else alert(result.message);
+                      }}
+                      type="button"
+                    >
+                      Delete history
+                    </button>
                   </>
                 ) : (
                   <>
                     Cancelled — {round.promptText}
                     <br />
                     <span className={styles.promptMeta}>
-                      {round.category} · {formatRelative(round.createdAt)}
+                      {round.category} · {formatRelative(round.createdAt)} · with{" "}
+                      {round.partnerEmail ?? "your partner"} · started by{" "}
+                      {round.createdByAccountId === accountId
+                        ? "you"
+                        : round.partnerEmail ?? "partner"}
                     </span>
+                    <button
+                      className={styles.secondary}
+                      style={{ marginTop: "var(--space-2)" }}
+                      onClick={async () => {
+                        if (!confirm("Delete this history for both of you?")) return;
+                        const result = await deleteRound(round.roundId);
+                        if (result.ok) await reload();
+                        else alert(result.message);
+                      }}
+                      type="button"
+                    >
+                      Delete history
+                    </button>
                   </>
                 )}
               </li>

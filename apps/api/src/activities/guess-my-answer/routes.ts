@@ -314,6 +314,27 @@ export const registerGuessMyAnswerRoutes = (
     },
   );
 
+  app.delete(
+    "/v1/activities/guess-my-answer/rounds/:roundId",
+    { schema: { hide: true } },
+    async (request, reply) => {
+      if (!verifyUnsafeRequest(request))
+        return sendError(reply, 403, "forbidden");
+      const roundId = roundParameters(request, reply);
+      if (roundId === undefined) return reply;
+      const space = await requireSpace(request, reply);
+      if (space === undefined) return reply;
+      const deleted = await dependencies.roundService.deleteRound({
+        actorAccountId: space.accountId,
+        roundId,
+      });
+      if (deleted === "not-member" || deleted === "unknown-round")
+        return roundOutcomeError(reply, deleted);
+      dependencies.events?.roundUpdated(space.spaceId, roundId, "round-deleted");
+      return reply.send({ status: deleted });
+    },
+  );
+
   app.post(
     "/v1/activities/guess-my-answer/rounds/:roundId/react",
     { schema: { hide: true } },

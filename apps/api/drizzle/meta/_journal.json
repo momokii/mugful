@@ -78,6 +78,13 @@
       "when": 1786291200010,
       "tag": "0010_privacy_requests",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1786291200011,
+      "tag": "0011_allow_multiple_pending_rounds",
+      "breakpoints": true
     }
   ]
 }

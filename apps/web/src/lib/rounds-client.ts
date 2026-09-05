@@ -26,8 +26,11 @@ export type RoundView = Readonly<{
   answers: RoundAnswerView[] | undefined;
   category: string;
   createdAt: string;
+  createdByAccountId: string | undefined;
   match: boolean | undefined;
   ownAnswer: string | undefined;
+  partnerAccountId: string | undefined;
+  partnerEmail: string | undefined;
   partnerSubmitted: boolean | undefined;
   promptText: string;
   promptVersionId: string;
@@ -72,8 +75,11 @@ const roundViewSchema = z
       .optional(),
     category: z.string(),
     createdAt: z.string(),
+    createdByAccountId: z.string().optional(),
     match: z.boolean().nullable().optional(),
     ownAnswer: z.string().nullable().optional(),
+    partnerAccountId: z.string().nullable().optional(),
+    partnerEmail: z.string().nullable().optional(),
     partnerSubmitted: z.boolean().nullable().optional(),
     promptText: z.string(),
     promptVersionId: z.string(),
@@ -98,8 +104,11 @@ const toRoundView = (round: ParsedRoundView): RoundView => ({
   answers: round.answers,
   category: round.category,
   createdAt: round.createdAt,
+  createdByAccountId: round.createdByAccountId ?? undefined,
   match: round.match ?? undefined,
   ownAnswer: round.ownAnswer ?? undefined,
+  partnerAccountId: round.partnerAccountId ?? undefined,
+  partnerEmail: round.partnerEmail ?? undefined,
   partnerSubmitted: round.partnerSubmitted ?? undefined,
   promptText: round.promptText,
   promptVersionId: round.promptVersionId,
@@ -219,6 +228,17 @@ export const cancelRound = async (
   const response = await mutateIdentity(
     `/activities/guess-my-answer/rounds/${roundId}/cancel`,
     "POST",
+  );
+  if (response.status === 200) return { data: null, ok: true };
+  return { message: messageForStatus(response.status), ok: false };
+};
+
+export const deleteRound = async (
+  roundId: string,
+): Promise<CommandResult<null>> => {
+  const response = await mutateIdentity(
+    `/activities/guess-my-answer/rounds/${roundId}`,
+    "DELETE",
   );
   if (response.status === 200) return { data: null, ok: true };
   return { message: messageForStatus(response.status), ok: false };

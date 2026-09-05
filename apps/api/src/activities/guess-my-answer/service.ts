@@ -58,8 +58,11 @@ export type RoundView = Readonly<{
   answers: readonly RoundAnswerView[] | undefined;
   category: string;
   createdAt: Date;
+  createdByAccountId: string;
   match: boolean | undefined;
   ownAnswer: string | undefined;
+  partnerAccountId: string | undefined;
+  partnerEmail: string | undefined;
   partnerSubmitted: boolean | undefined;
   promptText: string;
   promptVersionId: string;
@@ -209,6 +212,13 @@ export const createGuessMyAnswerService = (
         )
       : undefined;
     const [firstAnswer, secondAnswer] = answers;
+    const partnerRow = await dependencies.repository.query<
+      Readonly<{ account_id: string; email: string }>
+    >(
+      "SELECT cm.account_id, a.email FROM couple_memberships cm JOIN accounts a ON a.id = cm.account_id WHERE cm.couple_space_id = $1 AND cm.account_id <> $2 AND cm.revoked_at IS NULL LIMIT 1",
+      [round.couple_space_id, actorAccountId],
+    );
+    const partner = partnerRow.rows[0];
     return {
       answers: completed
         ? answers.map((row) => ({
@@ -218,12 +228,15 @@ export const createGuessMyAnswerService = (
         : undefined,
       category: promptRow.category,
       createdAt: round.created_at,
+      createdByAccountId: round.created_by_account_id,
       match: completed
         ? firstAnswer !== undefined &&
           secondAnswer !== undefined &&
           firstAnswer.answer.toLowerCase() === secondAnswer.answer.toLowerCase()
         : undefined,
       ownAnswer: own?.answer,
+      partnerAccountId: partner?.account_id,
+      partnerEmail: partner?.email,
       partnerSubmitted,
       promptText: promptRow.text,
       promptVersionId: promptRow.id,
@@ -392,6 +405,25 @@ export const createGuessMyAnswerService = (
           [roundId, actorAccountId],
         );
         return "cancelled";
+      });
+    },
+
+    deleteRound: async (input) => {
+      const roundId = idSchema.parse(input.roundId);
+      const actorAccountId = idSchema.parse(input.actorAccountId);
+      return dependencies.repository.transaction(async (transaction) => {
+        const round = await loadRoundForUpdate(transaction, roundId);
+        if (round === undefined) return "unknown-round";
+        if (!(await assertMember(round.couple_space_id, actorAccountId)))
+          return "not-member";
+        await transaction.query("DELETE FROM round_reactions WHERE round_id = $1", [
+          roundId,
+        ]);
+        await transaction.query("DELETE FROM round_answers WHERE round_id = $1", [
+          roundId,
+        ]);
+        await transaction.query("DELETE FROM rounds WHERE id = $1", [roundId]);
+        return "deleted";
       });
     },
 
