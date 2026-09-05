@@ -17,6 +17,10 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/packages ./packages
 COPY --from=deps /app/apps ./apps
 COPY . .
+ARG NEXT_PUBLIC_REGISTRATION_ENABLED=true
+ARG API_INTERNAL_ORIGIN=http://api:3001
+ENV NEXT_PUBLIC_REGISTRATION_ENABLED=$NEXT_PUBLIC_REGISTRATION_ENABLED
+ENV API_INTERNAL_ORIGIN=$API_INTERNAL_ORIGIN
 RUN mkdir -p apps/web/public
 RUN pnpm --filter @mugful/contracts build
 RUN pnpm --filter @mugful/web build
