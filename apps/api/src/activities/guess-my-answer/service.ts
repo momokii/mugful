@@ -95,6 +95,9 @@ export type GuessMyAnswerService = Readonly<{
       spaceId: string;
     }>,
   ) => Promise<readonly RoundView[] | "not-member">;
+  deleteRound: (
+    input: Readonly<{ actorAccountId: string; roundId: string }>,
+  ) => Promise<"deleted" | "not-member" | "unknown-round">;
   reactToRound: (
     input: Readonly<{
       actorAccountId: string;
@@ -408,7 +411,7 @@ export const createGuessMyAnswerService = (
       });
     },
 
-    deleteRound: async (input) => {
+    deleteRound: async (input: Readonly<{ actorAccountId: string; roundId: string }>) => {
       const roundId = idSchema.parse(input.roundId);
       const actorAccountId = idSchema.parse(input.actorAccountId);
       return dependencies.repository.transaction(async (transaction) => {

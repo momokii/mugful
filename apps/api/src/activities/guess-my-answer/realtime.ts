@@ -8,6 +8,7 @@ export type RoundEventType =
   | "answer-submitted"
   | "reaction-added"
   | "round-cancelled"
+  | "round-deleted"
   | "round-revealed"
   | "round-started";
 
