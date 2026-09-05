@@ -1,0 +1,4 @@
+services:
+  mailpit:
+    ports: !override
+      - "0.0.0.0:${MAILPIT_UI_PORT:-8025}:8025"

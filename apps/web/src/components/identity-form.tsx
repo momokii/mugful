@@ -111,7 +111,7 @@ export function IdentityForm({ mode }: Readonly<{ mode: IdentityFormMode }>) {
                 ? "If email verification is required, check your email for a verification link. If you do not receive one, check your spam folder or try signing in if you already have an account."
                 : "Done. Check your email or continue with your account.",
         );
-        if (mode === "login") window.location.assign("/settings/security");
+        if (mode === "login") window.location.assign("/home");
       } else setMessage(identityMessage(response));
     } catch (error) {
       setMessage(

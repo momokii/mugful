@@ -24,6 +24,102 @@ describe.skipIf(!databaseTestsEnabled)(
       await context.pool.end();
     });
 
+    const setCookieNamed = (
+      value: string | string[] | number | undefined,
+      name: string,
+    ): string => {
+      const headers =
+        value === undefined ? [] : Array.isArray(value) ? value : [value];
+      const cookie = headers.find(
+        (candidate): candidate is string =>
+          typeof candidate === "string" && candidate.startsWith(`${name}=`),
+      );
+      if (cookie === undefined) throw new Error(`Expected a ${name} cookie`);
+      return cookie;
+    };
+
+    const maxAgeSecondsOf = (cookie: string): number => {
+      const attribute = cookie
+        .split(";")
+        .map((part) => part.trim())
+        .find((part) => part.startsWith("Max-Age="));
+      if (attribute === undefined)
+        throw new Error("Expected a Max-Age attribute");
+      return Number(attribute.slice("Max-Age=".length));
+    };
+
+    const seedVerifiedAccount = async (): Promise<void> => {
+      const passwordHash = await hashPassword("correct horse battery staple");
+      await context.pool.query(
+        "INSERT INTO accounts (email, normalized_email, display_name, password_hash, email_verified_at) VALUES ('ada@example.test', 'ada@example.test', 'Ada', $1, NOW())",
+        [passwordHash],
+      );
+    };
+
+    it("issues session and csrf cookies that share the full session lifetime", async () => {
+      // Given: a verified seeded account and a valid CSRF exchange
+      await seedVerifiedAccount();
+      const csrf = await csrfFor(context.app);
+
+      // When: valid credentials log in and a fresh CSRF cookie is issued
+      const login = await context.app.inject({
+        method: "POST",
+        url: "/v1/auth/login",
+        headers: unsafeHeaders({ cookie: csrf.cookie, csrfToken: csrf.token }),
+        payload: {
+          email: "ada@example.test",
+          password: "correct horse battery staple",
+        },
+      });
+      const csrfIssue = await context.app.inject({
+        method: "GET",
+        url: "/v1/csrf",
+      });
+
+      // Then: both cookies carry the 30-day session lifetime with the unchanged policy
+      expect(login.statusCode).toBe(200);
+      const sessionCookie = setCookieNamed(
+        login.headers["set-cookie"],
+        "mugful-session",
+      );
+      expect(sessionCookie).toContain("HttpOnly");
+      expect(sessionCookie).toContain("SameSite=Lax");
+      expect(sessionCookie).not.toContain("Secure");
+      const sessionMaxAge = maxAgeSecondsOf(sessionCookie);
+      expect(sessionMaxAge).toBeGreaterThan(2_591_900);
+      expect(sessionMaxAge).toBeLessThanOrEqual(2_592_000);
+      expect(
+        maxAgeSecondsOf(
+          setCookieNamed(csrfIssue.headers["set-cookie"], "mugful-csrf"),
+        ),
+      ).toBe(2_592_000);
+    });
+
+    it("rejects cross-origin unsafe logins without mutating any cookie", async () => {
+      // Given: a verified seeded account and a valid CSRF exchange
+      await seedVerifiedAccount();
+      const csrf = await csrfFor(context.app);
+
+      // When: a login arrives from a foreign origin
+      const rejected = await context.app.inject({
+        method: "POST",
+        url: "/v1/auth/login",
+        headers: {
+          cookie: csrf.cookie,
+          "x-csrf-token": csrf.token,
+          origin: "https://attacker.test",
+        },
+        payload: {
+          email: "ada@example.test",
+          password: "correct horse battery staple",
+        },
+      });
+
+      // Then: the mutation is forbidden and no cookie is set or rotated
+      expect(rejected.statusCode).toBe(403);
+      expect(rejected.headers["set-cookie"]).toBeUndefined();
+    });
+
     it("rejects registration while the default policy is closed", async () => {
       // Given: an API whose registration configuration is explicitly closed
       const closed = createIdentityHttpTestContext(false);

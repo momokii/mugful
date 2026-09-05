@@ -2,6 +2,12 @@ import { expect, test } from "@playwright/test";
 
 const baseUrl = process.env["PLAYWRIGHT_BASE_URL"] ?? "http://127.0.0.1:3100";
 const routes = ["/", "/login", "/register"] as const;
+const gatedRoutes = [
+  "/home",
+  "/onboarding",
+  "/privacy",
+  "/settings/security",
+] as const;
 const colorSchemes = ["light", "dark"] as const;
 
 const relativeLuminance = (
@@ -39,6 +45,18 @@ const contrastRatio = (foreground: string, background: string): number => {
   const darker = Math.min(foregroundLuminance, backgroundLuminance);
   return (lighter + 0.05) / (darker + 0.05);
 };
+
+test.describe("authenticated route gating", () => {
+  for (const route of gatedRoutes) {
+    test(`unauthenticated GET ${route} redirects to /login`, async ({
+      request,
+    }) => {
+      const response = await request.get(route, { maxRedirects: 0 });
+      expect(response.status()).toBe(307);
+      expect(response.headers()["location"]).toBe("/login");
+    });
+  }
+});
 
 test.describe("public and auth shell", () => {
   for (const route of routes) {
@@ -190,5 +208,23 @@ test.describe("public and auth shell", () => {
     await expect(page.getByLabel("Create a password")).toHaveValue(
       "eight-char",
     );
+  });
+
+  test("unauthenticated header links wordmark home and offers sign in", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    const header = page.locator("header");
+    await expect(
+      header.getByRole("link", { name: "Mugful home" }),
+    ).toHaveAttribute("href", "/");
+    await expect(header.getByRole("link", { name: "Sign in" })).toHaveAttribute(
+      "href",
+      "/login",
+    );
+    await expect(
+      header.getByRole("link", { name: "Create your space" }),
+    ).toHaveAttribute("href", "/register");
   });
 });

@@ -25,6 +25,29 @@
   gap: var(--space-6);
 }
 
+.loadingWordmark,
+.loadingSignIn,
+.loadingAction {
+  display: block;
+  border-radius: var(--radius-control);
+  background: var(--surface-secondary);
+}
+
+.loadingWordmark {
+  width: calc(var(--space-12) + var(--space-2));
+  height: var(--space-6);
+}
+
+.loadingSignIn {
+  width: calc(var(--space-10) + var(--space-2));
+  height: var(--space-4);
+}
+
+.loadingAction {
+  width: calc(var(--space-12) + var(--space-8));
+  height: var(--space-8);
+}
+
 .signInLink,
 .headerAction {
   font-size: 14px;

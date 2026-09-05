@@ -29,7 +29,7 @@ type SessionCookieTiming = Readonly<{
   now: Date;
 }>;
 
-type SessionCookiePolicy = Readonly<{
+export type SessionCookiePolicy = Readonly<{
   name: string;
   secure: boolean;
 }>;
@@ -109,3 +109,14 @@ export const buildLocalDevelopmentSessionCookieOptions = (
     { expires: input.expiresAt, now: input.now },
     localDevelopmentCookiePolicy,
   );
+
+export const sessionCookiePolicyForPublicOrigin = (
+  origin: string,
+): SessionCookiePolicy => {
+  const { protocol } = new URL(origin);
+  if (protocol === "https:") return productionCookiePolicy;
+  if (protocol === "http:") return localDevelopmentCookiePolicy;
+  throw new Error(
+    `Unsupported public-origin scheme for session cookies: ${origin}`,
+  );
+};

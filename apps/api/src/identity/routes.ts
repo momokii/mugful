@@ -7,6 +7,7 @@ import { identityOpenApiSchemas } from "./openapi.js";
 import type { IdentityEmailService } from "./email-service.js";
 import { registerIdentityEmailRoutes } from "./email-routes.js";
 import { sessionTokenSchema } from "./session.js";
+import { sessionLifetimeSeconds } from "./session-store.js";
 import type { IdentityService } from "./service.js";
 
 const registrationSchema = z
@@ -84,7 +85,7 @@ const setCsrfCookie = (
     : "mugful-csrf";
   reply.header(
     "set-cookie",
-    `${name}=${value}; ${cookieAttributes({ httpOnly: false, maxAge: 60 * 60, production: dependencies.productionCookies })}`,
+    `${name}=${value}; ${cookieAttributes({ httpOnly: false, maxAge: sessionLifetimeSeconds, production: dependencies.productionCookies })}`,
   );
 };
 

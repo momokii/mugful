@@ -53,6 +53,7 @@ Zod validates API and server-side web configuration. Invalid values fail with ge
 
 - Local development uses an ignored environment file populated from safe placeholders.
 - Mailpit is used only locally and in isolated integration runtimes so development does not send real email.
+- Mailpit is a development/test mail sink, never a production email provider. Its SMTP and inbox ports bind only to `127.0.0.1` in the base and production Compose configuration because captured verification and reset links are sensitive. For trusted Tailscale-only manual testing, opt in to exposing only its UI with `docker compose -f compose.yaml -f compose.prod.yaml -f compose.tailscale.yaml up -d`; do not use that override for a production deployment.
 - The API validates SMTP configuration at startup but never logs the SMTP URL, credentials, message body, or identity tokens.
 - Production values live outside the repository in a restricted VPS secret file or an approved secret manager.
 - `REGISTRATION_DEFAULT_ENABLED` controls whether the API accepts public registration; `NEXT_PUBLIC_REGISTRATION_ENABLED` controls only whether the web page renders the form. Both must be true for local public registration.

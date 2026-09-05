@@ -8,7 +8,8 @@ import {
   type SessionToken,
 } from "./session.js";
 
-const sessionLifetimeMilliseconds = 1000 * 60 * 60 * 24 * 30;
+export const sessionLifetimeSeconds = 60 * 60 * 24 * 30;
+export const sessionLifetimeMilliseconds = sessionLifetimeSeconds * 1000;
 
 export type AuthenticatedSession = Readonly<{
   accountId: string;

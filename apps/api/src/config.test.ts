@@ -196,4 +196,28 @@ describe("parseApiConfig", () => {
     // Then: an origin-only policy rejects the path
     expect(parse).toThrow("Invalid API configuration");
   });
+
+  it("normalizes a trailing slash on the web origin", () => {
+    // Given: a valid configuration whose web origin ends with a slash
+    const environment = {
+      DATABASE_URL:
+        "postgresql://mugful:local-only-password@127.0.0.1:5432/mugful",
+      CSRF_SECRET: "c".repeat(32),
+      RATE_LIMIT_PRINCIPAL_PEPPER: "r".repeat(32),
+      SESSION_TOKEN_PEPPER: "s".repeat(32),
+      IDENTITY_TOKEN_PEPPER: "t".repeat(32),
+      INVITE_TOKEN_PEPPER: "i".repeat(32),
+      SMTP_FROM: "Mugful <noreply@mugful.test>",
+      SMTP_HOST: "mailpit",
+      SMTP_PORT: "1025",
+      SMTP_SECURE: "false",
+      WEB_ORIGIN: "http://100.124.184.116:3002/",
+    };
+
+    // When: configuration is parsed
+    const config = parseApiConfig(environment);
+
+    // Then: consumers receive a normalized origin without the trailing slash
+    expect(config.webOrigin).toBe("http://100.124.184.116:3002");
+  });
 });

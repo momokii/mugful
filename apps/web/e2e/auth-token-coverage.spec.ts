@@ -24,7 +24,10 @@ test("Privacy Center requires authentication and has no deferred privacy operati
   page,
 }) => {
   await page.goto("/privacy");
-  await expect(page.getByRole("link", { name: /masuk/i })).toBeVisible();
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(
+    page.getByRole("heading", { name: "Sign in to Mugful" }),
+  ).toBeVisible();
   await expect(
     page.getByRole("button", {
       name: /export|koreksi|hapus|penarikan|pembatasan/i,

@@ -5,8 +5,7 @@ import { createIdentityEmailService } from "./identity/email-service.js";
 import { createSmtpMailer } from "./identity/mailer.js";
 import { rateLimitPrincipalPepperSchema } from "./identity/rate-limit.js";
 import {
-  buildLocalDevelopmentSessionCookieOptions,
-  buildProductionSessionCookieOptions,
+  sessionCookiePolicyForPublicOrigin,
   sessionPepperSchema,
 } from "./identity/session.js";
 import { createIdentityService } from "./identity/service.js";
@@ -30,11 +29,7 @@ import type { IdentityService } from "./identity/service.js";
 export const main = async (): Promise<void> => {
   const config = parseApiConfig(process.env);
   const database = createDatabaseConnection(config.databaseUrl);
-  const productionCookies = process.env["NODE_ENV"] === "production";
-  const expiresAt = new Date(Date.now() + 1000);
-  const sessionCookie = productionCookies
-    ? buildProductionSessionCookieOptions({ expiresAt, now: new Date() })
-    : buildLocalDevelopmentSessionCookieOptions({ expiresAt, now: new Date() });
+  const cookiePolicy = sessionCookiePolicyForPublicOrigin(config.webOrigin);
   const identityEmailService = createIdentityEmailService({
     mailer: createSmtpMailer(config.smtp),
     publicOrigin: config.webOrigin,
@@ -84,9 +79,9 @@ export const main = async (): Promise<void> => {
     csrfSecret: config.csrfSecret,
     events: undefined,
     identityService,
-    productionCookies,
+    productionCookies: cookiePolicy.secure,
     roundService,
-    sessionCookieName: sessionCookie.name,
+    sessionCookieName: cookiePolicy.name,
     webOrigin: config.webOrigin,
   };
   const app = createApp({
@@ -95,9 +90,9 @@ export const main = async (): Promise<void> => {
       csrfSecret: config.csrfSecret,
       identityEmailService,
       identityService,
-      productionCookies,
+      productionCookies: cookiePolicy.secure,
       registrationEnabled: config.registrationDefaultEnabled,
-      sessionCookieName: sessionCookie.name,
+      sessionCookieName: cookiePolicy.name,
       webOrigin: config.webOrigin,
     },
     couples: {
@@ -109,8 +104,8 @@ export const main = async (): Promise<void> => {
       }),
       csrfSecret: config.csrfSecret,
       identityService,
-      productionCookies,
-      sessionCookieName: sessionCookie.name,
+      productionCookies: cookiePolicy.secure,
+      sessionCookieName: cookiePolicy.name,
       webOrigin: config.webOrigin,
     },
     superadmin: {
@@ -118,11 +113,11 @@ export const main = async (): Promise<void> => {
       csrfSecret: config.csrfSecret,
       identityService,
       mfaService: superadminMfaService,
-      productionCookies,
+      productionCookies: cookiePolicy.secure,
       promptService: createPromptCatalogService({
         repository: database.identityRepository,
       }),
-      sessionCookieName: sessionCookie.name,
+      sessionCookieName: cookiePolicy.name,
       superadminService,
       webOrigin: config.webOrigin,
     },
@@ -131,8 +126,8 @@ export const main = async (): Promise<void> => {
       csrfSecret: config.csrfSecret,
       identityService,
       privacyService,
-      productionCookies,
-      sessionCookieName: sessionCookie.name,
+      productionCookies: cookiePolicy.secure,
+      sessionCookieName: cookiePolicy.name,
       webOrigin: config.webOrigin,
     },
   });
@@ -144,7 +139,7 @@ export const main = async (): Promise<void> => {
   activitiesDependencies.events = wireRealtimeGateway(io, {
     identityService,
     roundService,
-    sessionCookieName: sessionCookie.name,
+    sessionCookieName: cookiePolicy.name,
   });
 
   app.addHook("onClose", async () => {

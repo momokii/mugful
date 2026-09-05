@@ -4,10 +4,12 @@ import { readFile } from "node:fs/promises";
 
 import {
   baseUrl,
+  loginViaApi,
   mailpitUrl,
+  registerAccountViaApi,
   required,
-  waitForMailpitMessages,
-  waitForMailpitToken,
+  waitForMailpitTokenForRecipient,
+  verifyEmailViaApi,
 } from "./auth-test-support";
 import { checkAuthPageMatrix } from "./auth-page-matrix";
 
@@ -158,8 +160,11 @@ test("registration, verification, sessions, reset, and password change use isola
   expect(await duplicateResponse.json()).toEqual({ status: "accepted" });
 
   const mailpit = required(mailpitUrl, "MUGFUL_TEST_MAILPIT_URL");
-  await waitForMailpitMessages(mailpit, 1);
-  const verifyToken = await waitForMailpitToken(mailpit, "/verify-email");
+  const verifyToken = await waitForMailpitTokenForRecipient(
+    mailpit,
+    "/verify-email",
+    email,
+  );
   await checkAuthPageMatrix({
     browser,
     open: async (tokenPage) => {
@@ -192,7 +197,7 @@ test("registration, verification, sessions, reset, and password change use isola
   await page.getByLabel("Email address").fill(email);
   await page.getByLabel("Password").fill(password);
   await page.getByRole("button", { name: "Continue" }).click();
-  await expect(page).toHaveURL(/\/settings\/security$/);
+  await expect(page).toHaveURL(/\/home$/);
 
   const secondContext = await browser.newContext({
     baseURL: baseUrl,
@@ -209,12 +214,13 @@ test("registration, verification, sessions, reset, and password change use isola
     await secondPage.getByLabel("Email address").fill(email);
     await secondPage.getByLabel("Password").fill(password);
     await secondPage.getByRole("button", { name: "Continue" }).click();
-    await expect(secondPage).toHaveURL(/\/settings\/security$/);
+    await expect(secondPage).toHaveURL(/\/home$/);
     await thirdPage.goto("/login");
     await thirdPage.getByLabel("Email address").fill(email);
     await thirdPage.getByLabel("Password").fill(password);
     await thirdPage.getByRole("button", { name: "Continue" }).click();
-    await expect(thirdPage).toHaveURL(/\/settings\/security$/);
+    await expect(thirdPage).toHaveURL(/\/home$/);
+    await page.goto("/settings/security");
     await page.reload();
     const sessionIds = await page.evaluate(async () => {
       const response = await fetch("/api/v1/auth/sessions", {
@@ -322,10 +328,13 @@ test("registration, verification, sessions, reset, and password change use isola
               })
             ).status,
         ),
-      )
+    )
       .toBe(401);
     await thirdPage.goto("/settings/security");
-    await expect(thirdPage.getByText(/sign in to review/i)).toBeVisible();
+    await expect(thirdPage).toHaveURL(/\/login$/);
+    await expect(
+      thirdPage.getByRole("heading", { name: "Sign in to Mugful" }),
+    ).toBeVisible();
 
     await page.getByLabel("Current password").fill(password);
     await page
@@ -387,7 +396,11 @@ test("registration, verification, sessions, reset, and password change use isola
     await page.getByLabel("Email address").fill(email);
     await page.getByRole("button", { name: "Send reset link" }).click();
     await expect(page.getByText(/check your email/i)).toBeVisible();
-    const resetToken = await waitForMailpitToken(mailpit, "/reset-password");
+    const resetToken = await waitForMailpitTokenForRecipient(
+      mailpit,
+      "/reset-password",
+      email,
+    );
     await checkAuthPageMatrix({
       browser,
       open: async (tokenPage) => {
@@ -446,7 +459,7 @@ test("registration, verification, sessions, reset, and password change use isola
     await page.getByLabel("Email address").fill(email);
     await page.getByLabel("Password").fill(password);
     await page.getByRole("button", { name: "Continue" }).click();
-    await expect(page).toHaveURL(/\/settings\/security$/);
+    await expect(page).toHaveURL(/\/home$/);
     await page.goto("/privacy");
     await expect(
       page.getByRole("heading", { name: "Pusat Privasi" }),
@@ -481,4 +494,47 @@ test("registration, verification, sessions, reset, and password change use isola
     await secondContext.close();
     await thirdContext.close();
   }
+});
+
+test("session context swaps the header to authenticated state on /home", async ({
+  page,
+}) => {
+  test.skip(
+    registrationClosed,
+    "This lifecycle requires enabled registration.",
+  );
+  const email = uniqueEmail();
+  const password = "browser-session-context-password";
+
+  await registerAccountViaApi(page, {
+    displayName: "Session context",
+    email,
+    password,
+  });
+  const mailpit = required(mailpitUrl, "MUGFUL_TEST_MAILPIT_URL");
+  const verifyToken = await waitForMailpitTokenForRecipient(
+    mailpit,
+    "/verify-email",
+    email,
+  );
+  await verifyEmailViaApi(page, verifyToken);
+  await loginViaApi(page, { email, password });
+
+  await page.goto("/home");
+  await expect(page).toHaveURL(/\/home$/);
+  const header = page.locator("header");
+  await expect(header.getByRole("link", { name: "Sign in" })).toHaveCount(0);
+  await expect(header.locator('a[href="/register"]')).toHaveCount(0);
+  await expect(
+    header.getByRole("link", { name: "Mugful home" }),
+  ).toHaveAttribute("href", "/home");
+  await expect(
+    header.getByRole("link", { name: "Create your space" }),
+  ).toHaveAttribute("href", "/onboarding");
+
+  await page.reload();
+  const sessionResponse = await page.request.get("/api/v1/auth/session");
+  expect(sessionResponse.status()).toBe(200);
+  const sessionBody: unknown = await sessionResponse.json();
+  expect(sessionBody).toMatchObject({ session: { email } });
 });
