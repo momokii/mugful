@@ -15,8 +15,10 @@ export default async function HomePage() {
       eyebrow="Together"
       title="Welcome home"
     >
-      <TogetherRoom />
-      <GuessMyAnswer />
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-8)" }}>
+        <TogetherRoom />
+        <GuessMyAnswer />
+      </div>
     </AuthShell>
   );
 }

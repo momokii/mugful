@@ -108,37 +108,91 @@ export function GuessMyAnswer() {
     (round) => round.status === "completed" || round.status === "cancelled",
   );
 
+  const formatRelative = (iso: string): string => {
+    const diff = Date.now() - new Date(iso).getTime();
+    const minutes = Math.floor(diff / 60000);
+    if (minutes < 1) return "just now";
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    return `${days}d ago`;
+  };
+
   return (
     <div className={styles.console}>
       {pending === undefined ? (
         <GuessMyAnswerStart onStarted={reload} />
       ) : (
-        <GuessMyAnswerPending onReload={reload} round={pending} />
+        <>
+          <section aria-labelledby="active-round-title" className={styles.history}>
+            <h2 id="active-round-title">Active round</h2>
+            <div className={styles.completedCard} style={{ borderStyle: "solid", borderColor: "var(--accent-primary)" }}>
+              <p className={styles.promptMeta}>
+                {pending.category} · {formatRelative(pending.createdAt)} · started by {pending.ownAnswer !== undefined ? "you" : "partner"} · with your partner
+              </p>
+              <p className={styles.promptText} style={{ fontSize: "15px" }}>
+                {pending.promptText}
+              </p>
+              <p className={styles.hint}>Status: {pending.status.replace(/-/g, " ")}</p>
+            </div>
+          </section>
+          <GuessMyAnswerPending onReload={reload} round={pending} />
+        </>
       )}
-      {archived.length === 0 ? null : (
-        <section
-          aria-labelledby="round-history-title"
-          className={styles.history}
-        >
-          <h2 id="round-history-title">Past rounds</h2>
+      <section
+        aria-labelledby="round-history-title"
+        className={styles.history}
+      >
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
+          <h2 id="round-history-title">History</h2>
+          <span className={styles.hint}>{state.rounds.length} rounds</span>
+        </div>
+        {state.rounds.length === 0 ? (
+          <p className={styles.hint}>No rounds yet — start one above.</p>
+        ) : archived.length === 0 ? (
+          <p className={styles.hint}>No finished rounds yet. Active round above.</p>
+        ) : (
           <ul className={styles.historyList}>
-            {archived.map((round) =>
-              round.status === "completed" ? (
-                <GuessMyAnswerCompleted
-                  accountId={accountId}
-                  key={round.roundId}
-                  onReload={reload}
-                  round={round}
-                />
-              ) : (
-                <li className={styles.cancelledRow} key={round.roundId}>
-                  Cancelled — {round.promptText}
-                </li>
-              ),
-            )}
+            {state.rounds.map((round) => (
+              <li
+                key={round.roundId}
+                className={round.status === "completed" ? styles.completedCard : styles.cancelledRow}
+                style={
+                  isPendingRound(round)
+                    ? { opacity: 0.6, borderStyle: "dashed" }
+                    : undefined
+                }
+              >
+                {round.status === "completed" ? (
+                  <GuessMyAnswerCompleted
+                    accountId={accountId}
+                    onReload={reload}
+                    round={round}
+                  />
+                ) : isPendingRound(round) ? (
+                  <>
+                    <p className={styles.promptText} style={{ fontSize: "15px" }}>
+                      {round.promptText}
+                    </p>
+                    <p className={styles.promptMeta}>
+                      {round.category} · {formatRelative(round.createdAt)} · {round.status.replace(/-/g, " ")} · with partner
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    Cancelled — {round.promptText}
+                    <br />
+                    <span className={styles.promptMeta}>
+                      {round.category} · {formatRelative(round.createdAt)}
+                    </span>
+                  </>
+                )}
+              </li>
+            ))}
           </ul>
-        </section>
-      )}
+        )}
+      </section>
     </div>
   );
 }

@@ -41,11 +41,24 @@ export function GuessMyAnswerCompleted({
     }
   };
 
+  const timeAgo = (() => {
+    const diff = Date.now() - new Date(round.createdAt).getTime();
+    const m = Math.floor(diff / 60000);
+    if (m < 1) return "just now";
+    if (m < 60) return `${m}m ago`;
+    const h = Math.floor(m / 60);
+    if (h < 24) return `${h}h ago`;
+    return `${Math.floor(h / 24)}d ago`;
+  })();
+
   return (
     <li className={styles.completedCard}>
+      <p className={styles.promptMeta}>
+        {round.category} · {timeAgo} · with your partner · started by {round.ownAnswer !== undefined ? "you" : "partner"}
+      </p>
       <p className={styles.promptText}>{round.promptText}</p>
       <p className={styles.promptMeta}>
-        {round.category} · prompt version {round.promptVersionNumber}
+        prompt version {round.promptVersionNumber} · {new Date(round.createdAt).toLocaleDateString()}
       </p>
       {round.match === undefined ? null : (
         <p
