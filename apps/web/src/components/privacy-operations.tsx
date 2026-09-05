@@ -33,8 +33,9 @@ export function PrivacyOperations() {
       aria-labelledby="privacy-actions-title"
     >
       <h2 id="privacy-actions-title">Kelola data Anda</h2>
-      <div className={styles.sessions}>
+      <div className={styles.form} style={{ marginTop: "var(--space-4)" }}>
         <button
+          className={styles.submit}
           onClick={() =>
             void run(
               () =>
@@ -59,6 +60,7 @@ export function PrivacyOperations() {
           Unduh ekspor data
         </button>
         <form
+          className={styles.form}
           onSubmit={(event) => {
             event.preventDefault();
             void run(
@@ -67,34 +69,44 @@ export function PrivacyOperations() {
             );
           }}
         >
-          <label htmlFor="correction-name">Koreksi nama tampilan</label>
-          <input
-            id="correction-name"
-            onChange={(event) => setDisplayName(event.target.value)}
-            value={displayName}
-          />
-          <button type="submit">Simpan koreksi</button>
+          <div className={styles.field}>
+            <label htmlFor="correction-name">Koreksi nama tampilan</label>
+            <input
+              id="correction-name"
+              onChange={(event) => setDisplayName(event.target.value)}
+              placeholder="Nama baru"
+              value={displayName}
+            />
+          </div>
+          <button className={styles.submit} type="submit">
+            Simpan koreksi
+          </button>
         </form>
-        <button
-          onClick={() =>
-            void run(
-              () => requestDeletion(),
-              "Permintaan penghapusan dicatat. Masa tenggang 30 hari.",
-            )
-          }
-          type="button"
-        >
-          Minta penghapusan akun
-        </button>
-        <button
-          onClick={() =>
-            void run(() => withdrawConsent(), "Persetujuan ditarik.")
-          }
-          type="button"
-        >
-          Tarik persetujuan
-        </button>
+        <div className={styles.sessions} style={{ marginTop: "var(--space-2)" }}>
+          <button
+            className={styles.logout}
+            onClick={() =>
+              void run(
+                () => requestDeletion(),
+                "Permintaan penghapusan dicatat. Masa tenggang 30 hari.",
+              )
+            }
+            type="button"
+          >
+            Minta penghapusan akun
+          </button>
+          <button
+            className={styles.logout}
+            onClick={() =>
+              void run(() => withdrawConsent(), "Persetujuan ditarik.")
+            }
+            type="button"
+          >
+            Tarik persetujuan
+          </button>
+        </div>
         <form
+          className={styles.form}
           onSubmit={(event) => {
             event.preventDefault();
             void run(
@@ -103,27 +115,36 @@ export function PrivacyOperations() {
             );
           }}
         >
-          <label htmlFor="restriction-reason">
-            Batasi pemrosesan (alasan opsional)
-          </label>
-          <input
-            id="restriction-reason"
-            onChange={(event) => setReason(event.target.value)}
-            value={reason}
-          />
-          <button type="submit">Batasi</button>
-          <button
-            onClick={() =>
-              void run(() => liftRestriction(), "Pembatasan dicabut.")
-            }
-            type="button"
-          >
-            Cabut pembatasan
-          </button>
+          <div className={styles.field}>
+            <label htmlFor="restriction-reason">
+              Batasi pemrosesan (alasan opsional)
+            </label>
+            <input
+              id="restriction-reason"
+              onChange={(event) => setReason(event.target.value)}
+              placeholder="Alasan pembatasan"
+              value={reason}
+            />
+          </div>
+          <div style={{ display: "flex", gap: "var(--space-3)" }}>
+            <button className={styles.submit} style={{ flex: 1 }} type="submit">
+              Batasi
+            </button>
+            <button
+              className={styles.logout}
+              style={{ flex: 1, marginTop: 0 }}
+              onClick={() =>
+                void run(() => liftRestriction(), "Pembatasan dicabut.")
+              }
+              type="button"
+            >
+              Cabut pembatasan
+            </button>
+          </div>
         </form>
       </div>
       {notice === undefined ? null : (
-        <p aria-live="polite" className={styles.hint}>
+        <p aria-live="polite" className={styles.hint} style={{ marginTop: "var(--space-4)" }}>
           {notice}
         </p>
       )}
