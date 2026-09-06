@@ -15,6 +15,7 @@ import {
 } from "../lib/rounds-client";
 import { GuessMyAnswerCompleted } from "./guess-my-answer-completed";
 import { GuessMyAnswerPending } from "./guess-my-answer-pending";
+import { RoundDeleteDialog } from "./round-delete-dialog";
 import { GuessMyAnswerStart } from "./guess-my-answer-start";
 import styles from "./guess-my-answer.module.css";
 
@@ -22,6 +23,8 @@ export function GuessMyAnswer() {
   const [accountId, setAccountId] = useState<string | undefined>();
   const [state, setState] = useState<RoundsState>({ kind: "checking" });
   const [reloadKey, setReloadKey] = useState(0);
+  const [roundIdToDelete, setRoundIdToDelete] = useState<string | undefined>();
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const refresh = useCallback(async () => {
     setState({ kind: "checking" });
@@ -45,6 +48,17 @@ export function GuessMyAnswer() {
       setState({ kind: "unavailable" });
     }
   }, []);
+
+  const confirmDelete = useCallback(async () => {
+    if (roundIdToDelete === undefined) return;
+    setIsDeleting(true);
+    const result = await deleteRound(roundIdToDelete);
+    setIsDeleting(false);
+    if (result.ok) {
+      setRoundIdToDelete(undefined);
+      await reload();
+    } else alert(result.message);
+  }, [reload, roundIdToDelete]);
 
   useEffect(() => {
     void refresh();
@@ -144,12 +158,7 @@ export function GuessMyAnswer() {
                 </p>
                 <button
                   className={styles.deleteButton}
-                  onClick={async () => {
-                    if (!confirm("Delete this round for both of you?")) return;
-                    const result = await deleteRound(round.roundId);
-                    if (result.ok) await reload();
-                    else alert(result.message);
-                  }}
+                      onClick={() => setRoundIdToDelete(round.roundId)}
                   type="button"
                 >
                   Delete
@@ -197,12 +206,7 @@ export function GuessMyAnswer() {
                     />
                     <button
                       className={styles.deleteButton}
-                      onClick={async () => {
-                        if (!confirm("Delete this history for both of you?")) return;
-                        const result = await deleteRound(round.roundId);
-                        if (result.ok) await reload();
-                        else alert(result.message);
-                      }}
+                      onClick={() => setRoundIdToDelete(round.roundId)}
                       type="button"
                     >
                       Delete history
@@ -223,12 +227,7 @@ export function GuessMyAnswer() {
                       </p>
                       <button
                         className={styles.deleteButton}
-                        onClick={async () => {
-                          if (!confirm("Delete this round for both of you?")) return;
-                          const result = await deleteRound(round.roundId);
-                          if (result.ok) await reload();
-                          else alert(result.message);
-                        }}
+                        onClick={() => setRoundIdToDelete(round.roundId)}
                         type="button"
                       >
                         Delete
@@ -250,12 +249,7 @@ export function GuessMyAnswer() {
                       </span>
                       <button
                         className={styles.deleteButton}
-                        onClick={async () => {
-                          if (!confirm("Delete this history for both of you?")) return;
-                          const result = await deleteRound(round.roundId);
-                          if (result.ok) await reload();
-                          else alert(result.message);
-                      }}
+                        onClick={() => setRoundIdToDelete(round.roundId)}
                       type="button"
                     >
                       Delete history
@@ -268,6 +262,13 @@ export function GuessMyAnswer() {
           </ul>
         )}
       </section>
+      {roundIdToDelete !== undefined && (
+        <RoundDeleteDialog
+          isDeleting={isDeleting}
+          onCancel={() => setRoundIdToDelete(undefined)}
+          onConfirm={() => void confirmDelete()}
+        />
+      )}
     </div>
   );
 }
