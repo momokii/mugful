@@ -1,6 +1,6 @@
 # Development guide
 
-**Status:** 0b local runtime foundation, Todo 4 accessible web shell, Todo 5 identity foundation, Todo 6 couple onboarding, Todo 7 prompt administration (7A–7C), Todo 8 Guess My Answer (8A–8E), Todo 9 deployment and operations, v1.1 Together Room 11A–11D, and privacy-request operations are implemented and verified. v1 is ready for invite-only beta.
+**Status:** 0b local runtime through v1.1 Together Room foundations and privacy-request operations are implemented. The repo is in stabilization as of 2026-09-06: the latest Guess My Answer delete-modal and pending-answer fixes have passed lint/typecheck/build, but the full two-account browser journey still needs verification. The local Mugful Compose stack is intentionally stopped with service images removed; data volume retained. v1 is not yet invite-only beta.
 
 This document is the handoff point for a fresh agent or contributor who does not have the conversation history.
 
@@ -41,7 +41,7 @@ Before running the build, create the ignored environment file with `cp .env.exam
 - `scripts/run-auth-lifecycle.sh`, which creates an isolated PostgreSQL/Mailpit lifecycle and runs API/OpenAPI plus real-Chromium enabled/default-closed flows, including the authenticated Privacy Center, at 375px, 768px, and 1280px;
 - `pnpm dev`, which compiles and prints labels from the two shell entry points.
 
-All planned product slices (including Guess My Answer and Together Room) and deployment automation (Dockerfiles, production Compose, deployment and backup scripts) are now implemented and verified; only privacy-request operations remain as a future v1 slice.
+All planned product slices (including Guess My Answer and Together Room) and deployment automation (Dockerfiles, production Compose, deployment and backup scripts) are implemented. The latest stabilization adds an in-app delete confirmation dialog and a pending-round `ownAnswer`-aware render fix. Final two-account browser verification is still pending before the invite-only beta gate.
 
 ## Locked stack
 

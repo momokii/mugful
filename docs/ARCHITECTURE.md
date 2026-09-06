@@ -1,6 +1,6 @@
 # Architecture
 
-**Status:** Confirmed target architecture; local runtime, Todo 5 identity, Todo 6 onboarding, Todo 7 prompt administration, Todo 8 Guess My Answer, and Todo 9 deployment and operations implemented and verified
+**Status:** Confirmed target architecture; local runtime through Todo 9 is implemented. Stabilization is in progress as of 2026-09-06 pending final two-account Guess My Answer browser verification.
 **Scope:** v1 LDR couples beta
 
 ## Architecture summary
