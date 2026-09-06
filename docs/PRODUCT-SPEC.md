@@ -1,6 +1,6 @@
 # Mugful — Product Specification
 
-**Status:** Confirmed direction; bounded identity and couple-onboarding implementation underway
+**Status:** Confirmed direction; implemented product is in stabilization before invite-only beta
 **Audience:** Adults in long-distance romantic relationships
 **Release target:** v1 invite-only beta, with public registration feature-flagged off by default
 **License target:** Apache-2.0
