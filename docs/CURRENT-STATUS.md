@@ -1,11 +1,19 @@
 # Current status
 
-**Last updated:** 2026-09-05
-**Phase:** Todo 7 prompt administration (7A–7C), Todo 8 Guess My Answer (8A–8E), Todo 9 deployment and operations, v1.1 Together Room 11A–11D, and privacy-request operations are implemented and verified; v1 is ready for invite-only beta
+**Last updated:** 2026-09-06
+**Phase:** Implementation is complete through Todo 9, Guess My Answer realtime, privacy-request operations, and Together Room foundations; active stabilization is in progress before invite-only beta
 **Release target:** v1 invite-only beta
 **Product name:** Mugful
 **Public repository:** https://github.com/momokii/mugful
-**Latest implementation baseline:** `5838fb2` on `master`, including the local development auth bypass and registration messaging
+**Latest implementation baseline:** `master` with local stabilization work pending review and commit
+
+## Current verification state
+
+- Guess My Answer history supports a clear destructive action and an in-app confirmation dialog rather than a browser confirmation prompt.
+- A pending round now distinguishes the reloaded account’s `ownAnswer` from the shared `waiting-for-partner` status: the partner who has not yet answered is shown the answer form rather than a false “Your locked answer” state.
+- The API emits room-scoped `round-updated` events after deletion and the `/home` client refreshes its round list on those events. Final two-account browser verification of this flow remains outstanding because Chrome is unavailable in the current environment.
+- The latest web lint, TypeScript check, and production Docker build passed before cleanup. The local Mugful Compose stack was then deliberately stopped and removed, and all tagged Mugful service images were deleted on 2026-09-06. The PostgreSQL data volume was retained.
+- Do not describe the repository as beta-ready until the two-account Guess My Answer browser path, including submit/reload/delete synchronization, has been exercised successfully after the runtime is restarted.
 
 ## Completed
 
@@ -58,11 +66,11 @@
 
 ## Not started
 
-- No v1 product slices remain. Future milestones (True E2EE, additional activities, AI) are gated behind design, DPIA, and legal review per ROADMAP.
+- No new v1 product slices are planned. Stabilization remains: verify the full two-account Guess My Answer path, resolve any defects it exposes, then reassess the beta gate. Future milestones (True E2EE, additional activities, AI) remain gated behind design, DPIA, and legal review per ROADMAP.
 
 ## Next recommended step
 
-Invite a small set of real couples per ROADMAP Phase 2 (invite-only beta) with registration disabled by default. Observe first-round completion, return rate, async flow, mobile reconnect, prompt quality, and operational burden. Do not add True E2EE, additional activities, or AI until the v1.1 stability gate passes and the explicit design and legal prerequisites are met.
+Restart the documented local or production-style Compose stack and run a two-account browser scenario: partner A starts and submits, partner B reloads and submits, both reveal, and either partner deletes a history item while the other open session updates without reload. Only after that scenario, responsive checks, and the existing stability gate pass should invite-only beta be considered.
 
 ## Command status
 
@@ -70,7 +78,7 @@ Invite a small set of real couples per ROADMAP Phase 2 (invite-only beta) with r
 
 ## Known constraints
 
-- The project is not production-ready; only the bounded identity foundation and its local/test lifecycle are implemented.
+- The project is not beta-ready. Its full two-account Guess My Answer journey has not yet completed the final browser verification pass after the current stabilization changes.
 - UU PDP research is not legal advice; counsel-needed items remain open.
 - SMTP quotas and provider policies change; re-check official sources before production setup.
 - The application-level privacy boundary is not end-to-end encryption.

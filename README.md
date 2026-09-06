@@ -2,7 +2,7 @@
 
 A private, playful web space for adults in long-distance relationships. The first release focuses on one shared activity: **Guess My Answer**.
 
-> **Status:** The local runtime foundation, Todo 4 accessible public/auth UI shell, Todo 5 identity-consent foundation, and Todo 6 couple onboarding are implemented and accepted.
+> **Status:** The repository contains implemented v1 slices through deployment/operations, Guess My Answer realtime, privacy operations, and Together Room foundations. It is in active stabilization, not ready for invite-only beta: the full two-account Guess My Answer browser journey still needs final verification. The local Mugful Compose runtime and its service images are intentionally stopped and removed as of 2026-09-06.
 
 ## Product direction
 
@@ -24,7 +24,7 @@ v1 deliberately does **not** include native video, AI, behavioral analytics, or 
 
 ## Current repository state
 
-This repository contains local-only PostgreSQL 17 and Mailpit Compose services, Fastify liveness/readiness API, a minimal Next.js proxy, and explicit manual migrations. Todo 5 provides bounded accounts, email verification, secure sessions, reset, OpenAPI, and negative-path identity protections. Registration records separate adult self-attestation, Terms, and Privacy Notice affirmations as three atomic, versioned consent records. The Bahasa-first registration flow has no preselected consent. Authenticated users can read their Terms/Privacy consent versions and timestamps, email-verification status, and links to account-security/session controls through `/privacy`, and the Privacy Center now exposes export, correction, 30-day deletion, withdrawal, and idempotent restriction/lift, all verified against real PostgreSQL with CSRF-protected, audit-logged endpoints. Tokens are HMAC-persisted, short-lived, replaced on resend, atomically single-use, and sent only in fragment links. Registration remains closed by default; account creation does not create a session before email verification. Todo 6 adds verified-session couple-space creation, one active space per account, seven-day single-use fragment-only invite links, atomic acceptance, immediate membership/invite revocation on end, and a 30-day deletion grace timestamp. The API and UI flows, including responsive Brave Chromium coverage, are accepted.
+This repository contains the Next.js web app, Fastify API/realtime service, PostgreSQL/Drizzle migrations, and Docker Compose definitions for local and production-style operation. The implemented product includes verified identity and couple onboarding, prompt administration, Guess My Answer rounds with private answer locking, history deletion, Socket.IO room updates, Privacy Center operations, and the initial Together Room foundation. The most recent Guess My Answer work adds an in-app destructive-action confirmation and corrects the reloaded partner’s pending-answer state; it has passed lint, type checking, and production build, but needs final two-account browser verification before any beta claim. Registration remains feature-flagged and closed by default. See [`docs/CURRENT-STATUS.md`](./docs/CURRENT-STATUS.md) for the authoritative release and runtime status.
 
 With Node 22 and pnpm 11.20.0 installed, a contributor can verify the tooling foundation with:
 
