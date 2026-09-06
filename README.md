@@ -26,21 +26,68 @@ v1 deliberately does **not** include native video, AI, behavioral analytics, or 
 
 This repository contains the Next.js web app, Fastify API/realtime service, PostgreSQL/Drizzle migrations, and Docker Compose definitions for local and production-style operation. The implemented product includes verified identity and couple onboarding, prompt administration, Guess My Answer rounds with private answer locking, history deletion, Socket.IO room updates, Privacy Center operations, and the initial Together Room foundation. The most recent Guess My Answer work adds an in-app destructive-action confirmation and corrects the reloaded partner’s pending-answer state; it has passed lint, type checking, and production build, but needs final two-account browser verification before any beta claim. Registration remains feature-flagged and closed by default. See [`docs/CURRENT-STATUS.md`](./docs/CURRENT-STATUS.md) for the authoritative release and runtime status.
 
-With Node 22 and pnpm 11.20.0 installed, a contributor can verify the tooling foundation with:
+## Run with Docker
+
+All runnable paths are Docker-based. Pick one; every path starts from the same ignored env file.
+
+```sh
+cp .env.example .env
+# edit .env and replace every `replace-with-a-...` secret/password
+```
+
+### 1) Verify tooling (no Docker needed)
 
 ```sh
 pnpm install --frozen-lockfile
-pnpm typecheck
-pnpm lint
-pnpm format:check
-pnpm test
-cp .env.example .env
+pnpm typecheck && pnpm lint && pnpm format:check && pnpm test
 pnpm build
 ```
 
-The web shell has production-server Playwright coverage for public/auth routes and the authenticated identity lifecycle, including `/privacy`, at mobile, tablet, and desktop widths. Run the isolated API/PostgreSQL/Mailpit/browser lifecycle through `scripts/run-auth-lifecycle.sh` after the regular production build.
+### 2) Local development — DB in Docker, app on host (fastest iteration)
 
-Create ignored `.env` from `.env.example`, replace its local-only password consistently, then run `docker compose -f compose.yaml up -d postgres mailpit`, `pnpm --filter @mugful/api dev`, and `pnpm --filter @mugful/web dev`. Mailpit is available only on `http://127.0.0.1:8025`; it captures local messages and is not a production provider. Liveness is `http://127.0.0.1:3001/health/live`; the proxy is `http://127.0.0.1:3000/api/health/live`. Run the reviewed bootstrap migration only explicitly with `pnpm --filter @mugful/api db:migrate`.
+```sh
+docker compose -f compose.yaml up -d postgres mailpit
+pnpm --filter @mugful/api db:migrate   # explicit, never on startup
+pnpm --filter @mugful/api dev          # http://127.0.0.1:3001/health/live
+pnpm --filter @mugful/web dev          # http://127.0.0.1:3000  (proxies /api to API)
+# Mailpit inbox: http://127.0.0.1:8025  — SMTP is localhost-only
+docker compose -f compose.yaml down    # add -v to drop postgres-data
+```
+
+### 3) Production-style — everything in Docker (closest to VPS)
+
+Builds the same multi-stage images that are published to Docker Hub (`momokii/mugful-web`, `momokii/mugful-api`):
+
+```sh
+docker compose -f compose.yaml -f compose.prod.yaml config  # verify WEB_ORIGIN, ports, images
+docker compose -f compose.yaml -f compose.prod.yaml up -d --build
+docker compose -f compose.yaml -f compose.prod.yaml ps      # wait for healthy
+curl http://127.0.0.1:3001/health/live
+curl http://127.0.0.1:3002/api/health/live
+docker compose -f compose.yaml -f compose.prod.yaml down            # keep data
+docker compose -f compose.yaml -f compose.prod.yaml down --rmi all -v  # full reset
+```
+
+`compose.prod.yaml` pins `NODE_ENV=production`, exposes `api:3001` and `web:3002` on `0.0.0.0`, adds healthchecks, and sets `API_INTERNAL_ORIGIN=http://api:3001` inside the compose network. `WEB_ORIGIN` must exactly match the browser origin (scheme + host + port) — it selects the cookie policy (`__Host-*` Secure on https, plain on http for Tailscale/LAN).
+
+For a real VPS behind Traefik, set `WEB_ORIGIN`, `TRAEFIK_HOST`, and `IMAGE_TAG` (pin `vX.Y.Z` or commit SHA, never `latest` in prod) and keep secrets in a restricted `.env` outside the repo. See [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) and [`docs/ENVIRONMENT.md`](./docs/ENVIRONMENT.md).
+
+### 4) Private-network QA — expose Mailpit UI on Tailscale only
+
+```sh
+docker compose -f compose.yaml -f compose.prod.yaml -f compose.tailscale.yaml up -d
+# Mailpit UI now on 0.0.0.0:8025 for trusted mesh only; base compose keeps it on 127.0.0.1
+```
+
+Never commit a Tailscale IP; describe it generically.
+
+### Useful checks
+
+```sh
+pnpm --filter @mugful/api db:migrate          # reviewed bootstrap migration, explicit only
+scripts/run-auth-lifecycle.sh                 # isolated Postgres + Mailpit + prod build + Playwright (375/768/1280)
+docker compose -f compose.yaml -f compose.prod.yaml exec postgres pg_isready -h 127.0.0.1 -U mugful -d mugful
+```
 
 ## Documentation map
 
