@@ -116,17 +116,18 @@
 
 .select {
   appearance: none;
-  padding-right: 2.75rem;
+  padding-right: 3rem;
   background-image:
     linear-gradient(45deg, transparent 50%, var(--text-secondary) 50%),
     linear-gradient(135deg, var(--text-secondary) 50%, transparent 50%);
   background-position:
-    calc(100% - 1.35rem) calc(50% - 3px),
-    calc(100% - 1rem) calc(50% - 3px);
+    calc(100% - 1.6rem) calc(50%),
+    calc(100% - 1.15rem) calc(50%);
   background-size:
-    6px 6px,
-    6px 6px;
+    7px 7px,
+    7px 7px;
   background-repeat: no-repeat;
+  background-origin: padding-box;
 }
 
 .select:focus-visible {
@@ -296,37 +297,40 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-4);
+  gap: var(--space-6);
   flex-wrap: wrap;
 }
 
 .historyMetaRow .promptMeta {
   flex: 1;
-  min-width: 180px;
+  min-width: 220px;
   word-break: break-all;
 }
 
 .deleteButton {
-  min-height: 36px;
-  padding: var(--space-2) var(--space-4);
+  min-height: 40px;
+  padding: var(--space-2) var(--space-5);
   border: 1px solid var(--status-error);
   border-radius: var(--radius-control);
-  background: transparent;
-  color: var(--status-error);
+  background: var(--status-error);
+  color: var(--surface-primary);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
   transition:
     background-color var(--motion-micro),
     color var(--motion-micro),
-    border-color var(--motion-micro);
+    border-color var(--motion-micro),
+    transform var(--motion-micro);
 }
 
 .deleteButton:hover:not(:disabled) {
-  background: var(--status-error);
-  border-color: var(--status-error);
+  background: color-mix(in srgb, var(--status-error) 85%, black);
+  border-color: color-mix(in srgb, var(--status-error) 85%, black);
   color: var(--surface-primary);
+  transform: translateY(-1px);
 }
 
 .deleteButton:disabled {
