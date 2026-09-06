@@ -260,6 +260,7 @@ export function GuessMyAnswer() {
                     >
                       Delete history
                     </button>
+                    </div>
                   </>
                 )}
               </li>
