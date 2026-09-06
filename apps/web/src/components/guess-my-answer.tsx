@@ -136,11 +136,25 @@ export function GuessMyAnswer() {
               className={styles.completedCard}
               style={{ borderStyle: "solid", borderColor: "var(--accent-primary)", marginBottom: "var(--space-3)" }}
             >
-              <p className={styles.promptMeta}>
-                {round.category} · {formatRelative(round.createdAt)} · started by{" "}
-                {round.createdByAccountId === accountId ? "you" : round.partnerEmail ?? "partner"} · with{" "}
-                {round.partnerEmail ?? "your partner"}
-              </p>
+              <div className={styles.historyMetaRow}>
+                <p className={styles.promptMeta}>
+                  {round.category} · {formatRelative(round.createdAt)} · started by{" "}
+                  {round.createdByAccountId === accountId ? "you" : round.partnerEmail ?? "partner"} · with{" "}
+                  {round.partnerEmail ?? "your partner"}
+                </p>
+                <button
+                  className={styles.deleteButton}
+                  onClick={async () => {
+                    if (!confirm("Delete this round for both of you?")) return;
+                    const result = await deleteRound(round.roundId);
+                    if (result.ok) await reload();
+                    else alert(result.message);
+                  }}
+                  type="button"
+                >
+                  Delete
+                </button>
+              </div>
               <p className={styles.promptText} style={{ fontSize: "15px" }}>
                 {round.promptText}
               </p>
@@ -182,8 +196,7 @@ export function GuessMyAnswer() {
                       round={round}
                     />
                     <button
-                      className={styles.secondary}
-                      style={{ marginTop: "var(--space-2)" }}
+                      className={styles.deleteButton}
                       onClick={async () => {
                         if (!confirm("Delete this history for both of you?")) return;
                         const result = await deleteRound(round.roundId);
@@ -200,46 +213,48 @@ export function GuessMyAnswer() {
                     <p className={styles.promptText} style={{ fontSize: "15px" }}>
                       {round.promptText}
                     </p>
-                    <p className={styles.promptMeta}>
-                      {round.category} · {formatRelative(round.createdAt)} · {round.status.replace(/-/g, " ")} · with{" "}
-                      {round.partnerEmail ?? "your partner"} · started by{" "}
-                      {round.createdByAccountId === accountId
-                        ? "you"
-                        : round.partnerEmail ?? "partner"}
-                    </p>
-                    <button
-                      className={styles.secondary}
-                      style={{ marginTop: "var(--space-2)" }}
-                      onClick={async () => {
-                        if (!confirm("Delete this round for both of you?")) return;
-                        const result = await deleteRound(round.roundId);
-                        if (result.ok) await reload();
-                        else alert(result.message);
-                      }}
-                      type="button"
-                    >
-                      Delete history
-                    </button>
+                    <div className={styles.historyMetaRow}>
+                      <p className={styles.promptMeta}>
+                        {round.category} · {formatRelative(round.createdAt)} · {round.status.replace(/-/g, " ")} · with{" "}
+                        {round.partnerEmail ?? "your partner"} · started by{" "}
+                        {round.createdByAccountId === accountId
+                          ? "you"
+                          : round.partnerEmail ?? "partner"}
+                      </p>
+                      <button
+                        className={styles.deleteButton}
+                        onClick={async () => {
+                          if (!confirm("Delete this round for both of you?")) return;
+                          const result = await deleteRound(round.roundId);
+                          if (result.ok) await reload();
+                          else alert(result.message);
+                        }}
+                        type="button"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </>
                 ) : (
                   <>
-                    Cancelled — {round.promptText}
-                    <br />
-                    <span className={styles.promptMeta}>
-                      {round.category} · {formatRelative(round.createdAt)} · with{" "}
-                      {round.partnerEmail ?? "your partner"} · started by{" "}
-                      {round.createdByAccountId === accountId
-                        ? "you"
-                        : round.partnerEmail ?? "partner"}
-                    </span>
-                    <button
-                      className={styles.secondary}
-                      style={{ marginTop: "var(--space-2)" }}
-                      onClick={async () => {
-                        if (!confirm("Delete this history for both of you?")) return;
-                        const result = await deleteRound(round.roundId);
-                        if (result.ok) await reload();
-                        else alert(result.message);
+                    <p className={styles.promptText} style={{ fontSize: "15px" }}>
+                      Cancelled — {round.promptText}
+                    </p>
+                    <div className={styles.historyMetaRow}>
+                      <span className={styles.promptMeta}>
+                        {round.category} · {formatRelative(round.createdAt)} · with{" "}
+                        {round.partnerEmail ?? "your partner"} · started by{" "}
+                        {round.createdByAccountId === accountId
+                          ? "you"
+                          : round.partnerEmail ?? "partner"}
+                      </span>
+                      <button
+                        className={styles.deleteButton}
+                        onClick={async () => {
+                          if (!confirm("Delete this history for both of you?")) return;
+                          const result = await deleteRound(round.roundId);
+                          if (result.ok) await reload();
+                          else alert(result.message);
                       }}
                       type="button"
                     >

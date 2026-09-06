@@ -72,7 +72,7 @@ export function GuessMyAnswerStart({
       <div className={styles.field}>
         <label htmlFor="round-category">Mood / Category (optional)</label>
         <select
-          className={styles.input}
+          className={styles.select}
           id="round-category"
           onChange={(event) => setCategory(event.target.value)}
           value={category}
