@@ -60,7 +60,8 @@ export function GuessMyAnswerPending({
           {round.category} · prompt version {round.promptVersionNumber}
         </p>
       </div>
-      {round.status === "active" ? (
+      {round.ownAnswer === undefined &&
+      (round.status === "active" || round.status === "waiting-for-partner") ? (
         <form
           onSubmit={(event) => {
             submit(event);
@@ -87,7 +88,7 @@ export function GuessMyAnswerPending({
           </div>
         </form>
       ) : null}
-      {round.status === "waiting-for-partner" ? (
+      {round.ownAnswer !== undefined && round.status === "waiting-for-partner" ? (
         <>
           <div className={styles.answerBox}>
             <p className={styles.answerLabel}>Your locked answer</p>
