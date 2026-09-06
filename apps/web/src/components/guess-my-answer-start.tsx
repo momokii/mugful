@@ -66,18 +66,32 @@ export function GuessMyAnswerStart({
     <section aria-busy={pending} className={styles.card}>
       <h2>Start a round</h2>
       <p className={styles.hint}>
-        Pick a mood, or let Mugful suggest something at random.
+        Mugful will suggest a prompt for both of you to answer privately. This
+        filter only picks <em>which mood</em> the suggestion comes from.
       </p>
       <div className={styles.field}>
-        <label htmlFor="round-category">Category (optional)</label>
-        <input
+        <label htmlFor="round-category">Mood / Category (optional)</label>
+        <select
           className={styles.input}
           id="round-category"
           onChange={(event) => setCategory(event.target.value)}
-          placeholder="daily-life"
-          type="text"
           value={category}
-        />
+        >
+          <option value="">All moods — random prompt</option>
+          <option value="daily-life">daily-life</option>
+          <option value="gratitude">gratitude</option>
+          <option value="deep">deep</option>
+          <option value="playful">playful</option>
+        </select>
+        <p className={styles.hint}>
+          Leave empty for a random prompt. Choose a mood to filter
+          superadmin-created prompts — e.g. <code>daily-life</code>. You don’t
+          type your own question here; you’ll answer the suggestion after you
+          press{" "}
+          <strong>Start this round</strong>. If you see “No prompts left,” that
+          mood has no active prompts — ask your superadmin to add more at{" "}
+          <code>/superadmin</code>.
+        </p>
       </div>
       {suggestion === undefined ? null : (
         <div className={styles.promptCard}>
